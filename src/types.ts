@@ -3,7 +3,7 @@ import { CustomEntity } from './inverters/dto/custom-entity';
 
 declare global {
   interface HTMLElementTagNameMap {
-    'sunsynk-power-flow-card': LovelaceCard;
+    'solar-solution': LovelaceCard;
   }
 }
 

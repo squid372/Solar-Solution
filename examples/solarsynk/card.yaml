@@ -1,5 +1,5 @@
 # ============================================================================
-#  Sunsynk Power Flow Card — drop-in preset for the SolarSynk V3 add-on
+#  Solar-Solution — drop-in card preset for the SolarSynk V3 add-on
 #  https://github.com/martinville/solarsynkv3
 #
 #  SolarSynk publishes entities named:
@@ -15,7 +15,7 @@
 #  string is pv_mppt0 and the first grid phase is grid_phase0.
 # ============================================================================
 
-type: custom:sunsynk-power-flow-card
+type: custom:solar-solution
 cardstyle: full
 
 # ---- Neon glow visual upgrade (the enhanced look) ----

@@ -16,8 +16,8 @@ export const validGridDisconnected = [
 ];
 export const validGridConnected = ['on', '1', 'on-grid', 'on grid', 'ongrid'];
 
-export const EDITOR_NAME = 'sunsynk-content-card-editor';
-export const MAIN_NAME = 'sunsynk-power-flow-card';
+export const EDITOR_NAME = 'solar-solution-editor';
+export const MAIN_NAME = 'solar-solution';
 
 export const enum SensorDeviceClass {
   DATE = 'date',

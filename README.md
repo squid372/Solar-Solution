@@ -8,6 +8,8 @@ and pairs out of the box with the [SolarSynk](examples/solarsynk/) add-on.
 
 [![Open your Home Assistant instance and open this repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=squid372&repository=Solar-Solution&category=plugin)
 
+![Solar-Solution power flow card with the neon glow theme](docs/images/solar-solution-glow.svg)
+
 ## Features
 
 - **Neon glow theme** (opt-in) — glowing flow lines with white-hot cores,
@@ -29,7 +31,7 @@ and pairs out of the box with the [SolarSynk](examples/solarsynk/) add-on.
 An optional, opt-in visual theme. Enable it with:
 
 ```yaml
-type: custom:sunsynk-power-flow-card
+type: custom:solar-solution
 cardstyle: full
 glow: true
 glow_intensity: 3 # 1 (subtle / lighter render) … 5 (intense)
@@ -65,7 +67,7 @@ glow-on-vs-off comparison across all themes — serve it with any static server
 ### Manual
 
 1. Create `www/solar-solution/` in your Home Assistant config directory.
-2. Copy `dist/sunsynk-power-flow-card.js` into it.
+2. Copy `dist/solar-solution.js` into it.
 3. Add it as a Dashboard resource (JavaScript Module). Append `?ver=x` to the
    URL and bump `x` after each update to bypass the browser cache.
 
@@ -83,7 +85,7 @@ Every option is documented in [`docs/configuration.md`](docs/configuration.md).
 
 ```bash
 npm install      # install dependencies
-npm run build    # bundle to dist/sunsynk-power-flow-card.js
+npm run build    # bundle to dist/solar-solution.js
 npm run watch    # rebuild on change
 ```
 

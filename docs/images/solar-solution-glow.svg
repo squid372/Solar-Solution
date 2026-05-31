@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 340" width="760" height="340" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif">
+  <defs>
+    <!-- Neon glow: blur a copy and merge under the source so the bloom takes the element's own colour -->
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glowSoft" x="-120%" y="-120%" width="340%" height="340%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6"/>
+    </filter>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#171c27"/>
+      <stop offset="1" stop-color="#0f131c"/>
+    </linearGradient>
+    <radialGradient id="aSolar" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ffa500" stop-opacity="0.5"/><stop offset="100%" stop-color="#ffa500" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="aGrid" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#5490c2" stop-opacity="0.5"/><stop offset="100%" stop-color="#5490c2" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="aBatt" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#ff5fa2" stop-opacity="0.45"/><stop offset="100%" stop-color="#ff5fa2" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Frosted glass card -->
+  <rect x="6" y="6" width="748" height="328" rx="18" fill="url(#panel)" stroke="#ffffff" stroke-opacity="0.12"/>
+  <!-- Ambient state aura -->
+  <g filter="url(#glowSoft)" opacity="0.85">
+    <ellipse cx="210" cy="110" rx="190" ry="120" fill="url(#aSolar)"/>
+    <ellipse cx="560" cy="250" rx="200" ry="130" fill="url(#aGrid)"/>
+    <ellipse cx="430" cy="120" rx="170" ry="110" fill="url(#aBatt)"/>
+  </g>
+
+  <!-- ===== Flow lines (colour + white-hot core) ===== -->
+  <!-- Solar -> Inverter -->
+  <path d="M 150 80 C 280 80 300 170 380 170" fill="none" stroke="#ffa500" stroke-width="4.5" stroke-linecap="round" filter="url(#glow)"/>
+  <path d="M 150 80 C 280 80 300 170 380 170" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity="0.6"/>
+  <!-- Battery -> Inverter -->
+  <path d="M 150 200 L 380 188" fill="none" stroke="#ff5fa2" stroke-width="4.5" stroke-linecap="round" filter="url(#glow)"/>
+  <path d="M 150 200 L 380 188" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity="0.6"/>
+  <!-- Grid -> Inverter -->
+  <path d="M 150 280 C 280 280 300 188 380 182" fill="none" stroke="#5490c2" stroke-width="4.5" stroke-linecap="round" filter="url(#glow)"/>
+  <path d="M 150 280 C 280 280 300 188 380 182" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity="0.6"/>
+  <!-- Inverter -> Home -->
+  <path d="M 470 175 L 610 175" fill="none" stroke="#5fb6ad" stroke-width="4.5" stroke-linecap="round" filter="url(#glow)"/>
+  <path d="M 470 175 L 610 175" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity="0.6"/>
+
+  <!-- Comet dots (colour + white-hot centre) -->
+  <g filter="url(#glow)">
+    <circle cx="285" cy="103" r="6" fill="#ffa500"/>
+    <circle cx="270" cy="194" r="6" fill="#ff5fa2"/>
+    <circle cx="270" cy="246" r="6" fill="#5490c2"/>
+    <circle cx="545" cy="175" r="6" fill="#5fb6ad"/>
+  </g>
+  <circle cx="285" cy="103" r="2.6" fill="#fff"/>
+  <circle cx="270" cy="194" r="2.6" fill="#fff"/>
+  <circle cx="270" cy="246" r="2.6" fill="#fff"/>
+  <circle cx="545" cy="175" r="2.6" fill="#fff"/>
+
+  <!-- ===== Nodes ===== -->
+  <!-- Solar -->
+  <g filter="url(#glow)"><circle cx="120" cy="80" r="22" fill="#ffa500"/></g>
+  <text x="120" y="36" fill="#ffd9a0" font-size="13" text-anchor="middle">Solar</text>
+  <!-- Battery + SOC ring (74%) -->
+  <g filter="url(#glow)" transform="rotate(-90 120 200)">
+    <circle cx="120" cy="200" r="30" fill="none" stroke="#ff5fa2" stroke-opacity="0.16" stroke-width="3"/>
+    <circle cx="120" cy="200" r="30" fill="none" stroke="#ff5fa2" stroke-width="3" stroke-linecap="round" pathLength="100" stroke-dasharray="74 100"/>
+  </g>
+  <g filter="url(#glow)"><circle cx="120" cy="200" r="22" fill="#ff5fa2"/></g>
+  <text x="120" y="252" fill="#ffc4dd" font-size="13" text-anchor="middle">Battery 74%</text>
+  <!-- Grid -->
+  <g filter="url(#glow)"><circle cx="120" cy="280" r="22" fill="#5490c2"/></g>
+  <text x="120" y="318" fill="#bcd6ef" font-size="13" text-anchor="middle">Grid</text>
+  <!-- Inverter -->
+  <g filter="url(#glow)"><rect x="380" y="140" width="70" height="70" rx="12" fill="#2a3142" stroke="#9fb0c9" stroke-opacity="0.5"/></g>
+  <text x="415" y="179" fill="#dfe7f2" font-size="12" text-anchor="middle">Inverter</text>
+  <!-- Home / Load -->
+  <g filter="url(#glow)"><circle cx="640" cy="175" r="24" fill="#5fb6ad"/></g>
+  <text x="640" y="222" fill="#bdeae3" font-size="13" text-anchor="middle">Home</text>
+</svg>

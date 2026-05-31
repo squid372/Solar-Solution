@@ -48,11 +48,11 @@ import {
 import { icons } from './helpers/icons';
 
 console.groupCollapsed(
-  `%c ⚡ SUNSYNK-POWER-FLOW-CARD %c ${localize('common.version')}: ${CARD_VERSION} `,
+  `%c ⚡ SOLAR-SOLUTION %c ${localize('common.version')}: ${CARD_VERSION} `,
   'color: orange; font-weight: bold; background: black',
   'color: white; font-weight: bold; background: dimgray',
 );
-console.log('Readme:', 'https://github.com/slipx06/sunsynk-power-flow-card');
+console.log('Readme:', 'https://github.com/squid372/Solar-Solution');
 console.groupEnd();
 
 @customElement(MAIN_NAME)
@@ -3117,8 +3117,8 @@ export class SunsynkPowerFlowCard extends LitElement {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 (window as any).customCards.push({
-  type: 'sunsynk-power-flow-card',
-  name: 'Sunsynk Power Flow Card',
+  type: 'solar-solution',
+  name: 'Solar-Solution',
   preview: true,
   description: localize('common.description'),
   configurable: true,

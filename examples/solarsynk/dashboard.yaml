@@ -15,7 +15,7 @@ views:
     sections:
       - type: grid
         cards:
-          - type: custom:sunsynk-power-flow-card
+          - type: custom:solar-solution
             cardstyle: full
             glow: true
             glow_intensity: 3
