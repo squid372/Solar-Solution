@@ -56,26 +56,85 @@ respected (the moving extras are dropped and CSS animations are paused).
 glow-on-vs-off comparison across all themes — serve it with any static server
 (e.g. `npx http-server demo`) and open `index.html`.
 
-## Installation
+## Installation & setup
 
-### HACS (recommended)
+Getting the card running is **three steps**: install the file, register it as a
+dashboard resource, then add the card with your entities. Step 2 is the one most
+people miss — if you skip it you'll see **"Custom element doesn't exist:
+solar-solution"**.
 
-1. In HACS, open the menu → **Custom repositories**.
-2. Add `https://github.com/squid372/Solar-Solution` with category **Dashboard**.
-3. Search for **Solar-Solution** and install it, or use the button above.
+### Step 1 — Install the card file
 
-### Manual
+**HACS (recommended)**
 
-1. Create `www/solar-solution/` in your Home Assistant config directory.
-2. Copy `dist/solar-solution.js` into it.
-3. Add it as a Dashboard resource (JavaScript Module). Append `?ver=x` to the
-   URL and bump `x` after each update to bypass the browser cache.
+1. HACS → top-right menu (⋮) → **Custom repositories**.
+2. Repository: `https://github.com/squid372/Solar-Solution` — Category: **Dashboard**. Add.
+3. Find **Solar-Solution** in HACS → **Download**.
+
+**Manual**
+
+1. Copy `dist/solar-solution.js` into `config/www/solar-solution/` (create the folder).
+2. Continue to Step 2 to register it (HACS usually does this for you; manual installs must do it themselves).
+
+### Step 2 — Register the dashboard resource ⚠️ required
+
+Go to **Settings → Dashboards → top-right menu (⋮) → Resources → + Add resource**, then:
+
+| Field | HACS install | Manual install |
+| --- | --- | --- |
+| **URL** | `/hacsfiles/solar-solution/solar-solution.js` | `/local/solar-solution/solar-solution.js` |
+| **Type** | JavaScript Module | JavaScript Module |
+
+> If you don't see the **Resources** tab, enable **Advanced Mode** in your user
+> profile (top-left avatar → toggle *Advanced Mode*). After adding the resource,
+> do a hard refresh (**Ctrl/Cmd + Shift + R**).
+
+### Step 3 — Add the card
+
+Edit a dashboard → **+ Add Card** → **Manual**, and paste this. **Then change
+every `sensor.*` value to your own entity IDs** (find them in
+*Developer Tools → States*). This is the only part you must edit:
+
+```yaml
+type: custom:solar-solution
+cardstyle: full # full | lite | compact
+glow: true # optional neon theme — set false for the classic look
+inverter:
+  model: sunsynk # sunsynk | deye | solis | goodwe | lux | ...
+battery:
+  shutdown_soc: 20 # required when show_battery is on
+solar:
+  mppts: 1 # required when show_solar is on — number of PV strings
+grid: {}
+entities:
+  # 👇 REPLACE each sensor.* below with YOUR Home Assistant entity IDs 👇
+  inverter_power_175: sensor.inverter_power
+  battery_soc_184: sensor.battery_soc
+  battery_power_190: sensor.battery_power
+  pv1_power_186: sensor.pv1_power
+  grid_power_169: sensor.grid_power
+```
+
+Don't have solar or a battery? Add `show_solar: false` and/or
+`show_battery: false` at the top level to skip those sections (and their
+required attributes).
 
 ## Use with the SolarSynk add-on
 
 If you use the SolarSynk add-on to pull your inverter data into Home Assistant,
 a ready-to-use, pre-mapped card preset (with the glow theme enabled) lives in
-[`examples/solarsynk/`](examples/solarsynk/) — just replace `YOURSERIAL` and paste it in.
+[`examples/solarsynk/`](examples/solarsynk/) — replace `YOURSERIAL` and paste it in.
+
+## Troubleshooting
+
+| Symptom | Fix |
+| --- | --- |
+| **"Custom element doesn't exist: solar-solution"** | The resource (Step 2) isn't registered, or the browser cached the old page. Add the resource, then hard-refresh (Ctrl/Cmd+Shift+R). After an update, append `?v=2` to the resource URL and bump it. |
+| **"No battery attributes defined"** | Add a `battery:` section with `shutdown_soc`, or set `show_battery: false`. |
+| **"No solar attributes defined" / "include the solar mppts"** | Add a `solar:` section with `mppts: <1-6>`, or set `show_solar: false`. |
+| **"Please include the day_… attributes"** | You turned on a `show_daily*` option but didn't map its `day_*` entity. Map it or set the `show_daily*` option back to `false`. |
+| **Card loads but values are blank / "unavailable"** | Your `sensor.*` entity IDs are wrong. Check exact IDs in *Developer Tools → States*. |
+| **Glow theme looks flat** | It's opt-in: set `glow: true`. It shows best on dark themes. |
 
 ## Configuration
 
