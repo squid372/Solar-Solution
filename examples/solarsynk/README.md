@@ -44,10 +44,11 @@ the card's entity slots so the card works out of the box.
 | Card slot | SolarSynk sensor (`…_<name>`) |
 |-----------|-------------------------------|
 | `inverter_power_175` | `inverter_power` |
+| `inverter_status_59` | `status` |
 | `inverter_voltage_154` | `inverter_voltager_phase_0` |
 | `inverter_current_164` | `inverter_current_phase_0` |
 | `load_frequency_192` | `load_frequency` |
-| `grid_connected_status_194` | `grid_status` |
+| `grid_connected_status_194` | `gridsignal` |
 | `dc_transformer_temp_90` | `inverter_dc_temperature` |
 | `radiator_temp_91` | `inverter_ac_temperature` |
 | `battery_soc_184` | `battery_soc` |
