@@ -1,8 +1,12 @@
-# SolarSynk V3 → Sunsynk Power Flow Card
+# SolarSynk V3 → Solar-Solution
 
 A ready-to-use preset that wires the [SolarSynk V3 add-on](https://github.com/martinville/solarsynkv3)
 (which pulls your Sunsynk cloud data into Home Assistant) directly into the
-Sunsynk Power Flow Card — with the new **neon glow** visuals enabled.
+Solar-Solution card — with the **neon glow** visuals enabled.
+
+> ✅ The entity names below are validated against a **real SolarSynk V3** install.
+> **The only thing you change is your serial number** — everything else maps
+> automatically. No hand-mapping each sensor.
 
 ## How it works
 
@@ -54,8 +58,8 @@ the card's entity slots so the card works out of the box.
 | `battery_soc_184` | `battery_soc` |
 | `battery_power_190` | `battery_power` |
 | `battery_voltage_183` | `battery_voltage` |
-| `battery_current_191` | `battery_current` |
-| `battery_temp_182` | `battery_temperature` |
+| `battery_current_191` | `battery_bms_current` (some inverters: `battery_current`) |
+| `battery_temp_182` | `battery_bms_temperature` (some inverters: `battery_temperature`) |
 | `battery_status` | `battery_status` |
 | `day_battery_charge_70` | `battery_etoday_charge` |
 | `day_battery_discharge_71` | `battery_etoday_discharge` |
@@ -68,15 +72,17 @@ the card's entity slots so the card works out of the box.
 | `pv1_voltage_109` … `pv6_voltage` | `pv_mppt0_voltage` … `pv_mppt5_voltage` |
 | `pv1_current_110` … `pv6_current` | `pv_mppt0_current` … `pv_mppt5_current` |
 | `day_pv_energy_108` | `pv_etoday` |
-| `pv_total` | `pv_pac` |
 | `total_pv_generation` | `pv_etotal` |
-| `grid_power_169` | `grid_pac` |
-| `grid_ct_power_172` / `grid_ct_power_total` | `grid_limiter_total_power` |
+| `grid_power_169` / `grid_ct_power_172` | `grid_pac` |
 | `grid_voltage` | `grid_phase0_voltage` |
-| `day_grid_import_76` | `grid_etoday_from` |
-| `day_grid_export_77` | `grid_etoday_to` |
+| `day_grid_import_76` | `grid_etoday_from` * |
+| `day_grid_export_77` | `grid_etoday_to` * |
 | `essential_power` | `load_total_power` |
 | `day_load_energy_84` | `load_daily_used` |
+
+\* SolarSynk's `_from` = imported, `_to` = exported. If your daily buy/sell read
+swapped, swap `_from` and `_to`. `pv_total` is intentionally unmapped — the card
+sums the mapped `pv1…pvN` strings instead.
 
 ### No SolarSynk equivalent
 

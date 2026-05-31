@@ -74,8 +74,8 @@ entities:
   battery_soc_184: sensor.solarsynkv3_YOURSERIAL_battery_soc
   battery_power_190: sensor.solarsynkv3_YOURSERIAL_battery_power
   battery_voltage_183: sensor.solarsynkv3_YOURSERIAL_battery_voltage
-  battery_current_191: sensor.solarsynkv3_YOURSERIAL_battery_current
-  battery_temp_182: sensor.solarsynkv3_YOURSERIAL_battery_temperature
+  battery_current_191: sensor.solarsynkv3_YOURSERIAL_battery_bms_current # some inverters: _battery_current
+  battery_temp_182: sensor.solarsynkv3_YOURSERIAL_battery_bms_temperature # some inverters: _battery_temperature
   battery_status: sensor.solarsynkv3_YOURSERIAL_battery_status
   day_battery_charge_70: sensor.solarsynkv3_YOURSERIAL_battery_etoday_charge
   day_battery_discharge_71: sensor.solarsynkv3_YOURSERIAL_battery_etoday_discharge
@@ -108,14 +108,15 @@ entities:
   pv6_voltage: sensor.solarsynkv3_YOURSERIAL_pv_mppt5_voltage
   pv6_current: sensor.solarsynkv3_YOURSERIAL_pv_mppt5_current
   day_pv_energy_108: sensor.solarsynkv3_YOURSERIAL_pv_etoday
-  pv_total: sensor.solarsynkv3_YOURSERIAL_pv_pac
   total_pv_generation: sensor.solarsynkv3_YOURSERIAL_pv_etotal
+  # (pv_total is intentionally omitted — the card sums the mapped pv1..pvN strings)
 
   # ---- Grid ----
   grid_power_169: sensor.solarsynkv3_YOURSERIAL_grid_pac
-  grid_ct_power_172: sensor.solarsynkv3_YOURSERIAL_grid_limiter_total_power
-  grid_ct_power_total: sensor.solarsynkv3_YOURSERIAL_grid_limiter_total_power
+  grid_ct_power_172: sensor.solarsynkv3_YOURSERIAL_grid_pac
   grid_voltage: sensor.solarsynkv3_YOURSERIAL_grid_phase0_voltage
+  # Daily buy/sell: SolarSynk's _from = imported, _to = exported.
+  # If your buy/sell read swapped, swap _from and _to below.
   day_grid_import_76: sensor.solarsynkv3_YOURSERIAL_grid_etoday_from
   day_grid_export_77: sensor.solarsynkv3_YOURSERIAL_grid_etoday_to
 
