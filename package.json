@@ -1,7 +1,7 @@
 {
   "name": "sunsynk-power-flow-card",
   "version": "7.3.3",
-  "description": "A customizable Home Assistant card to emulate the Sunsynk System flow that's displayed on the Inverter screen.",
+  "description": "Solar-Solution — a customizable, animated Home Assistant card with an optional neon glow theme for visualizing solar / battery / grid power flow.",
   "main": "sunsynk-power-flow-card.js",
   "prettier": {
     "singleQuote": true,
@@ -24,14 +24,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/slipx06/sunsynk-power-flow-card.git"
+    "url": "git+https://github.com/squid372/Solar-Solution.git"
   },
-  "author": "slipx06 <slipx06@users.noreply.github.com>",
+  "author": "squid372",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/slipx06/sunsynk-power-flow-card/issues"
+    "url": "https://github.com/squid372/Solar-Solution/issues"
   },
-  "homepage": "https://github.com/slipx06/sunsynk-power-flow-card#readme",
+  "homepage": "https://github.com/squid372/Solar-Solution#readme",
   "dependencies": {
     "@lit-labs/scoped-registry-mixin": "^1.0.3",
     "custom-card-helpers": "^1.9.0",

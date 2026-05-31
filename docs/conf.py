@@ -7,10 +7,10 @@ import json
 
 sys.path.insert(0, os.path.abspath(".."))
 
-project = "sunsynk-power-flow-card"
+project = "Solar-Solution"
 slug = re.sub(r"\W+", "-", project.lower())
-copyright = "2024, slipx06"
-author = "slipx06"
+copyright = "2026, squid372"
+author = "squid372"
 
 # Get version from package.json file
 with open('../package.json') as json_file:
@@ -102,7 +102,7 @@ texinfo_documents = [
     (
         master_doc,
         author,
-        "slipx06",
+        "squid372",
         "",
         "Miscellaneous",
     ),

@@ -1,40 +1,32 @@
-# Sunsynk Power Flow Card
+# Solar-Solution
 
-An animated Home Assistant card to emulate the power flow that's shown on the Sunsynk Inverter screen. You can use this to display data from many inverters e.g. Sunsynk, Deye, Solis, Lux, FoxESS, Goodwe, Huawei etc as long as you have the required sensor data. See the [wiki](https://github.com/slipx06/sunsynk-power-flow-card/wiki) for integration methods and examples.
+An animated Home Assistant dashboard card for visualizing solar, battery, grid
+and load power flow — with an optional **neon glow** theme that makes the card
+really stand out. It works with many inverter brands (Sunsynk, Deye, Solis, Lux,
+FoxESS, Goodwe, Huawei and more) as long as you have the required sensor data,
+and pairs out of the box with the [SolarSynk](examples/solarsynk/) add-on.
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=slipx06&repository=sunsynk-power-flow-card&category=plugin)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/slipx06/sunsynk-power-flow-card?style=for-the-badge)
-[![Community Forum](https://img.shields.io/badge/community-forum-brightgreen.svg?style=for-the-badge)](https://community.home-assistant.io/t/sunsynk-deye-inverter-power-flow-card/562933/1)
-<a href="https://www.buymeacoffee.com/slipx" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="28" width="120"></a>
-
-## Documentation
-
-Refer to [https://slipx06.github.io/sunsynk-power-flow-card/index.html](https://slipx06.github.io/sunsynk-power-flow-card/index.html)
+[![Open your Home Assistant instance and open this repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=squid372&repository=Solar-Solution&category=plugin)
 
 ## Features
 
-- Option to switch between three card styles: `compact`, `lite` or `full`.
-- Optional **neon glow theme** (`glow: true`): glowing flow lines with white-hot cores, comet-trail dots, energy pulse waves, pulsing nodes, a frosted-glass card with a live ambient state glow (tinted to the dominant flow and scaled to system activity), and a charging-aware battery state-of-charge ring. Choose a `glow_theme` (`neon`, `ice`, `fire`, `aurora`, `mono`). Opt-in — the classic look is unchanged by default.
-- Wide view for 16:9 layout.
-- Animated power flow based on positive/negative/zero sensor values with configurable dynamic speed. (Supports inverted battery, AUX and grid power).
-- Dynamic battery image based on SOC.
-- Grid connected status.
-- Configurable battery size and shutdown SOC to calculate and display remaining battery runtime based on current battery usage and system time slot setting i.e. SOC, Grid Charge. Can be toggled off.
-- Daily Totals that can be toggled on or off.
-- Hide all solar data if not installed or specify number of mppts in use. Set custom MPPT labels.
-- "Use Timer" setting and "Energy Pattern" setting (Priority Load or Priority Battery) shown as dynamic icons, with the ability to hide if not required. If setup as switches can be toggled by clicking on the card.
-- Card can be scaled by setting the card_height and card_width attributes.
-- AUX and Non-essential can be hidden from the full card or assigned configurable labels.
-- Customisable - Change colours and images.
-- Most entities can be clicked to show more-info dialog.
-- Optional data points include self sufficiency and ratio percentages, battery temperature, AC and DC temperature.
-- Display additional non-essential, essential and AUX loads.
-- Display energy cost per kWh and solar sell status.
-- Select your inverter model for custom inverter status and battery status messages i.e. Sunsynk, Lux, Goodwe, Solis.
+- **Neon glow theme** (opt-in) — glowing flow lines with white-hot cores,
+  comet-trail dots, energy pulse waves, pulsing nodes, a frosted-glass card with
+  a live ambient aura, charging-aware battery state-of-charge rings, and five
+  colour themes. See [below](#neon-glow-theme).
+- Three card styles — `compact`, `lite` or `full`, plus a wide 16:9 layout.
+- Animated power flow with configurable, power-reactive speed (supports inverted
+  battery / AUX / grid power).
+- Dynamic battery image based on SOC, with optional runtime-to-shutdown estimate.
+- Up to **6 MPPT** solar strings and **dual-battery** support.
+- Daily totals, self-sufficiency / ratio, temperatures, energy cost and more —
+  each toggleable.
+- Dynamic colours, custom colours and images, and clickable entities (more-info).
+- Per-inverter status and battery messages (Sunsynk, Lux, Goodwe, Solis, …).
 
 ## Neon glow theme
 
-An optional, opt-in visual theme that makes the card stand out. Enable it with:
+An optional, opt-in visual theme. Enable it with:
 
 ```yaml
 type: custom:sunsynk-power-flow-card
@@ -49,8 +41,8 @@ What it adds (all off by default, so the classic look is untouched):
 - Glowing flow lines with white-hot cores and comet-trail dots
 - Energy pulse waves that sweep each active line
 - Pulsing node halos and a softly glowing solar node
-- A frosted-glass card with a **live ambient aura** tinted to the dominant
-  flow (solar / grid / battery) and scaled to system activity
+- A frosted-glass card with a **live ambient aura** tinted to the dominant flow
+  (solar / grid / battery) and scaled to system activity
 - A charging-aware **battery state-of-charge ring** (both batteries)
 - Five colour themes via `glow_theme`
 
@@ -62,54 +54,40 @@ respected (the moving extras are dropped and CSS animations are paused).
 glow-on-vs-off comparison across all themes — serve it with any static server
 (e.g. `npx http-server demo`) and open `index.html`.
 
-## Screenshots
-
-_Compact Version_
-
-![image](https://github.com/slipx06/sunsynk-power-flow-card/assets/7227275/b1e437a8-d1f7-4d6a-a549-1cc908950002)
-![image](https://github.com/slipx06/sunsynk-power-flow-card/assets/7227275/49c499c5-9d2b-43e7-8f5d-5b9da5e07fb9)
-
-_Lite Version_
-
-![image](https://github.com/slipx06/sunsynk-power-flow-card/assets/7227275/d25c621c-2607-445f-b3a3-865930387a05)
-![image](https://github.com/slipx06/sunsynk-power-flow-card/assets/7227275/5a9078ee-7375-4f1c-affa-6fe291d62f8a)
-![image](https://github.com/slipx06/sunsynk-power-flow-card/assets/7227275/73d6fae3-3e6b-4891-acc2-deb29156cd2d)
-![image](https://github.com/slipx06/sunsynk-power-flow-card/assets/7227275/54ae290d-aa5c-428e-8a00-2a75e11c2de8)
-
-_Full Version_
-
-![image](https://github.com/slipx06/sunsynk-power-flow-card/assets/7227275/fdcce257-e7b5-4874-926c-17e911e83eba)
-![image](https://github.com/slipx06/sunsynk-power-flow-card/assets/7227275/12af5b02-c456-4685-a50f-bd0044b9e9b0)
-
-_Wide Full Version (2 batteries)_
-
-![{4D3F02C5-3DC5-4995-AD99-7478E6DE5557}](https://github.com/user-attachments/assets/af169593-c73f-469e-bc8b-62fb72b8af43)
-
-_Wide Lite Version (2 batteries)_
-
-![{F448EFB0-5549-470B-BAE0-13F9DF2E3769}](https://github.com/user-attachments/assets/100c80d2-1d5f-46f4-ae83-f48c923cadf6)
-
-_Wide Compact Version (2 batteries)_
-
-![{B8CBC3C3-0E0A-4E37-B489-C41CB8EA4E7E}](https://github.com/user-attachments/assets/1cd5508d-33a0-4df9-9665-5a4d9e753178)
-
 ## Installation
 
-The card can be installed via HACS (recommended) or manually.
+### HACS (recommended)
 
-### Installation using HACS
+1. In HACS, open the menu → **Custom repositories**.
+2. Add `https://github.com/squid372/Solar-Solution` with category **Dashboard**.
+3. Search for **Solar-Solution** and install it, or use the button above.
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Default-blue.svg)](https://github.com/custom-components/hacs)
+### Manual
 
-1. Install HACS.
-2. Search & Install sunsynk-power-flow-card or click the button below.
+1. Create `www/solar-solution/` in your Home Assistant config directory.
+2. Copy `dist/sunsynk-power-flow-card.js` into it.
+3. Add it as a Dashboard resource (JavaScript Module). Append `?ver=x` to the
+   URL and bump `x` after each update to bypass the browser cache.
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=slipx06&repository=sunsynk-power-flow-card&category=plugin)
+## Use with the SolarSynk add-on
 
-### Manual Installation
+If you use the SolarSynk add-on to pull your inverter data into Home Assistant,
+a ready-to-use, pre-mapped card preset (with the glow theme enabled) lives in
+[`examples/solarsynk/`](examples/solarsynk/) — just replace `YOURSERIAL` and paste it in.
 
-1. Create a new directory under `www` and name it `sunsynk-power-flow-card` e.g `www/sunsynk-power-flow-card/`.
-2. Copy the `sunsynk-power-flow-card.js` into the directory.
-3. Add the resource to your Dashboard. You can append the filename with a `?ver=x` and increment x each time you download a new version to force a reload and avoid using a cached version. It is also a good idea to clear your browser cache.
+## Configuration
 
-![image](https://user-images.githubusercontent.com/7227275/235441241-93ab0c7d-341d-428f-8ca8-60ec932dde2d.png)
+Every option is documented in [`docs/configuration.md`](docs/configuration.md).
+
+## Development
+
+```bash
+npm install      # install dependencies
+npm run build    # bundle to dist/sunsynk-power-flow-card.js
+npm run watch    # rebuild on change
+```
+
+## License
+
+MIT © 2026 squid372. Built on the open-source
+[Sunsynk Power Flow Card](https://github.com/slipx06/sunsynk-power-flow-card) (MIT).
