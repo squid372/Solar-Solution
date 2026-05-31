@@ -1387,7 +1387,7 @@ export const renderBatteryElements = (
             ? renderSocRing(
                 compactMode ? 251.875 : 271.875,
                 364.875,
-                46,
+                42,
                 data.stateBatterySoc?.toNum() ?? 0,
                 batteryColour,
                 data.stateBatterySoc?.isValid() ?? false,
@@ -1552,7 +1552,7 @@ export const renderBatteryElements = (
             ? renderSocRing(
                 271.875,
                 364.875,
-                46,
+                42,
                 data.stateBattery2Soc?.toNum() ?? 0,
                 battery2Colour,
                 data.stateBattery2Soc?.isValid() ?? false,

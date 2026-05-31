@@ -80,7 +80,7 @@ export const renderBatteryElements = (
         ${renderSocRing(
           115.5,
           336,
-          47,
+          44,
           data.stateBatterySoc?.toNum() ?? 0,
           batteryColour,
           data.stateBatterySoc?.isValid() ?? false,
@@ -253,7 +253,7 @@ export const renderBatteryElements = (
         ${renderSocRing(
           115.5,
           336,
-          47,
+          44,
           data.stateBattery2Soc?.toNum() ?? 0,
           battery2Colour,
           batteryCount === 2 && (data.stateBattery2Soc?.isValid() ?? false),

@@ -35,7 +35,7 @@ export function renderSocRing(
   // While charging, a short bright arc orbits the ring to convey inflow.
   const sweep = charging
     ? svg`<circle class="ss-soc-sweep" cx="${cx}" cy="${cy}" r="${r}" fill="none"
-				stroke="${color}" stroke-width="3" stroke-linecap="round"
+				stroke="${color}" stroke-width="2.5" stroke-linecap="round"
 				pathLength="100" stroke-dasharray="10 90"
 				style="transform-origin:${cx}px ${cy}px" />`
     : svg``;
@@ -44,9 +44,9 @@ export function renderSocRing(
 		<g class="ss-soc-ring${charging ? ' ss-soc-ring--charging' : ''}"
 			transform="rotate(-90 ${cx} ${cy})" pointer-events="none">
 			<circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
-				stroke="${color}" stroke-opacity="0.16" stroke-width="3" />
+				stroke="${color}" stroke-opacity="0.16" stroke-width="2.5" />
 			<circle class="ss-soc-arc" cx="${cx}" cy="${cy}" r="${r}" fill="none"
-				stroke="${color}" stroke-width="3" stroke-linecap="round"
+				stroke="${color}" stroke-width="2.5" stroke-linecap="round"
 				pathLength="100" stroke-dasharray="${pct} 100" />
 			${sweep}
 		</g>

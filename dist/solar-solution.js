@@ -294,11 +294,11 @@ function Me(e,t){return(t,a,o)=>((e,t,a)=>(a.configurable=!0,a.enumerable=!0,Ref
     0%,
     100% {
       stroke-opacity: 0.85;
-      stroke-width: 3;
+      stroke-width: 2.5;
     }
     50% {
       stroke-opacity: 1;
-      stroke-width: 3.6;
+      stroke-width: 3;
     }
   }
 
@@ -637,15 +637,15 @@ function Me(e,t){return(t,a,o)=>((e,t,a)=>(a.configurable=!0,a.enumerable=!0,Ref
             </animateMotion>
         </circle>`:W``}
     `};function ja(e,t,a,o,i,n=!0,r=!1){if(!_a.glow||!n)return W``;const s=Math.max(0,Math.min(100,Number.isFinite(o)?o:0)),l=r?W`<circle class="ss-soc-sweep" cx="${e}" cy="${t}" r="${a}" fill="none"
-				stroke="${i}" stroke-width="3" stroke-linecap="round"
+				stroke="${i}" stroke-width="2.5" stroke-linecap="round"
 				pathLength="100" stroke-dasharray="10 90"
 				style="transform-origin:${e}px ${t}px" />`:W``;return W`
 		<g class="ss-soc-ring${r?" ss-soc-ring--charging":""}"
 			transform="rotate(-90 ${e} ${t})" pointer-events="none">
 			<circle cx="${e}" cy="${t}" r="${a}" fill="none"
-				stroke="${i}" stroke-opacity="0.16" stroke-width="3" />
+				stroke="${i}" stroke-opacity="0.16" stroke-width="2.5" />
 			<circle class="ss-soc-arc" cx="${e}" cy="${t}" r="${a}" fill="none"
-				stroke="${i}" stroke-width="3" stroke-linecap="round"
+				stroke="${i}" stroke-width="2.5" stroke-linecap="round"
 				pathLength="100" stroke-dasharray="${s} 100" />
 			${l}
 		</g>
@@ -1250,7 +1250,7 @@ function Me(e,t){return(t,a,o)=>((e,t,a)=>(a.configurable=!0,a.enumerable=!0,Ref
         ${za("battery_power_total",120,282,!0,(!0!==n?"st14":"st4")+" st8",o,g?`${Oa.convertValue(e.batteryPowerTotal,r)||0}`:`${Oa.toNum(e.batteryPowerTotal||0,0)} ${Ye.WATT}`)}
       </svg>
       <svg id="battery1_icon" x="${2===a?"12.25%":"0%"}">
-        ${ja(115.5,336,47,e.stateBatterySoc?.toNum()??0,o,e.stateBatterySoc?.isValid()??!1,(t.battery?.invert_flow?s>0:s<0)&&!d)}
+        ${ja(115.5,336,44,e.stateBatterySoc?.toNum()??0,o,e.stateBatterySoc?.isValid()??!1,(t.battery?.invert_flow?s>0:s<0)&&!d)}
         <a
           href="#"
           @click=${e=>t.battery.navigate?Oa.handleNavigation(e,t.battery.navigate):null}
@@ -1333,7 +1333,7 @@ function Me(e,t){return(t,a,o)=>((e,t,a)=>(a.configurable=!0,a.enumerable=!0,Ref
         style="overflow: visible; display: ${2===a?"inline":"none"};"
         x="${2===a?"19%":"0%"}"
       >
-        ${ja(115.5,336,47,e.stateBattery2Soc?.toNum()??0,i,2===a&&(e.stateBattery2Soc?.isValid()??!1),(t.battery2?.invert_flow?l>0:l<0)&&!c)}
+        ${ja(115.5,336,44,e.stateBattery2Soc?.toNum()??0,i,2===a&&(e.stateBattery2Soc?.isValid()??!1),(t.battery2?.invert_flow?l>0:l<0)&&!c)}
         <a
           href="#"
           @click=${e=>t.battery2.navigate?Oa.handleNavigation(e,t.battery2.navigate):null}
@@ -2609,7 +2609,7 @@ function Me(e,t){return(t,a,o)=>((e,t,a)=>(a.configurable=!0,a.enumerable=!0,Ref
           style="overflow: visible;"
           x="${2===a?"-6.25%":"0%"}"
         >
-          ${1===a?ja(n?251.875:271.875,364.875,46,e.stateBatterySoc?.toNum()??0,o,e.stateBatterySoc?.isValid()??!1,(t.battery?.invert_flow?(e.batteryPower??0)>0:(e.batteryPower??0)<0)&&!e.isFloating):""}
+          ${1===a?ja(n?251.875:271.875,364.875,42,e.stateBatterySoc?.toNum()??0,o,e.stateBatterySoc?.isValid()??!1,(t.battery?.invert_flow?(e.batteryPower??0)>0:(e.batteryPower??0)<0)&&!e.isFloating):""}
           ${Va("battery_temp_182",n?205:250,n?332:324.5,!e.stateBatteryTemp.isValid()||n&&2===a,t.entities?.battery_temp_182?"st3 left-align":"st12",o,`${Oa.formatNumberLocale(e.stateBatteryTemp.toNum(1),1)}°`,e=>Oa.handlePopup(e,t.entities.battery_temp_182),!0)}
           ${Va("battery_soh",n?205:250,n?332:324.5,!e.stateBatterySOH.isValid()||t.entities?.battery_temp_182||n&&2===a,t.entities?.battery_soh?"st3 left-align":"st12",o,`${e.stateBatterySOH.toNum(0)}%`,e=>Oa.handlePopup(e,t.entities.battery_soh),!0)}
           <circle
@@ -2698,7 +2698,7 @@ function Me(e,t){return(t,a,o)=>((e,t,a)=>(a.configurable=!0,a.enumerable=!0,Ref
           style="overflow: visible; display: ${t.wide&&2===a?"inline":"none"};"
           x="0.75%"
         >
-          ${t.wide&&2===a?ja(271.875,364.875,46,e.stateBattery2Soc?.toNum()??0,i,e.stateBattery2Soc?.isValid()??!1,(t.battery2?.invert_flow?(e.battery2Power??0)>0:(e.battery2Power??0)<0)&&!e.isFloating2):""}
+          ${t.wide&&2===a?ja(271.875,364.875,42,e.stateBattery2Soc?.toNum()??0,i,e.stateBattery2Soc?.isValid()??!1,(t.battery2?.invert_flow?(e.battery2Power??0)>0:(e.battery2Power??0)<0)&&!e.isFloating2):""}
           ${Va("battery2_temp_182",250,324.5,!e.stateBattery2Temp.isValid()||n&&2===a,t.entities?.battery2_temp_182?"st3 left-align":"st12",i,`${Oa.formatNumberLocale(e.stateBattery2Temp.toNum(1),1)}°`,e=>Oa.handlePopup(e,t.entities.battery2_temp_182),!0)}
           ${Va("battery_soh",250,324.5,!e.stateBattery2SOH.isValid()||t.entities?.battery2_temp_182||n&&2===a,t.entities?.battery2_soh?"st3 left-align":"st12",i,`${e.stateBattery2SOH.toNum(0)}%`,e=>Oa.handlePopup(e,t.entities.battery2_soh),!0)}
           <circle

@@ -248,11 +248,11 @@ export const styles: CSSResultGroup = css`
     0%,
     100% {
       stroke-opacity: 0.85;
-      stroke-width: 3;
+      stroke-width: 2.5;
     }
     50% {
       stroke-opacity: 1;
-      stroke-width: 3.6;
+      stroke-width: 3;
     }
   }
 
