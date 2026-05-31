@@ -44,6 +44,8 @@ views:
               inverter_current_164: sensor.solarsynkv3_YOURSERIAL_inverter_current_phase_0
               inverter_power_175: sensor.solarsynkv3_YOURSERIAL_inverter_power
               inverter_status_59: sensor.solarsynkv3_YOURSERIAL_status
+              priority_load_243: sensor.solarsynkv3_YOURSERIAL_energymode
+              use_timer_248: sensor.solarsynkv3_YOURSERIAL_sysworkmode
               load_frequency_192: sensor.solarsynkv3_YOURSERIAL_load_frequency
               grid_connected_status_194: sensor.solarsynkv3_YOURSERIAL_gridsignal
               dc_transformer_temp_90: sensor.solarsynkv3_YOURSERIAL_inverter_dc_temperature

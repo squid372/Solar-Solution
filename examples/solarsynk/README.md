@@ -49,6 +49,8 @@ the card's entity slots so the card works out of the box.
 |-----------|-------------------------------|
 | `inverter_power_175` | `inverter_power` |
 | `inverter_status_59` | `status` |
+| `priority_load_243` | `energymode` † |
+| `use_timer_248` | `sysworkmode` † |
 | `inverter_voltage_154` | `inverter_voltager_phase_0` |
 | `inverter_current_164` | `inverter_current_phase_0` |
 | `load_frequency_192` | `load_frequency` |
@@ -86,6 +88,10 @@ the card's entity slots so the card works out of the box.
 \* SolarSynk's `_from` = imported, `_to` = exported. If your daily buy/sell read
 swapped, swap `_from` and `_to`. `pv_total` is intentionally unmapped — the card
 sums the mapped `pv1…pvN` strings instead.
+
+† `energymode` / `sysworkmode` are inverter integers driving the Energy-Pattern
+and Use-Timer icons. If an icon shows the wrong state, swap these two — or remove
+both lines to hide the icons.
 
 ### Not available from SolarSynk
 
