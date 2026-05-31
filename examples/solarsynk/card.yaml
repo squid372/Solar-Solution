@@ -77,6 +77,7 @@ entities:
   battery_current_191: sensor.solarsynkv3_YOURSERIAL_battery_bms_current # some inverters: _battery_current
   battery_temp_182: sensor.solarsynkv3_YOURSERIAL_battery_bms_temperature # some inverters: _battery_temperature
   battery_status: sensor.solarsynkv3_YOURSERIAL_battery_status
+  battery_rated_capacity: sensor.solarsynkv3_YOURSERIAL_battery_capacity # Ah
   day_battery_charge_70: sensor.solarsynkv3_YOURSERIAL_battery_etoday_charge
   day_battery_discharge_71: sensor.solarsynkv3_YOURSERIAL_battery_etoday_discharge
 
@@ -109,6 +110,8 @@ entities:
   pv6_current: sensor.solarsynkv3_YOURSERIAL_pv_mppt5_current
   day_pv_energy_108: sensor.solarsynkv3_YOURSERIAL_pv_etoday
   total_pv_generation: sensor.solarsynkv3_YOURSERIAL_pv_etotal
+  solar_sell_247: sensor.solarsynkv3_YOURSERIAL_solarsell # solar-sell on/off status
+  max_sell_power: sensor.solarsynkv3_YOURSERIAL_solarmaxsellpower
   # (pv_total is intentionally omitted — the card sums the mapped pv1..pvN strings)
 
   # ---- Grid ----

@@ -61,6 +61,7 @@ the card's entity slots so the card works out of the box.
 | `battery_current_191` | `battery_bms_current` (some inverters: `battery_current`) |
 | `battery_temp_182` | `battery_bms_temperature` (some inverters: `battery_temperature`) |
 | `battery_status` | `battery_status` |
+| `battery_rated_capacity` | `battery_capacity` (Ah) |
 | `day_battery_charge_70` | `battery_etoday_charge` |
 | `day_battery_discharge_71` | `battery_etoday_discharge` |
 | `battery2_soc_184` | `battery_soc2` |
@@ -73,6 +74,8 @@ the card's entity slots so the card works out of the box.
 | `pv1_current_110` … `pv6_current` | `pv_mppt0_current` … `pv_mppt5_current` |
 | `day_pv_energy_108` | `pv_etoday` |
 | `total_pv_generation` | `pv_etotal` |
+| `solar_sell_247` | `solarsell` |
+| `max_sell_power` | `solarmaxsellpower` |
 | `grid_power_169` / `grid_ct_power_172` | `grid_pac` |
 | `grid_voltage` | `grid_phase0_voltage` |
 | `day_grid_import_76` | `grid_etoday_from` * |
@@ -84,12 +87,20 @@ the card's entity slots so the card works out of the box.
 swapped, swap `_from` and `_to`. `pv_total` is intentionally unmapped — the card
 sums the mapped `pv1…pvN` strings instead.
 
-### No SolarSynk equivalent
+### Not available from SolarSynk
 
-Some card slots have no matching SolarSynk sensor and are intentionally left
-unmapped: `battery2_power_190` (SolarSynk exposes no `battery_power2`),
-`nonessential_power`, and the AUX load entities. The card derives or hides
-these as needed.
+These card features need data SolarSynk doesn't publish, so they're left unmapped
+(the card derives or hides them):
+
+- **AUX** output (`aux_power_166`, `day_aux_energy`, `aux_load*`) — Sunsynk AUX port isn't exposed.
+- **Non-essential / per-circuit loads** (`nonessential_power`, `essential_load1…6`, `non_essential_load1…3`).
+- **Battery health** (`battery_soh`) and **`battery2_power_190`** (no `battery_power2`).
+- **Energy cost / prepaid** (`energy_cost_buy/sell`, `prepaid_units`).
+- **Environment temp**, **solar forecast** (`remaining_solar`).
+
+Everything SolarSynk *does* publish is mapped above, so the card shows the full
+flow plus per-MPPT, both-battery, grid, temps, daily totals, solar-sell and
+self-sufficiency.
 
 ## Turning the glow off
 

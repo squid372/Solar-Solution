@@ -53,6 +53,8 @@ views:
               battery_voltage_183: sensor.solarsynkv3_YOURSERIAL_battery_voltage
               battery_current_191: sensor.solarsynkv3_YOURSERIAL_battery_bms_current
               battery_temp_182: sensor.solarsynkv3_YOURSERIAL_battery_bms_temperature
+              battery_status: sensor.solarsynkv3_YOURSERIAL_battery_status
+              battery_rated_capacity: sensor.solarsynkv3_YOURSERIAL_battery_capacity
               day_battery_charge_70: sensor.solarsynkv3_YOURSERIAL_battery_etoday_charge
               day_battery_discharge_71: sensor.solarsynkv3_YOURSERIAL_battery_etoday_discharge
               pv1_power_186: sensor.solarsynkv3_YOURSERIAL_pv_mppt0_power
@@ -63,6 +65,8 @@ views:
               pv2_current_112: sensor.solarsynkv3_YOURSERIAL_pv_mppt1_current
               day_pv_energy_108: sensor.solarsynkv3_YOURSERIAL_pv_etoday
               total_pv_generation: sensor.solarsynkv3_YOURSERIAL_pv_etotal
+              solar_sell_247: sensor.solarsynkv3_YOURSERIAL_solarsell
+              max_sell_power: sensor.solarsynkv3_YOURSERIAL_solarmaxsellpower
               grid_power_169: sensor.solarsynkv3_YOURSERIAL_grid_pac
               grid_ct_power_172: sensor.solarsynkv3_YOURSERIAL_grid_pac
               grid_voltage: sensor.solarsynkv3_YOURSERIAL_grid_phase0_voltage
