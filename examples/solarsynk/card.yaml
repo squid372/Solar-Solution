@@ -1,0 +1,115 @@
+# ============================================================================
+#  Sunsynk Power Flow Card — drop-in preset for the SolarSynk V3 add-on
+#  https://github.com/martinville/solarsynkv3
+#
+#  SolarSynk publishes entities named:
+#      sensor.solarsynkv3_<SERIAL>_<name>
+#
+#  HOW TO USE:
+#  1. Find your inverter serial (the SolarSynk add-on config / entity names).
+#  2. Replace every "YOURSERIAL" below with that serial. Quick way:
+#       sed 's/YOURSERIAL/1234567890/g' card.yaml > my-card.yaml
+#  3. Paste into a Manual card on your dashboard (or see dashboard.yaml).
+#
+#  NOTE: SolarSynk indexes MPPT strings and phases from 0, so the first PV
+#  string is pv_mppt0 and the first grid phase is grid_phase0.
+# ============================================================================
+
+type: custom:sunsynk-power-flow-card
+cardstyle: full
+
+# ---- Neon glow visual upgrade (the enhanced look) ----
+glow: true
+glow_intensity: 3
+glow_theme: neon # neon | ice | fire | aurora | mono
+
+large_font: false
+show_solar: true
+show_battery: true
+show_grid: true
+
+inverter:
+  model: sunsynk
+  modern: true
+  autarky: power
+  three_phase: false
+
+battery:
+  energy: 0 # set to your battery capacity in Wh to enable runtime estimate
+  shutdown_soc: 20
+  show_daily: true
+  dynamic_colour: true
+  animation_speed: 6
+  max_power: 8000
+
+solar:
+  show_daily: true
+  mppts: 2 # increase to match the number of PV strings you actually use
+  animation_speed: 9
+  max_power: 8000
+
+load:
+  show_daily: true
+  animation_speed: 4
+  max_power: 8000
+
+grid:
+  show_daily_buy: true
+  show_daily_sell: true
+  animation_speed: 8
+  max_power: 8000
+
+entities:
+  # ---- Inverter ----
+  inverter_voltage_154: sensor.solarsynkv3_YOURSERIAL_inverter_voltager_phase_0
+  inverter_current_164: sensor.solarsynkv3_YOURSERIAL_inverter_current_phase_0
+  inverter_power_175: sensor.solarsynkv3_YOURSERIAL_inverter_power
+  load_frequency_192: sensor.solarsynkv3_YOURSERIAL_load_frequency
+  grid_connected_status_194: sensor.solarsynkv3_YOURSERIAL_grid_status
+  dc_transformer_temp_90: sensor.solarsynkv3_YOURSERIAL_inverter_dc_temperature
+  radiator_temp_91: sensor.solarsynkv3_YOURSERIAL_inverter_ac_temperature
+
+  # ---- Battery ----
+  battery_soc_184: sensor.solarsynkv3_YOURSERIAL_battery_soc
+  battery_power_190: sensor.solarsynkv3_YOURSERIAL_battery_power
+  battery_voltage_183: sensor.solarsynkv3_YOURSERIAL_battery_voltage
+  battery_current_191: sensor.solarsynkv3_YOURSERIAL_battery_current
+  battery_temp_182: sensor.solarsynkv3_YOURSERIAL_battery_temperature
+  day_battery_charge_70: sensor.solarsynkv3_YOURSERIAL_battery_etoday_charge
+  day_battery_discharge_71: sensor.solarsynkv3_YOURSERIAL_battery_etoday_discharge
+
+  # ---- Solar (MPPT strings are 0-indexed in SolarSynk) ----
+  pv1_power_186: sensor.solarsynkv3_YOURSERIAL_pv_mppt0_power
+  pv1_voltage_109: sensor.solarsynkv3_YOURSERIAL_pv_mppt0_voltage
+  pv1_current_110: sensor.solarsynkv3_YOURSERIAL_pv_mppt0_current
+  pv2_power_187: sensor.solarsynkv3_YOURSERIAL_pv_mppt1_power
+  pv2_voltage_111: sensor.solarsynkv3_YOURSERIAL_pv_mppt1_voltage
+  pv2_current_112: sensor.solarsynkv3_YOURSERIAL_pv_mppt1_current
+  pv3_power_188: sensor.solarsynkv3_YOURSERIAL_pv_mppt2_power
+  pv3_voltage_113: sensor.solarsynkv3_YOURSERIAL_pv_mppt2_voltage
+  pv3_current_114: sensor.solarsynkv3_YOURSERIAL_pv_mppt2_current
+  pv4_power_189: sensor.solarsynkv3_YOURSERIAL_pv_mppt3_power
+  pv4_voltage_115: sensor.solarsynkv3_YOURSERIAL_pv_mppt3_voltage
+  pv4_current_116: sensor.solarsynkv3_YOURSERIAL_pv_mppt3_current
+  # MPPT 5 & 6 (shown on compact/lite or wide layouts; set solar.mppts: 5 or 6)
+  pv5_power: sensor.solarsynkv3_YOURSERIAL_pv_mppt4_power
+  pv5_voltage: sensor.solarsynkv3_YOURSERIAL_pv_mppt4_voltage
+  pv5_current: sensor.solarsynkv3_YOURSERIAL_pv_mppt4_current
+  pv6_power: sensor.solarsynkv3_YOURSERIAL_pv_mppt5_power
+  pv6_voltage: sensor.solarsynkv3_YOURSERIAL_pv_mppt5_voltage
+  pv6_current: sensor.solarsynkv3_YOURSERIAL_pv_mppt5_current
+  day_pv_energy_108: sensor.solarsynkv3_YOURSERIAL_pv_etoday
+  pv_total: sensor.solarsynkv3_YOURSERIAL_pv_pac
+  total_pv_generation: sensor.solarsynkv3_YOURSERIAL_pv_etotal
+
+  # ---- Grid ----
+  grid_power_169: sensor.solarsynkv3_YOURSERIAL_grid_pac
+  grid_ct_power_172: sensor.solarsynkv3_YOURSERIAL_grid_limiter_total_power
+  grid_ct_power_total: sensor.solarsynkv3_YOURSERIAL_grid_limiter_total_power
+  grid_voltage: sensor.solarsynkv3_YOURSERIAL_grid_phase0_voltage
+  day_grid_import_76: sensor.solarsynkv3_YOURSERIAL_grid_etoday_from
+  day_grid_export_77: sensor.solarsynkv3_YOURSERIAL_grid_etoday_to
+
+  # ---- Load ----
+  essential_power: sensor.solarsynkv3_YOURSERIAL_load_total_power
+  day_load_energy_84: sensor.solarsynkv3_YOURSERIAL_load_daily_used

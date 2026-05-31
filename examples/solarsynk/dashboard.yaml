@@ -1,0 +1,73 @@
+# ============================================================================
+#  Example dashboard view embedding the Sunsynk Power Flow Card wired to
+#  the SolarSynk V3 add-on. Replace YOURSERIAL with your inverter serial.
+#
+#  Add via: Settings -> Dashboards -> (your dashboard) -> Edit -> Raw
+#  configuration editor, then paste this `views:` entry.
+# ============================================================================
+
+title: Solar
+views:
+  - title: Power Flow
+    path: power-flow
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        cards:
+          - type: custom:sunsynk-power-flow-card
+            cardstyle: full
+            glow: true
+            glow_intensity: 3
+            show_solar: true
+            show_battery: true
+            show_grid: true
+            inverter:
+              model: sunsynk
+              modern: true
+              autarky: power
+            battery:
+              energy: 0
+              shutdown_soc: 20
+              show_daily: true
+              dynamic_colour: true
+            solar:
+              show_daily: true
+              mppts: 2
+            load:
+              show_daily: true
+            grid:
+              show_daily_buy: true
+              show_daily_sell: true
+            entities:
+              inverter_voltage_154: sensor.solarsynkv3_YOURSERIAL_inverter_voltager_phase_0
+              inverter_current_164: sensor.solarsynkv3_YOURSERIAL_inverter_current_phase_0
+              inverter_power_175: sensor.solarsynkv3_YOURSERIAL_inverter_power
+              load_frequency_192: sensor.solarsynkv3_YOURSERIAL_load_frequency
+              grid_connected_status_194: sensor.solarsynkv3_YOURSERIAL_grid_status
+              dc_transformer_temp_90: sensor.solarsynkv3_YOURSERIAL_inverter_dc_temperature
+              radiator_temp_91: sensor.solarsynkv3_YOURSERIAL_inverter_ac_temperature
+              battery_soc_184: sensor.solarsynkv3_YOURSERIAL_battery_soc
+              battery_power_190: sensor.solarsynkv3_YOURSERIAL_battery_power
+              battery_voltage_183: sensor.solarsynkv3_YOURSERIAL_battery_voltage
+              battery_current_191: sensor.solarsynkv3_YOURSERIAL_battery_current
+              battery_temp_182: sensor.solarsynkv3_YOURSERIAL_battery_temperature
+              day_battery_charge_70: sensor.solarsynkv3_YOURSERIAL_battery_etoday_charge
+              day_battery_discharge_71: sensor.solarsynkv3_YOURSERIAL_battery_etoday_discharge
+              pv1_power_186: sensor.solarsynkv3_YOURSERIAL_pv_mppt0_power
+              pv1_voltage_109: sensor.solarsynkv3_YOURSERIAL_pv_mppt0_voltage
+              pv1_current_110: sensor.solarsynkv3_YOURSERIAL_pv_mppt0_current
+              pv2_power_187: sensor.solarsynkv3_YOURSERIAL_pv_mppt1_power
+              pv2_voltage_111: sensor.solarsynkv3_YOURSERIAL_pv_mppt1_voltage
+              pv2_current_112: sensor.solarsynkv3_YOURSERIAL_pv_mppt1_current
+              day_pv_energy_108: sensor.solarsynkv3_YOURSERIAL_pv_etoday
+              pv_total: sensor.solarsynkv3_YOURSERIAL_pv_pac
+              total_pv_generation: sensor.solarsynkv3_YOURSERIAL_pv_etotal
+              grid_power_169: sensor.solarsynkv3_YOURSERIAL_grid_pac
+              grid_ct_power_172: sensor.solarsynkv3_YOURSERIAL_grid_limiter_total_power
+              grid_ct_power_total: sensor.solarsynkv3_YOURSERIAL_grid_limiter_total_power
+              grid_voltage: sensor.solarsynkv3_YOURSERIAL_grid_phase0_voltage
+              day_grid_import_76: sensor.solarsynkv3_YOURSERIAL_grid_etoday_from
+              day_grid_export_77: sensor.solarsynkv3_YOURSERIAL_grid_etoday_to
+              essential_power: sensor.solarsynkv3_YOURSERIAL_load_total_power
+              day_load_energy_84: sensor.solarsynkv3_YOURSERIAL_load_daily_used

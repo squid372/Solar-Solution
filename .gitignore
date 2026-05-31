@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# OS / editor junk
+.DS_Store
+**/.DS_Store
+*.log
+
+# Build caches
+.rpt2_cache/
+*.tsbuildinfo
+
+# Python (solarsynk add-on)
+__pycache__/
+*.pyc
+.venv/
+venv/
