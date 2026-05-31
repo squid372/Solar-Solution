@@ -32,6 +32,36 @@ Refer to [https://slipx06.github.io/sunsynk-power-flow-card/index.html](https://
 - Display energy cost per kWh and solar sell status.
 - Select your inverter model for custom inverter status and battery status messages i.e. Sunsynk, Lux, Goodwe, Solis.
 
+## Neon glow theme
+
+An optional, opt-in visual theme that makes the card stand out. Enable it with:
+
+```yaml
+type: custom:sunsynk-power-flow-card
+cardstyle: full
+glow: true
+glow_intensity: 3 # 1 (subtle / lighter render) … 5 (intense)
+glow_theme: neon # neon | ice | fire | aurora | mono
+```
+
+What it adds (all off by default, so the classic look is untouched):
+
+- Glowing flow lines with white-hot cores and comet-trail dots
+- Energy pulse waves that sweep each active line
+- Pulsing node halos and a softly glowing solar node
+- A frosted-glass card with a **live ambient aura** tinted to the dominant
+  flow (solar / grid / battery) and scaled to system activity
+- A charging-aware **battery state-of-charge ring** (both batteries)
+- Five colour themes via `glow_theme`
+
+Performance & accessibility: `glow_intensity: 1` renders a lighter "effects-lite"
+variant (no comet trails / pulse waves), and `prefers-reduced-motion` is
+respected (the moving extras are dropped and CSS animations are paused).
+
+**Preview it locally:** the [`demo/`](demo/) folder contains a standalone,
+glow-on-vs-off comparison across all themes — serve it with any static server
+(e.g. `npx http-server demo`) and open `index.html`.
+
 ## Screenshots
 
 _Compact Version_

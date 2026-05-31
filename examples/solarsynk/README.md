@@ -55,8 +55,14 @@ the card's entity slots so the card works out of the box.
 | `battery_voltage_183` | `battery_voltage` |
 | `battery_current_191` | `battery_current` |
 | `battery_temp_182` | `battery_temperature` |
+| `battery_status` | `battery_status` |
 | `day_battery_charge_70` | `battery_etoday_charge` |
 | `day_battery_discharge_71` | `battery_etoday_discharge` |
+| `battery2_soc_184` | `battery_soc2` |
+| `battery2_voltage_183` | `battery_voltage2` |
+| `battery2_current_191` | `battery_current2` |
+| `battery2_temp_182` | `battery_temperature2` |
+| `battery2_status` | `battery_status2` |
 | `pv1_power_186` … `pv4_power_189`, `pv5_power`, `pv6_power` | `pv_mppt0_power` … `pv_mppt5_power` |
 | `pv1_voltage_109` … `pv6_voltage` | `pv_mppt0_voltage` … `pv_mppt5_voltage` |
 | `pv1_current_110` … `pv6_current` | `pv_mppt0_current` … `pv_mppt5_current` |
@@ -70,6 +76,13 @@ the card's entity slots so the card works out of the box.
 | `day_grid_export_77` | `grid_etoday_to` |
 | `essential_power` | `load_total_power` |
 | `day_load_energy_84` | `load_daily_used` |
+
+### No SolarSynk equivalent
+
+Some card slots have no matching SolarSynk sensor and are intentionally left
+unmapped: `battery2_power_190` (SolarSynk exposes no `battery_power2`),
+`nonessential_power`, and the AUX load entities. The card derives or hides
+these as needed.
 
 ## Turning the glow off
 

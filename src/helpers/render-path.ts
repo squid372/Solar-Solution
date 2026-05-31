@@ -11,18 +11,18 @@ import { globalData } from './globals';
  * @returns A Lit SVG template for the path element.
  */
 export const renderPath = (
-	id: string,
-	d: string,
-	display: boolean,
-	color: string,
-	lineWidth: number,
+  id: string,
+  d: string,
+  display: boolean,
+  color: string,
+  lineWidth: number,
 ) => {
-	const glow = globalData.glow;
-	const glowClass = glow ? 'ss-flow-line' : '';
+  const glow = globalData.glow;
+  const glowClass = glow ? 'ss-flow-line' : '';
 
-	// Normalise pathLength so the CSS pulse-wave dash animation (applied to a
-	// <use> clone of this path) travels consistently regardless of real length.
-	return svg`
+  // Normalise pathLength so the CSS pulse-wave dash animation (applied to a
+  // <use> clone of this path) travels consistently regardless of real length.
+  return svg`
         <path id="${id}" d="${d}" fill="none" display="${display ? '' : 'none'}"
             stroke="${color}" stroke-width="${lineWidth}"
             stroke-miterlimit="10" pointer-events="stroke" class="${glowClass}"

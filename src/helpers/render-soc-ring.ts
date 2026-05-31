@@ -18,29 +18,29 @@ import { globalData } from './globals';
  * @param charging - When true, a rotating sweep is overlaid to signal charging.
  */
 export function renderSocRing(
-	cx: number,
-	cy: number,
-	r: number,
-	soc: number,
-	color: string,
-	show: boolean = true,
-	charging: boolean = false,
+  cx: number,
+  cy: number,
+  r: number,
+  soc: number,
+  color: string,
+  show: boolean = true,
+  charging: boolean = false,
 ) {
-	if (!globalData.glow || !show) {
-		return svg``;
-	}
+  if (!globalData.glow || !show) {
+    return svg``;
+  }
 
-	const pct = Math.max(0, Math.min(100, Number.isFinite(soc) ? soc : 0));
+  const pct = Math.max(0, Math.min(100, Number.isFinite(soc) ? soc : 0));
 
-	// While charging, a short bright arc orbits the ring to convey inflow.
-	const sweep = charging
-		? svg`<circle class="ss-soc-sweep" cx="${cx}" cy="${cy}" r="${r}" fill="none"
+  // While charging, a short bright arc orbits the ring to convey inflow.
+  const sweep = charging
+    ? svg`<circle class="ss-soc-sweep" cx="${cx}" cy="${cy}" r="${r}" fill="none"
 				stroke="${color}" stroke-width="3" stroke-linecap="round"
 				pathLength="100" stroke-dasharray="10 90"
 				style="transform-origin:${cx}px ${cy}px" />`
-		: svg``;
+    : svg``;
 
-	return svg`
+  return svg`
 		<g class="ss-soc-ring${charging ? ' ss-soc-ring--charging' : ''}"
 			transform="rotate(-90 ${cx} ${cy})" pointer-events="none">
 			<circle cx="${cx}" cy="${cy}" r="${r}" fill="none"

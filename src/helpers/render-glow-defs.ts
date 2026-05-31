@@ -13,17 +13,17 @@ import { svg } from 'lit';
  * @param intensity - Glow strength multiplier (defaults to 2).
  */
 export const renderGlowDefs = (enabled: boolean, intensity: number = 2) => {
-	if (!enabled) {
-		return svg``;
-	}
+  if (!enabled) {
+    return svg``;
+  }
 
-	const k = Number.isFinite(intensity) && intensity > 0 ? intensity : 2;
-	// Tame blur radii so the bloom is striking but doesn't smear the diagram.
-	const lineBlur = Math.min(1 + k * 0.6, 4).toFixed(2);
-	const dotBlur = Math.min(1.4 + k * 0.9, 6).toFixed(2);
-	const nodeBlur = Math.min(1 + k * 0.8, 5).toFixed(2);
+  const k = Number.isFinite(intensity) && intensity > 0 ? intensity : 2;
+  // Tame blur radii so the bloom is striking but doesn't smear the diagram.
+  const lineBlur = Math.min(1 + k * 0.6, 4).toFixed(2);
+  const dotBlur = Math.min(1.4 + k * 0.9, 6).toFixed(2);
+  const nodeBlur = Math.min(1 + k * 0.8, 5).toFixed(2);
 
-	return svg`
+  return svg`
 		<defs>
 			<filter id="ss-glow-line" x="-60%" y="-60%" width="220%" height="220%">
 				<feGaussianBlur in="SourceGraphic" stdDeviation="${lineBlur}" result="b" />

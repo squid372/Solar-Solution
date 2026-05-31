@@ -13,66 +13,69 @@ import { renderGlowDefs } from '../helpers/render-glow-defs';
 import { ambientStyle } from '../helpers/glow-ambient';
 
 export const compactCard = (
-	config: sunsynkPowerFlowCardConfig,
-	inverterImg: string,
-	data: DataDto,
+  config: sunsynkPowerFlowCardConfig,
+  inverterImg: string,
+  data: DataDto,
 ) => {
-	const glow = config.glow === true;
-	setGlow(glow, config.glow_intensity);
-	const ambientVars = ambientStyle(config, data);
-	const glowClasses = glow
-		? ` ss-glow ss-theme-${config.glow_theme ?? 'neon'}`
-		: '';
-	const titleKey = config.title
-		? `${config.title}|${config.title_colour ?? ''}|${config.title_size ?? ''}`
-		: 'no-title';
-	const titleTemplate = config.title
-		? cache(
-				keyed(
-					titleKey,
-					html`
-						<h1
-							style="text-align: center; color: ${config.title_colour ||
-							'inherit'}; font-size: ${config.title_size || '32px'};"
-						>
-							${config.title}
-						</h1>
-					`,
-				),
-			)
-		: '';
-	return html`
-		<ha-card>
-			${getDynamicStyles(data)}
-			<div class="container card${glowClasses}" style="${ambientVars}">
-				${titleTemplate}
-				<svg
-					viewBox="${config.wide
-						? '0 0 720 405'
-						: `${data.viewBoxXLite} ${data.viewBoxYLite} ${data.viewBoxWidthLite} ${data.viewBoxHeightLite}`}"
-					preserveAspectRatio="xMidYMid meet"
-					height="${data.cardHeight}"
-					width="${data.cardWidth}"
-					xmlns="http://www.w3.org/2000/svg"
-					xmlns:xlink="http://www.w3.org/1999/xlink"
-				>
-					${renderGlowDefs(glow, config.glow_intensity)}
-					<!-- Solar Elements -->
-					${renderSolarElements(data, config)}
+  const glow = config.glow === true;
+  const reducedMotion =
+    typeof window !== 'undefined' &&
+    !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  setGlow(glow, config.glow_intensity, reducedMotion);
+  const ambientVars = ambientStyle(config, data);
+  const glowClasses = glow
+    ? ` ss-glow ss-theme-${config.glow_theme ?? 'neon'}`
+    : '';
+  const titleKey = config.title
+    ? `${config.title}|${config.title_colour ?? ''}|${config.title_size ?? ''}`
+    : 'no-title';
+  const titleTemplate = config.title
+    ? cache(
+        keyed(
+          titleKey,
+          html`
+            <h1
+              style="text-align: center; color: ${config.title_colour ||
+              'inherit'}; font-size: ${config.title_size || '32px'};"
+            >
+              ${config.title}
+            </h1>
+          `,
+        ),
+      )
+    : '';
+  return html`
+    <ha-card>
+      ${getDynamicStyles(data)}
+      <div class="container card${glowClasses}" style="${ambientVars}">
+        ${titleTemplate}
+        <svg
+          viewBox="${config.wide
+            ? '0 0 720 405'
+            : `${data.viewBoxXLite} ${data.viewBoxYLite} ${data.viewBoxWidthLite} ${data.viewBoxHeightLite}`}"
+          preserveAspectRatio="xMidYMid meet"
+          height="${data.cardHeight}"
+          width="${data.cardWidth}"
+          xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+        >
+          ${renderGlowDefs(glow, config.glow_intensity)}
+          <!-- Solar Elements -->
+          ${renderSolarElements(data, config)}
 
-					<!-- Battery Elements -->
-					${renderBatteryElements(data, config)}
+          <!-- Battery Elements -->
+          ${renderBatteryElements(data, config)}
 
-					<!-- Grid Elements -->
-					${renderGridElements(data, config)}
+          <!-- Grid Elements -->
+          ${renderGridElements(data, config)}
 
-					<!-- Load Elements -->
-					${renderLoadElements(data, config)}
+          <!-- Load Elements -->
+          ${renderLoadElements(data, config)}
 
-					<!-- Inverter Elements -->
-					${renderInverterElements(data, inverterImg, config)}
-				</svg>
-			</div>
-		</ha-card>
-	`;
+          <!-- Inverter Elements -->
+          ${renderInverterElements(data, inverterImg, config)}
+        </svg>
+      </div>
+    </ha-card>
+  `;
 };

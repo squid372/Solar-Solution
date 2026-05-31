@@ -75,8 +75,16 @@ entities:
   battery_voltage_183: sensor.solarsynkv3_YOURSERIAL_battery_voltage
   battery_current_191: sensor.solarsynkv3_YOURSERIAL_battery_current
   battery_temp_182: sensor.solarsynkv3_YOURSERIAL_battery_temperature
+  battery_status: sensor.solarsynkv3_YOURSERIAL_battery_status
   day_battery_charge_70: sensor.solarsynkv3_YOURSERIAL_battery_etoday_charge
   day_battery_discharge_71: sensor.solarsynkv3_YOURSERIAL_battery_etoday_discharge
+
+  # ---- Battery 2 (only if battery.count: 2; SolarSynk has no battery_power2) ----
+  battery2_soc_184: sensor.solarsynkv3_YOURSERIAL_battery_soc2
+  battery2_voltage_183: sensor.solarsynkv3_YOURSERIAL_battery_voltage2
+  battery2_current_191: sensor.solarsynkv3_YOURSERIAL_battery_current2
+  battery2_temp_182: sensor.solarsynkv3_YOURSERIAL_battery_temperature2
+  battery2_status: sensor.solarsynkv3_YOURSERIAL_battery_status2
 
   # ---- Solar (MPPT strings are 0-indexed in SolarSynk) ----
   pv1_power_186: sensor.solarsynkv3_YOURSERIAL_pv_mppt0_power

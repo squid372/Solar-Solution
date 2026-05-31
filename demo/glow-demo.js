@@ -555,7 +555,11 @@ var globalData = {
   // Set once per render by the card so the shared flow helpers can self-gate
   // without threading the flag through every call site.
   glow: false,
-  glowIntensity: 2
+  glowIntensity: 2,
+  // When the user prefers reduced motion, the flow helpers drop the extra
+  // SMIL-animated elements (comet trails, moving hot-core) that CSS media
+  // queries can't pause.
+  reducedMotion: false
 };
 
 // src/helpers/render-glow-defs.ts
@@ -849,14 +853,16 @@ function renderPVFlow(id, path, color, lineWidth, powerWatts, duration, invertFl
   const lineClass = `${className}${glow ? " ss-flow-line" : ""}`.trim();
   const dotClass = `${className}${glow ? " ss-flow-dot" : ""}`.trim();
   const dotRadius = Math.min(2 + lineWidth + Math.max(minLineWidth - 2, 0), 8);
-  const trail = showDot && glow ? [
+  const lite2 = globalData.glowIntensity <= 1;
+  const extras = showDot && glow && !lite2 && !globalData.reducedMotion;
+  const trail = extras ? [
     { r: dotRadius * 0.75, o: 0.45, lag: 0.06 },
     { r: dotRadius * 0.5, o: 0.22, lag: 0.12 }
   ] : [];
   const pulseClass = invertFlow ? "ss-flow-pulse ss-flow-pulse--rev" : "ss-flow-pulse";
   const lineOverlays = showDot && glow ? w`
 				<use href="#${lineId}" xlink:href="#${lineId}" class="ss-flow-core" />
-				<use href="#${lineId}" xlink:href="#${lineId}" class="${pulseClass}" />` : w``;
+				${extras ? w`<use href="#${lineId}" xlink:href="#${lineId}" class="${pulseClass}" />` : w``}` : w``;
   return w`
 		<svg
 			id="${id}-flow"
@@ -912,7 +918,7 @@ function renderPVFlow(id, path, color, lineWidth, powerWatts, duration, invertFl
 							<mpath href="#${lineId}" xlink:href="#${lineId}" />
 						</animateMotion>
 					</circle>
-					${glow ? w`<circle r="${Math.max(dotRadius * 0.42, 1)}" fill="#ffffff" class="ss-dot-core">
+					${extras ? w`<circle r="${Math.max(dotRadius * 0.42, 1)}" fill="#ffffff" class="ss-dot-core">
 							<animateMotion dur="${dur}s" repeatCount="indefinite"
 								keyPoints="${finalKeyPoints}" keyTimes="0;1" calcMode="linear">
 								<mpath href="#${lineId}" xlink:href="#${lineId}" />
@@ -941,16 +947,18 @@ var renderCircle = (id, radius, fill, duration, keyPoints, mpathHref, invertFlow
         </circle>
     `;
   }
-  const trail = [
+  const lite2 = globalData.glowIntensity <= 1;
+  const extras = !lite2 && !globalData.reducedMotion;
+  const coreOverlay = w`<use href="${mpathHref}" xlink:href="${mpathHref}" class="ss-flow-core" />`;
+  const pulseClass = invertFlow ? "ss-flow-pulse ss-flow-pulse--rev" : "ss-flow-pulse";
+  const pulseOverlay = extras ? w`<use href="${mpathHref}" xlink:href="${mpathHref}" class="${pulseClass}" />` : w``;
+  const trail = extras ? [
     { r: radius * 0.75, o: 0.45, lag: 0.06 },
     { r: radius * 0.5, o: 0.22, lag: 0.12 }
-  ];
-  const pulseClass = invertFlow ? "ss-flow-pulse ss-flow-pulse--rev" : "ss-flow-pulse";
-  const lineOverlays = w`
-        <use href="${mpathHref}" xlink:href="${mpathHref}" class="ss-flow-core" />
-        <use href="${mpathHref}" xlink:href="${mpathHref}" class="${pulseClass}" />`;
+  ] : [];
   return w`
-        ${lineOverlays}
+        ${coreOverlay}
+        ${pulseOverlay}
         ${trail.map(
     (t4) => w`
         <circle cx="0" cy="0" r="${t4.r}" fill="${fill}" opacity="${t4.o}" class="ss-flow-dot">
@@ -964,12 +972,12 @@ var renderCircle = (id, radius, fill, duration, keyPoints, mpathHref, invertFlow
         <circle id="${id}" cx="0" cy="0" r="${radius}" fill="${fill}" class="ss-flow-dot">
             ${motion}
         </circle>
-        <circle cx="0" cy="0" r="${Math.max(radius * 0.42, 1)}" fill="#ffffff" class="ss-dot-core">
+        ${extras ? w`<circle cx="0" cy="0" r="${Math.max(radius * 0.42, 1)}" fill="#ffffff" class="ss-dot-core">
             <animateMotion dur="${duration}s" repeatCount="indefinite"
                 keyPoints="${finalKeyPoints}" keyTimes="0;1" calcMode="linear">
                 <mpath href="${mpathHref}"/>
             </animateMotion>
-        </circle>
+        </circle>` : w``}
     `;
 };
 
@@ -1010,347 +1018,379 @@ function renderSocRing(cx, cy, r5, soc, color, show = true, charging = false) {
 
 // src/style.ts
 var styles = i`
-	.container {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		height: 100%;
-		width: 100%;
-		padding: 5px;
-	}
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    padding: 5px;
+  }
 
-	.card {
-		border-radius: var(--ha-card-border-radius, 10px);
-		box-shadow: var(
-			--ha-card-box-shadow,
-			0px 0px 0px 1px rgba(0, 0, 0, 0.12),
-			0px 0px 0px 0px rgba(0, 0, 0, 0.12),
-			0px 0px 0px 0px rgba(0, 0, 0, 0.12)
-		);
-		background: var(--ha-card-background, var(--card-background-color, white));
-		border-width: var(--ha-card-border-width);
-		padding: 0px;
-	}
+  .card {
+    border-radius: var(--ha-card-border-radius, 10px);
+    box-shadow: var(
+      --ha-card-box-shadow,
+      0px 0px 0px 1px rgba(0, 0, 0, 0.12),
+      0px 0px 0px 0px rgba(0, 0, 0, 0.12),
+      0px 0px 0px 0px rgba(0, 0, 0, 0.12)
+    );
+    background: var(--ha-card-background, var(--card-background-color, white));
+    border-width: var(--ha-card-border-width);
+    padding: 0px;
+  }
 
-	text {
-		text-anchor: middle;
-		dominant-baseline: middle;
-	}
+  text {
+    text-anchor: middle;
+    dominant-baseline: middle;
+  }
 
-	.left-align {
-		text-anchor: start;
-	}
-	.right-align {
-		text-anchor: end;
-	}
-	.st1 {
-		fill: #ff9b30;
-	}
-	.st2 {
-		fill: #f3b3ca;
-	}
-	.st3 {
-		font-size: 9px;
-	}
-	.st4 {
-		font-size: 14px;
-	}
-	.st5 {
-		fill: #969696;
-	}
-	.st6 {
-		fill: #5fb6ad;
-	}
-	.st7 {
-		fill: #5490c2;
-	}
-	.st8 {
-		font-weight: 500;
-	}
-	.st9 {
-		fill: #959595;
-	}
-	.st10 {
-		font-size: 16px;
-	}
-	.st11 {
-		fill: transparent;
-	}
-	.st12 {
-		display: none;
-	}
-	.st13 {
-		font-size: 22px;
-	}
-	.st14 {
-		font-size: 12px;
-	}
-	.remaining-energy {
-		font-size: 9px;
-	}
+  .left-align {
+    text-anchor: start;
+  }
+  .right-align {
+    text-anchor: end;
+  }
+  .st1 {
+    fill: #ff9b30;
+  }
+  .st2 {
+    fill: #f3b3ca;
+  }
+  .st3 {
+    font-size: 9px;
+  }
+  .st4 {
+    font-size: 14px;
+  }
+  .st5 {
+    fill: #969696;
+  }
+  .st6 {
+    fill: #5fb6ad;
+  }
+  .st7 {
+    fill: #5490c2;
+  }
+  .st8 {
+    font-weight: 500;
+  }
+  .st9 {
+    fill: #959595;
+  }
+  .st10 {
+    font-size: 16px;
+  }
+  .st11 {
+    fill: transparent;
+  }
+  .st12 {
+    display: none;
+  }
+  .st13 {
+    font-size: 22px;
+  }
+  .st14 {
+    font-size: 12px;
+  }
+  .remaining-energy {
+    font-size: 9px;
+  }
 
-	/* ===== Neon glow flow effects (opt-in via the \`glow\` config) ===== */
-	/* The filters referenced here are injected as <defs> inside the card SVG
+  /* ===== Neon glow flow effects (opt-in via the \`glow\` config) ===== */
+  /* The filters referenced here are injected as <defs> inside the card SVG
 	   when glow is enabled, so they resolve within this shadow root. */
-	.ss-glow .ss-flow-line {
-		filter: url(#ss-glow-line);
-	}
+  .ss-glow .ss-flow-line {
+    filter: url(#ss-glow-line);
+  }
 
-	.ss-glow .ss-flow-dot {
-		filter: url(#ss-glow-dot);
-		will-change: transform, filter;
-	}
+  .ss-glow .ss-flow-dot {
+    filter: url(#ss-glow-dot);
+    will-change: transform, filter;
+  }
 
-	/* Hot-core / pulse tint, themeable via the ss-theme-* class. */
-	.ss-glow {
-		--ss-hot: #ffffff;
-	}
-	.ss-glow.ss-theme-ice {
-		--ss-hot: #abe9ff;
-	}
-	.ss-glow.ss-theme-fire {
-		--ss-hot: #ffd08a;
-	}
-	.ss-glow.ss-theme-aurora {
-		--ss-hot: #b6ffd9;
-	}
-	.ss-glow.ss-theme-mono {
-		--ss-hot: #ffffff;
-	}
+  /* Hot-core / pulse tint, themeable via the ss-theme-* class. */
+  .ss-glow {
+    --ss-hot: #ffffff;
+  }
+  .ss-glow.ss-theme-ice {
+    --ss-hot: #abe9ff;
+  }
+  .ss-glow.ss-theme-fire {
+    --ss-hot: #ffd08a;
+  }
+  .ss-glow.ss-theme-aurora {
+    --ss-hot: #b6ffd9;
+  }
+  .ss-glow.ss-theme-mono {
+    --ss-hot: #ffffff;
+  }
+  /* Mono actually desaturates the glowing elements (grayscale before the
+	   colour-preserving glow filter). */
+  .ss-glow.ss-theme-mono .ss-flow-line {
+    filter: grayscale(1) url(#ss-glow-line);
+  }
+  .ss-glow.ss-theme-mono .ss-flow-dot {
+    filter: grayscale(1) url(#ss-glow-dot);
+  }
+  .ss-glow.ss-theme-mono .ss-soc-ring {
+    filter: grayscale(1) url(#ss-glow-line);
+  }
+  .ss-glow.ss-theme-mono svg#sun {
+    filter: grayscale(1) url(#ss-glow-node);
+  }
+  .ss-glow.ss-theme-mono.card::before {
+    filter: blur(30px) grayscale(1);
+  }
 
-	/* Hot core down the centre of each active flow line (a <use> clone
+  /* Hot core down the centre of each active flow line (a <use> clone
 	   of the path). CSS beats the path's own stroke attribute. */
-	.ss-glow .ss-flow-core {
-		fill: none;
-		stroke: var(--ss-hot, #ffffff);
-		stroke-opacity: 0.55;
-		stroke-width: 1.2;
-		stroke-linecap: round;
-		pointer-events: none;
-		filter: drop-shadow(0 0 1.5px var(--ss-hot, #fff));
-	}
+  .ss-glow .ss-flow-core {
+    fill: none;
+    stroke: var(--ss-hot, #ffffff);
+    stroke-opacity: 0.55;
+    stroke-width: 1.2;
+    stroke-linecap: round;
+    pointer-events: none;
+    filter: drop-shadow(0 0 1.5px var(--ss-hot, #fff));
+  }
 
-	/* Hot core inside the comet head. */
-	.ss-glow .ss-dot-core {
-		fill: var(--ss-hot, #ffffff);
-		fill-opacity: 0.92;
-		pointer-events: none;
-		filter: drop-shadow(0 0 2px var(--ss-hot, #fff));
-	}
+  /* Hot core inside the comet head. */
+  .ss-glow .ss-dot-core {
+    fill: var(--ss-hot, #ffffff);
+    fill-opacity: 0.92;
+    pointer-events: none;
+    filter: drop-shadow(0 0 2px var(--ss-hot, #fff));
+  }
 
-	/* Luminous pulse wave sweeping along the line (a second <use> clone).
+  /* Luminous pulse wave sweeping along the line (a second <use> clone).
 	   pathLength is normalised to 1000 on the source path. Speed comes from
 	   --ss-pulse-dur, which the card lowers as system activity rises. */
-	.ss-glow .ss-flow-pulse {
-		fill: none;
-		stroke: var(--ss-hot, #ffffff);
-		stroke-opacity: 0.85;
-		stroke-width: 2.6;
-		stroke-linecap: round;
-		pointer-events: none;
-		stroke-dasharray: 34 1000;
-		stroke-dashoffset: 1000;
-		filter: url(#ss-glow-line);
-		animation: ss-pulse-move var(--ss-pulse-dur, 2.6s) linear infinite;
-		will-change: stroke-dashoffset;
-	}
+  .ss-glow .ss-flow-pulse {
+    fill: none;
+    stroke: var(--ss-hot, #ffffff);
+    stroke-opacity: 0.85;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    pointer-events: none;
+    stroke-dasharray: 34 1000;
+    stroke-dashoffset: 1000;
+    filter: url(#ss-glow-line);
+    animation: ss-pulse-move var(--ss-pulse-dur, 2.6s) linear infinite;
+    will-change: stroke-dashoffset;
+  }
 
-	.ss-glow .ss-flow-pulse--rev {
-		animation-name: ss-pulse-move-rev;
-	}
+  .ss-glow .ss-flow-pulse--rev {
+    animation-name: ss-pulse-move-rev;
+  }
 
-	@keyframes ss-pulse-move {
-		from {
-			stroke-dashoffset: 1000;
-		}
-		to {
-			stroke-dashoffset: 0;
-		}
-	}
+  @keyframes ss-pulse-move {
+    from {
+      stroke-dashoffset: 1000;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
 
-	@keyframes ss-pulse-move-rev {
-		from {
-			stroke-dashoffset: 0;
-		}
-		to {
-			stroke-dashoffset: 1000;
-		}
-	}
+  @keyframes ss-pulse-move-rev {
+    from {
+      stroke-dashoffset: 0;
+    }
+    to {
+      stroke-dashoffset: 1000;
+    }
+  }
 
-	@keyframes ss-node-pulse {
-		0%,
-		100% {
-			filter: drop-shadow(0 0 1px currentColor);
-		}
-		50% {
-			filter: drop-shadow(0 0 4px currentColor)
-				drop-shadow(0 0 8px currentColor);
-		}
-	}
+  @keyframes ss-node-pulse {
+    0%,
+    100% {
+      filter: drop-shadow(0 0 1px currentColor);
+    }
+    50% {
+      filter: drop-shadow(0 0 4px currentColor)
+        drop-shadow(0 0 8px currentColor);
+    }
+  }
 
-	/* Breathe a soft halo around the major nodes so they feel "alive".
+  /* Breathe a soft halo around the major nodes so they feel "alive".
 	   Pulse speed rises with system activity (--ss-activity 0..1). */
-	.ss-glow .grid-icon,
-	.ss-glow .grid-icon-small,
-	.ss-glow .aux-icon,
-	.ss-glow .noness-icon,
-	.ss-glow .essload1-icon,
-	.ss-glow .essload1-icon-full,
-	.ss-glow .essload2-icon,
-	.ss-glow .nonessload1-icon {
-		animation: ss-node-pulse calc(3.4s - var(--ss-activity, 0) * 1.6s)
-			ease-in-out infinite;
-		will-change: filter;
-	}
+  .ss-glow .grid-icon,
+  .ss-glow .grid-icon-small,
+  .ss-glow .aux-icon,
+  .ss-glow .noness-icon,
+  .ss-glow .essload1-icon,
+  .ss-glow .essload1-icon-full,
+  .ss-glow .essload2-icon,
+  .ss-glow .nonessload1-icon {
+    animation: ss-node-pulse calc(3.4s - var(--ss-activity, 0) * 1.6s)
+      ease-in-out infinite;
+    will-change: filter;
+  }
 
-	/* Solar (sun) node — rendered as <svg id="sun"> with a coloured path;
+  /* Solar (sun) node — rendered as <svg id="sun"> with a coloured path;
 	   the node filter blooms it in its own colour. */
-	.ss-glow svg#sun {
-		filter: url(#ss-glow-node);
-	}
+  .ss-glow svg#sun {
+    filter: url(#ss-glow-node);
+  }
 
-	/* ===== Battery SOC ring ===== */
-	.ss-glow .ss-soc-ring {
-		filter: url(#ss-glow-line);
-	}
+  /* ===== Battery SOC ring ===== */
+  .ss-glow .ss-soc-ring {
+    filter: url(#ss-glow-line);
+  }
 
-	.ss-glow .ss-soc-arc {
-		animation: ss-soc-pulse 2.6s ease-in-out infinite;
-		will-change: stroke-opacity, stroke-width;
-	}
+  .ss-glow .ss-soc-arc {
+    animation: ss-soc-pulse 2.6s ease-in-out infinite;
+    will-change: stroke-opacity, stroke-width;
+  }
 
-	/* Orbiting sweep shown only while charging. */
-	.ss-glow .ss-soc-sweep {
-		stroke-opacity: 0.95;
-		animation: ss-soc-orbit 1.8s linear infinite;
-		will-change: transform;
-	}
+  /* Orbiting sweep shown only while charging. */
+  .ss-glow .ss-soc-sweep {
+    stroke-opacity: 0.95;
+    animation: ss-soc-orbit 1.8s linear infinite;
+    will-change: transform;
+  }
 
-	@keyframes ss-soc-orbit {
-		from {
-			transform: rotate(0deg);
-		}
-		to {
-			transform: rotate(360deg);
-		}
-	}
+  @keyframes ss-soc-orbit {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
 
-	@keyframes ss-soc-pulse {
-		0%,
-		100% {
-			stroke-opacity: 0.85;
-			stroke-width: 3;
-		}
-		50% {
-			stroke-opacity: 1;
-			stroke-width: 3.6;
-		}
-	}
+  @keyframes ss-soc-pulse {
+    0%,
+    100% {
+      stroke-opacity: 0.85;
+      stroke-width: 3;
+    }
+    50% {
+      stroke-opacity: 1;
+      stroke-width: 3.6;
+    }
+  }
 
-	/* ===== Glass card shell + ambient state glow ===== */
-	.ss-glow.card {
-		position: relative;
-		overflow: hidden;
-		background: color-mix(
-			in srgb,
-			var(--ha-card-background, var(--card-background-color, #161a23)) 72%,
-			transparent
-		);
-		-webkit-backdrop-filter: blur(10px) saturate(135%);
-		backdrop-filter: blur(10px) saturate(135%);
-		border: 1px solid rgba(255, 255, 255, 0.12);
-		box-shadow:
-			0 10px 44px rgba(0, 0, 0, 0.5),
-			inset 0 1px 0 rgba(255, 255, 255, 0.07);
-	}
+  /* ===== Glass card shell + ambient state glow ===== */
+  .ss-glow.card {
+    position: relative;
+    overflow: hidden;
+    /* Fallback for webviews without color-mix(): keep the theme background. */
+    background: var(
+      --ha-card-background,
+      var(--card-background-color, #161a23)
+    );
+    background: color-mix(
+      in srgb,
+      var(--ha-card-background, var(--card-background-color, #161a23)) 72%,
+      transparent
+    );
+    -webkit-backdrop-filter: blur(10px) saturate(135%);
+    backdrop-filter: blur(10px) saturate(135%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 10px 44px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  }
 
-	/* Soft ambient aura behind the diagram. The two strongest layers follow
+  /* Soft ambient aura behind the diagram. The two strongest layers follow
 	   the dominant live flow (--ss-ambient-1/-2, set by the card); the third is
 	   the battery palette tint. Overall intensity scales with --ss-activity so
 	   the aura swells under load. The keyframe only drifts; opacity is reactive. */
-	.ss-glow.card::before {
-		content: '';
-		position: absolute;
-		inset: -20%;
-		z-index: 0;
-		pointer-events: none;
-		background:
-			radial-gradient(
-				46% 56% at 26% 30%,
-				var(--ss-ambient-1, var(--ss-c-solar, #ffa500)) 0%,
-				transparent 70%
-			),
-			radial-gradient(
-				44% 54% at 74% 70%,
-				var(--ss-ambient-2, var(--ss-c-grid, #5490c2)) 0%,
-				transparent 70%
-			),
-			radial-gradient(
-				40% 50% at 60% 22%,
-				var(--ss-c-batt, #ffc0cb) 0%,
-				transparent 72%
-			);
-		opacity: calc(0.08 + var(--ss-activity, 0.15) * 0.26);
-		filter: blur(30px);
-		animation: ss-ambient 16s ease-in-out infinite alternate;
-	}
+  .ss-glow.card::before {
+    content: '';
+    position: absolute;
+    inset: -20%;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        46% 56% at 26% 30%,
+        var(--ss-ambient-1, var(--ss-c-solar, #ffa500)) 0%,
+        transparent 70%
+      ),
+      radial-gradient(
+        44% 54% at 74% 70%,
+        var(--ss-ambient-2, var(--ss-c-grid, #5490c2)) 0%,
+        transparent 70%
+      ),
+      radial-gradient(
+        40% 50% at 60% 22%,
+        var(--ss-c-batt, #ffc0cb) 0%,
+        transparent 72%
+      );
+    opacity: calc(0.08 + var(--ss-activity, 0.15) * 0.26);
+    filter: blur(30px);
+    animation: ss-ambient 16s ease-in-out infinite alternate;
+  }
 
-	.ss-glow.card > * {
-		position: relative;
-		z-index: 1;
-	}
+  .ss-glow.card > * {
+    position: relative;
+    z-index: 1;
+  }
 
-	@keyframes ss-ambient {
-		0% {
-			transform: translate3d(-2%, -1%, 0) scale(1.02);
-		}
-		100% {
-			transform: translate3d(2%, 2%, 0) scale(1.08);
-		}
-	}
+  @keyframes ss-ambient {
+    0% {
+      transform: translate3d(-2%, -1%, 0) scale(1.02);
+    }
+    100% {
+      transform: translate3d(2%, 2%, 0) scale(1.08);
+    }
+  }
 
-	@media (prefers-reduced-motion: reduce) {
-		.ss-glow .grid-icon,
-		.ss-glow .grid-icon-small,
-		.ss-glow .aux-icon,
-		.ss-glow .noness-icon,
-		.ss-glow .essload1-icon,
-		.ss-glow .essload1-icon-full,
-		.ss-glow .essload2-icon,
-		.ss-glow .nonessload1-icon {
-			animation: none;
-			filter: drop-shadow(0 0 3px currentColor);
-		}
-		.ss-glow .ss-flow-pulse,
-		.ss-glow .ss-soc-arc,
-		.ss-glow .ss-soc-sweep,
-		.ss-glow.card::before {
-			animation: none;
-		}
-	}
+  @media (prefers-reduced-motion: reduce) {
+    .ss-glow .grid-icon,
+    .ss-glow .grid-icon-small,
+    .ss-glow .aux-icon,
+    .ss-glow .noness-icon,
+    .ss-glow .essload1-icon,
+    .ss-glow .essload1-icon-full,
+    .ss-glow .essload2-icon,
+    .ss-glow .nonessload1-icon {
+      animation: none;
+      filter: drop-shadow(0 0 3px currentColor);
+    }
+    .ss-glow .ss-flow-pulse,
+    .ss-glow .ss-soc-arc,
+    .ss-glow .ss-soc-sweep,
+    .ss-glow.card::before {
+      animation: none;
+    }
+  }
 `;
 
 // demo/glow-demo.ts
 var FLOWS = [
   { id: "pv", color: "#ffa500", d: "M 60 40 C 140 40 140 110 220 110", dur: 2 },
   { id: "bat", color: "#ff5fa2", d: "M 60 110 L 220 110", dur: 1.4 },
-  { id: "grid", color: "#3fa9ff", d: "M 60 180 C 140 180 140 110 220 110", dur: 2.6 }
+  {
+    id: "grid",
+    color: "#3fa9ff",
+    d: "M 60 180 C 140 180 140 110 220 110",
+    dur: 2.6
+  }
 ];
 function buildFlows() {
   return w`
-		${FLOWS.map(
-    (f3) => renderPVFlow(f3.id, f3.d, f3.color, 3, 1e3, f3.dur, false, 1)
-  )}
+		${FLOWS.map((f3) => renderPVFlow(f3.id, f3.d, f3.color, 3, 1e3, f3.dur, false, 1))}
 		<!-- a couple of full-card style path+circle flows too -->
 		${renderPath("extra-line", "M 220 110 L 260 110", true, "#5fb6ad", 3)}
 		${renderCircle("extra-dot", 4, "#5fb6ad", 1.6, "0;1", "#extra-line")}
 	`;
 }
 function panel(title, glow, opts = {}) {
-  const { theme = "neon", activity = 0.7, charging = true } = opts;
+  const {
+    theme = "neon",
+    activity = 0.7,
+    charging = true,
+    intensity = 3,
+    reducedMotion = false
+  } = opts;
   globalData.glow = glow;
-  globalData.glowIntensity = 3;
+  globalData.glowIntensity = intensity;
+  globalData.reducedMotion = reducedMotion;
   const flows = buildFlows();
   const nodes = w`
 		<circle cx="40" cy="40" r="14" fill="#ffa500" class="grid-icon" style="color:#ffa500"/>
@@ -1365,19 +1405,21 @@ function panel(title, glow, opts = {}) {
   const ambientVars = glow ? `--ss-c-solar:#ffa500;--ss-c-batt:#ff5fa2;--ss-c-grid:#3fa9ff;--ss-ambient-1:#ffa500;--ss-ambient-2:#3fa9ff;--ss-activity:${activity};--ss-pulse-dur:${(3.4 - activity * 2).toFixed(2)}s;` : "";
   const cls = glow ? `ss-glow ss-theme-${theme}` : "";
   return b2`
-		<figure class="panel">
-			<figcaption>${title}</figcaption>
-			<div class="container card ${cls}" style="${ambientVars}">
-				<svg viewBox="0 0 300 220" width="380" height="280"
-					xmlns="http://www.w3.org/2000/svg"
-					xmlns:xlink="http://www.w3.org/1999/xlink">
-					${renderGlowDefs(glow, 3)}
-					${nodes}
-					${flows}
-				</svg>
-			</div>
-		</figure>
-	`;
+    <figure class="panel">
+      <figcaption>${title}</figcaption>
+      <div class="container card ${cls}" style="${ambientVars}">
+        <svg
+          viewBox="0 0 300 220"
+          width="380"
+          height="280"
+          xmlns="http://www.w3.org/2000/svg"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+        >
+          ${renderGlowDefs(glow, 3)} ${nodes} ${flows}
+        </svg>
+      </div>
+    </figure>
+  `;
 }
 var styleEl = document.createElement("style");
 styleEl.textContent = `
@@ -1406,7 +1448,29 @@ var fire = panel("Fire theme \xB7 charging", true, {
   activity: 0.6,
   charging: true
 });
-D(b2`<div class="wrap">${off}${neon}${ice}${fire}</div>`, root);
+var mono = panel("Mono theme (desaturated)", true, {
+  theme: "mono",
+  activity: 0.7,
+  charging: true
+});
+var lite = panel("Effects-lite (intensity 1)", true, {
+  theme: "neon",
+  activity: 0.7,
+  charging: true,
+  intensity: 1
+});
+var reduced = panel("Reduced motion", true, {
+  theme: "neon",
+  activity: 0.7,
+  charging: true,
+  reducedMotion: true
+});
+D(
+  b2`<div class="wrap">
+    ${off}${neon}${ice}${fire}${mono}${lite}${reduced}
+  </div>`,
+  root
+);
 /*! Bundled license information:
 
 @lit/reactive-element/css-tag.js:

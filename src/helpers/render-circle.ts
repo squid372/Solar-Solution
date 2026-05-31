@@ -14,60 +14,70 @@ import { globalData } from './globals';
  * @returns A Lit SVG template for the animated circle element.
  */
 export const renderCircle = (
-	id: string,
-	radius: number,
-	fill: string,
-	duration: number,
-	keyPoints: string,
-	mpathHref: string,
-	invertFlow: boolean = false,
+  id: string,
+  radius: number,
+  fill: string,
+  duration: number,
+  keyPoints: string,
+  mpathHref: string,
+  invertFlow: boolean = false,
 ) => {
-	// If fill is transparent, skip rendering the animated dot entirely to avoid
-	// running animations and triggering paints when power is zero or the flow is hidden.
-	if (fill === 'transparent') {
-		return svg``;
-	}
+  // If fill is transparent, skip rendering the animated dot entirely to avoid
+  // running animations and triggering paints when power is zero or the flow is hidden.
+  if (fill === 'transparent') {
+    return svg``;
+  }
 
-	const finalKeyPoints = invertFlow
-		? Utils.invertKeyPoints(keyPoints)
-		: keyPoints;
+  const finalKeyPoints = invertFlow
+    ? Utils.invertKeyPoints(keyPoints)
+    : keyPoints;
 
-	const motion = svg`
+  const motion = svg`
         <animateMotion dur="${duration}s" repeatCount="indefinite"
             keyPoints="${finalKeyPoints}"
             keyTimes="0;1" calcMode="linear">
             <mpath href="${mpathHref}"/>
         </animateMotion>`;
 
-	// Plain dot (default look) when glow is disabled.
-	if (!globalData.glow) {
-		return svg`
+  // Plain dot (default look) when glow is disabled.
+  if (!globalData.glow) {
+    return svg`
         <circle id="${id}" cx="0" cy="0" r="${radius}" fill="${fill}">
             ${motion}
         </circle>
     `;
-	}
+  }
 
-	// Comet trail: ghost dots phase-offset behind the head, fading and
-	// shrinking so the moving dot reads as a glowing comet.
-	const trail = [
-		{ r: radius * 0.75, o: 0.45, lag: 0.06 },
-		{ r: radius * 0.5, o: 0.22, lag: 0.12 },
-	];
+  // Effects-lite (intensity <= 1) and reduced-motion both drop the extra
+  // SMIL-animated elements; lite keeps a static hot core, reduced-motion
+  // keeps it too but without the moving extras.
+  const lite = globalData.glowIntensity <= 1;
+  const extras = !lite && !globalData.reducedMotion;
 
-	// Line overlays cloned from the flow path (mpathHref): a thin white-hot
-	// core down the centre, plus a luminous pulse wave that sweeps the line.
-	// CSS (.ss-flow-core / .ss-flow-pulse) styles + animates these; CSS wins
-	// over the path's own stroke attribute. Pulse direction follows flow.
-	const pulseClass = invertFlow ? 'ss-flow-pulse ss-flow-pulse--rev' : 'ss-flow-pulse';
-	const lineOverlays = svg`
-        <use href="${mpathHref}" xlink:href="${mpathHref}" class="ss-flow-core" />
-        <use href="${mpathHref}" xlink:href="${mpathHref}" class="${pulseClass}" />`;
+  // Static white-hot core down the centre of the line (a <use> clone). CSS
+  // (.ss-flow-core) wins over the path's own stroke attribute.
+  const coreOverlay = svg`<use href="${mpathHref}" xlink:href="${mpathHref}" class="ss-flow-core" />`;
 
-	return svg`
-        ${lineOverlays}
+  // Pulse wave sweeping the line + comet trail + moving hot core: only the
+  // richer presentation.
+  const pulseClass = invertFlow
+    ? 'ss-flow-pulse ss-flow-pulse--rev'
+    : 'ss-flow-pulse';
+  const pulseOverlay = extras
+    ? svg`<use href="${mpathHref}" xlink:href="${mpathHref}" class="${pulseClass}" />`
+    : svg``;
+  const trail = extras
+    ? [
+        { r: radius * 0.75, o: 0.45, lag: 0.06 },
+        { r: radius * 0.5, o: 0.22, lag: 0.12 },
+      ]
+    : [];
+
+  return svg`
+        ${coreOverlay}
+        ${pulseOverlay}
         ${trail.map(
-					(t) => svg`
+          (t) => svg`
         <circle cx="0" cy="0" r="${t.r}" fill="${fill}" opacity="${t.o}" class="ss-flow-dot">
             <animateMotion dur="${duration}s" begin="${(duration * t.lag).toFixed(3)}s"
                 repeatCount="indefinite" keyPoints="${finalKeyPoints}"
@@ -75,15 +85,19 @@ export const renderCircle = (
                 <mpath href="${mpathHref}"/>
             </animateMotion>
         </circle>`,
-				)}
+        )}
         <circle id="${id}" cx="0" cy="0" r="${radius}" fill="${fill}" class="ss-flow-dot">
             ${motion}
         </circle>
-        <circle cx="0" cy="0" r="${Math.max(radius * 0.42, 1)}" fill="#ffffff" class="ss-dot-core">
+        ${
+          extras
+            ? svg`<circle cx="0" cy="0" r="${Math.max(radius * 0.42, 1)}" fill="#ffffff" class="ss-dot-core">
             <animateMotion dur="${duration}s" repeatCount="indefinite"
                 keyPoints="${finalKeyPoints}" keyTimes="0;1" calcMode="linear">
                 <mpath href="${mpathHref}"/>
             </animateMotion>
-        </circle>
+        </circle>`
+            : svg``
+        }
     `;
 };
