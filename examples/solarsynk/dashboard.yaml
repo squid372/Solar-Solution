@@ -1,7 +1,9 @@
 # ============================================================================
-#  Example dashboard view embedding the Sunsynk Power Flow Card wired to
-#  the SolarSynk V3 add-on. Replace YOURSERIAL with your inverter serial.
+#  Example dashboard wiring the full Solar-Solution suite to the SolarSynk V3
+#  add-on: the power-flow card plus every companion card (battery, inverter,
+#  daily energy, self-sufficiency, solar-vs-grid).
 #
+#  Replace YOURSERIAL with your inverter serial throughout.
 #  Add via: Settings -> Dashboards -> (your dashboard) -> Edit -> Raw
 #  configuration editor, then paste this `views:` entry.
 # ============================================================================
@@ -13,6 +15,7 @@ views:
     type: sections
     max_columns: 2
     sections:
+      # ----- Main animated power-flow card ---------------------------------
       - type: grid
         cards:
           - type: custom:solar-solution
@@ -77,3 +80,97 @@ views:
               day_grid_export_77: sensor.solarsynkv3_YOURSERIAL_grid_etoday_to
               essential_power: sensor.solarsynkv3_YOURSERIAL_load_total_power
               day_load_energy_84: sensor.solarsynkv3_YOURSERIAL_load_daily_used
+
+      # ----- Battery status + self-sufficiency -----------------------------
+      - type: grid
+        cards:
+          - type: custom:solar-solution-battery
+            title: Battery
+            glow: true
+            soc: sensor.solarsynkv3_YOURSERIAL_battery_soc
+            power: sensor.solarsynkv3_YOURSERIAL_battery_power
+            voltage: sensor.solarsynkv3_YOURSERIAL_battery_voltage
+            current: sensor.solarsynkv3_YOURSERIAL_battery_bms_current
+            temp: sensor.solarsynkv3_YOURSERIAL_battery_bms_temperature
+
+          - type: custom:solar-solution-self-sufficiency
+            title: Self-sufficiency
+            glow: true
+            load: sensor.solarsynkv3_YOURSERIAL_load_daily_used
+            grid_import: sensor.solarsynkv3_YOURSERIAL_grid_etoday_from
+
+      # ----- Daily energy + solar vs grid ----------------------------------
+      - type: grid
+        cards:
+          - type: custom:solar-solution-energy-summary
+            title: Daily energy
+            glow: true
+            solar: sensor.solarsynkv3_YOURSERIAL_pv_etoday
+            load: sensor.solarsynkv3_YOURSERIAL_load_daily_used
+            battery_charge: sensor.solarsynkv3_YOURSERIAL_battery_etoday_charge
+            battery_discharge: sensor.solarsynkv3_YOURSERIAL_battery_etoday_discharge
+            grid_import: sensor.solarsynkv3_YOURSERIAL_grid_etoday_from
+            grid_export: sensor.solarsynkv3_YOURSERIAL_grid_etoday_to
+
+          - type: custom:solar-solution-grid-balance
+            title: Solar vs Grid
+            glow: true
+            left:
+              entity: sensor.solarsynkv3_YOURSERIAL_pv_etoday
+              label: Solar
+              colour: '#ffa500'
+            right:
+              entity: sensor.solarsynkv3_YOURSERIAL_grid_etoday_from
+              label: Grid
+              colour: '#5490c2'
+
+      # ----- All inverter settings -----------------------------------------
+      - type: grid
+        cards:
+          - type: custom:solar-solution-inverter
+            title: Inverter
+            glow: true
+            status: sensor.solarsynkv3_YOURSERIAL_status
+            entities:
+              - entity: sensor.solarsynkv3_YOURSERIAL_sysworkmode
+                label: Work mode
+                icon: mdi:cog
+              - entity: sensor.solarsynkv3_YOURSERIAL_energymode
+                label: Priority
+                icon: mdi:flash
+              - entity: sensor.solarsynkv3_YOURSERIAL_solarsell
+                label: Solar sell
+                icon: mdi:cash
+              - entity: sensor.solarsynkv3_YOURSERIAL_solarmaxsellpower
+                label: Max sell
+                icon: mdi:transmission-tower-export
+              - entity: sensor.solarsynkv3_YOURSERIAL_inverter_power
+                label: Output
+                icon: mdi:power-plug
+              - entity: sensor.solarsynkv3_YOURSERIAL_load_total_power
+                label: Load
+                icon: mdi:home-lightning-bolt
+              - entity: sensor.solarsynkv3_YOURSERIAL_load_frequency
+                label: Frequency
+                icon: mdi:sine-wave
+              - entity: sensor.solarsynkv3_YOURSERIAL_grid_phase0_voltage
+                label: Grid voltage
+                icon: mdi:flash-triangle
+              - entity: sensor.solarsynkv3_YOURSERIAL_gridsignal
+                label: Grid
+                icon: mdi:transmission-tower
+              - entity: sensor.solarsynkv3_YOURSERIAL_inverter_dc_temperature
+                label: DC temp
+                icon: mdi:thermometer
+              - entity: sensor.solarsynkv3_YOURSERIAL_inverter_ac_temperature
+                label: AC temp
+                icon: mdi:thermometer
+              - entity: sensor.solarsynkv3_YOURSERIAL_battery_capacity
+                label: Capacity
+                icon: mdi:battery-high
+              - entity: sensor.solarsynkv3_YOURSERIAL_pv_etotal
+                label: PV lifetime
+                icon: mdi:solar-power
+              - entity: sensor.solarsynkv3_YOURSERIAL_battery_status
+                label: Battery
+                icon: mdi:battery-heart-variant

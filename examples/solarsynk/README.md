@@ -38,13 +38,27 @@ the card's entity slots so the card works out of the box.
 4. Add the card:
    - **Single card** → copy [`card.yaml`](card.yaml) into a *Manual* card, or
    - **Whole view** → paste [`dashboard.yaml`](dashboard.yaml)'s `views:` entry
-     into your dashboard's raw configuration editor.
+     into your dashboard's raw configuration editor. This lays out the
+     **full suite**: the power-flow card plus all the companion cards below.
 5. Adjust `solar.mppts` (1–6), `battery.energy`, and the `max_power` values to
    match your system. The `full` style shows up to 4 MPPT strings; use
    `cardstyle: lite`/`compact` (with `wide: true`) to display 5–6 strings.
 
 The preset enables `wide: true` (16:9) so the full layout isn't cramped. Remove
 that line for the narrower 4:3 layout.
+
+## Companion cards in the preset
+
+[`dashboard.yaml`](dashboard.yaml) also wires up the extra Solar-Solution cards,
+so no live data is left unseen:
+
+| Card | Shows |
+|------|-------|
+| **Battery status** (`solar-solution-battery`) | Animated liquid SOC fill, charge/discharge, voltage, current, temperature |
+| **Self-sufficiency** (`solar-solution-self-sufficiency`) | Share of today's load met by solar + battery vs the grid |
+| **Daily energy** (`solar-solution-energy-summary`) | Today's solar / load / charged / discharged / imported / exported totals |
+| **Solar vs Grid** (`solar-solution-grid-balance`) | Today's energy mix as a diverging bar |
+| **Inverter** (`solar-solution-inverter`) | Work mode, priority, solar-sell, max-sell, output, load, frequency, grid voltage, temps, capacity, lifetime PV, battery state |
 
 ## Entity mapping
 
