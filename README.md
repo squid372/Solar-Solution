@@ -136,6 +136,26 @@ a ready-to-use, pre-mapped card preset (with the glow theme enabled) lives in
 | **Card loads but values are blank / "unavailable"** | Your `sensor.*` entity IDs are wrong. Check exact IDs in *Developer Tools → States*. |
 | **Glow theme looks flat** | It's opt-in: set `glow: true`. It shows best on dark themes. |
 
+## Companion cards
+
+The same resource also registers extra cards you can drop onto a dashboard:
+
+### Grid energy balance — `custom:solar-solution-grid-balance`
+
+Shows **imported − exported = net** grid energy with a proportional diverging
+bar (export purple, import blue). Point it at two energy (kWh) sensors:
+
+```yaml
+type: custom:solar-solution-grid-balance
+title: Grid energy balance
+import: sensor.solarsynkv3_YOURSERIAL_grid_etotal_from
+export: sensor.solarsynkv3_YOURSERIAL_grid_etotal_to
+glow: true # optional, matches the main card's neon look
+# import_colour: '#5490c2'   # optional
+# export_colour: '#b48be0'   # optional
+# decimals: 2                # optional
+```
+
 ## Configuration
 
 Every option is documented in [`docs/configuration.md`](docs/configuration.md).
