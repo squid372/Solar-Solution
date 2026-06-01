@@ -170,20 +170,27 @@ export class SolarSolutionEnergySummary extends LitElement {
       font-weight: 600;
     }
     .ss-es-glow {
-      background: color-mix(
+      --ha-card-background: color-mix(
         in srgb,
-        var(--ha-card-background, var(--card-background-color, #161a23)) 78%,
+        var(--card-background-color, #161a23) 80%,
         transparent
       );
-      -webkit-backdrop-filter: blur(8px) saturate(130%);
-      backdrop-filter: blur(8px) saturate(130%);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: color-mix(
+        in srgb,
+        var(--card-background-color, #161a23) 80%,
+        transparent
+      );
+      -webkit-backdrop-filter: blur(9px) saturate(135%);
+      backdrop-filter: blur(9px) saturate(135%);
+      border: 1px solid rgba(255, 255, 255, 0.14);
     }
     .ss-es-glow .fill {
       position: relative;
       overflow: hidden;
-      box-shadow: 0 0 14px -2px var(--c);
-      filter: drop-shadow(0 0 3px var(--c));
+      box-shadow:
+        0 0 16px var(--c),
+        0 0 5px var(--c);
+      filter: drop-shadow(0 0 4px var(--c));
     }
     /* Light shimmer sweeping along each glowing bar. */
     .ss-es-glow .fill::after {

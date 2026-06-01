@@ -244,14 +244,19 @@ export class SolarSolutionGridBalance extends LitElement {
     }
     /* Optional neon glow to match the main card */
     .ss-gb-glow {
-      background: color-mix(
+      --ha-card-background: color-mix(
         in srgb,
-        var(--ha-card-background, var(--card-background-color, #161a23)) 78%,
+        var(--card-background-color, #161a23) 80%,
         transparent
       );
-      -webkit-backdrop-filter: blur(8px) saturate(130%);
-      backdrop-filter: blur(8px) saturate(130%);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: color-mix(
+        in srgb,
+        var(--card-background-color, #161a23) 80%,
+        transparent
+      );
+      -webkit-backdrop-filter: blur(9px) saturate(135%);
+      backdrop-filter: blur(9px) saturate(135%);
+      border: 1px solid rgba(255, 255, 255, 0.14);
     }
     .ss-gb-glow .bar {
       box-shadow:
@@ -259,10 +264,14 @@ export class SolarSolutionGridBalance extends LitElement {
         inset 0 0 0 1px rgba(255, 255, 255, 0.06);
     }
     .ss-gb-glow .seg.l {
-      box-shadow: 0 0 12px -2px var(--left);
+      box-shadow:
+        0 0 16px var(--left),
+        0 0 5px var(--left);
     }
     .ss-gb-glow .seg.r {
-      box-shadow: 0 0 12px -2px var(--right);
+      box-shadow:
+        0 0 16px var(--right),
+        0 0 5px var(--right);
     }
     .ss-gb-glow .divider {
       box-shadow: 0 0 8px 1px rgba(255, 255, 255, 0.85);

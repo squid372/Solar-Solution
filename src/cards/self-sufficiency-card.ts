@@ -164,14 +164,19 @@ export class SolarSolutionSelfSufficiency extends LitElement {
     }
     /* A full-circle arc has a valid bounding box, so drop-shadow glows safely. */
     .ss-ss-glow {
-      background: color-mix(
+      --ha-card-background: color-mix(
         in srgb,
-        var(--ha-card-background, var(--card-background-color, #161a23)) 78%,
+        var(--card-background-color, #161a23) 80%,
         transparent
       );
-      -webkit-backdrop-filter: blur(8px) saturate(130%);
-      backdrop-filter: blur(8px) saturate(130%);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: color-mix(
+        in srgb,
+        var(--card-background-color, #161a23) 80%,
+        transparent
+      );
+      -webkit-backdrop-filter: blur(9px) saturate(135%);
+      backdrop-filter: blur(9px) saturate(135%);
+      border: 1px solid rgba(255, 255, 255, 0.14);
     }
     /* Animate the arc filling in, and breathe its glow. */
     .arc {
@@ -186,10 +191,10 @@ export class SolarSolutionSelfSufficiency extends LitElement {
     @keyframes ss-gauge-breathe {
       0%,
       100% {
-        filter: drop-shadow(0 0 4px var(--c));
+        filter: drop-shadow(0 0 6px var(--c));
       }
       50% {
-        filter: drop-shadow(0 0 11px var(--c));
+        filter: drop-shadow(0 0 16px var(--c)) drop-shadow(0 0 6px var(--c));
       }
     }
     @media (prefers-reduced-motion: reduce) {
