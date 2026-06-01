@@ -136,7 +136,9 @@ export const styles: CSSResultGroup = css`
     stroke-width: 1.2;
     stroke-linecap: round;
     pointer-events: none;
-    filter: drop-shadow(0 0 1.5px var(--ss-hot, #fff));
+    /* No filter here: a bounding-box filter would collapse on horizontal /
+       vertical core lines and hide them. The plain bright stroke is enough —
+       the underlying ss-flow-line already supplies the glow. */
   }
 
   /* Hot core inside the comet head. */

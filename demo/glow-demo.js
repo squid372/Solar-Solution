@@ -559,7 +559,10 @@ var globalData = {
   // When the user prefers reduced motion, the flow helpers drop the extra
   // SMIL-animated elements (comet trails, moving hot-core) that CSS media
   // queries can't pause.
-  reducedMotion: false
+  reducedMotion: false,
+  // Battery state-of-charge ring (a glow feature). On by default; can be
+  // disabled via the `soc_ring` config without turning off the rest of glow.
+  socRing: true
 };
 
 // src/helpers/render-glow-defs.ts
@@ -573,7 +576,7 @@ var renderGlowDefs = (enabled, intensity = 2) => {
   const nodeBlur = Math.min(1 + k2 * 0.8, 5).toFixed(2);
   return w`
 		<defs>
-			<filter id="ss-glow-line" x="-60%" y="-60%" width="220%" height="220%">
+			<filter id="ss-glow-line" filterUnits="userSpaceOnUse" x="-60" y="-60" width="840" height="525">
 				<feGaussianBlur in="SourceGraphic" stdDeviation="${lineBlur}" result="b" />
 				<feMerge>
 					<feMergeNode in="b" />
@@ -995,21 +998,21 @@ var renderPath = (id, d3, display, color, lineWidth) => {
 
 // src/helpers/render-soc-ring.ts
 function renderSocRing(cx, cy, r5, soc, color, show = true, charging = false) {
-  if (!globalData.glow || !show) {
+  if (!globalData.glow || !globalData.socRing || !show) {
     return w``;
   }
   const pct = Math.max(0, Math.min(100, Number.isFinite(soc) ? soc : 0));
   const sweep = charging ? w`<circle class="ss-soc-sweep" cx="${cx}" cy="${cy}" r="${r5}" fill="none"
-				stroke="${color}" stroke-width="3" stroke-linecap="round"
+				stroke="${color}" stroke-width="2.5" stroke-linecap="round"
 				pathLength="100" stroke-dasharray="10 90"
 				style="transform-origin:${cx}px ${cy}px" />` : w``;
   return w`
 		<g class="ss-soc-ring${charging ? " ss-soc-ring--charging" : ""}"
 			transform="rotate(-90 ${cx} ${cy})" pointer-events="none">
 			<circle cx="${cx}" cy="${cy}" r="${r5}" fill="none"
-				stroke="${color}" stroke-opacity="0.16" stroke-width="3" />
+				stroke="${color}" stroke-opacity="0.16" stroke-width="2.5" />
 			<circle class="ss-soc-arc" cx="${cx}" cy="${cy}" r="${r5}" fill="none"
-				stroke="${color}" stroke-width="3" stroke-linecap="round"
+				stroke="${color}" stroke-width="2.5" stroke-linecap="round"
 				pathLength="100" stroke-dasharray="${pct} 100" />
 			${sweep}
 		</g>
@@ -1153,7 +1156,9 @@ var styles = i`
     stroke-width: 1.2;
     stroke-linecap: round;
     pointer-events: none;
-    filter: drop-shadow(0 0 1.5px var(--ss-hot, #fff));
+    /* No filter here: a bounding-box filter would collapse on horizontal /
+       vertical core lines and hide them. The plain bright stroke is enough —
+       the underlying ss-flow-line already supplies the glow. */
   }
 
   /* Hot core inside the comet head. */
@@ -1265,11 +1270,11 @@ var styles = i`
     0%,
     100% {
       stroke-opacity: 0.85;
-      stroke-width: 3;
+      stroke-width: 2.5;
     }
     50% {
       stroke-opacity: 1;
-      stroke-width: 3.6;
+      stroke-width: 3;
     }
   }
 
@@ -1370,7 +1375,8 @@ var FLOWS = [
     color: "#3fa9ff",
     d: "M 60 180 C 140 180 140 110 220 110",
     dur: 2.6
-  }
+  },
+  { id: "vert", color: "#5fd0c5", d: "M 270 30 L 270 190", dur: 2.2 }
 ];
 function buildFlows() {
   return w`

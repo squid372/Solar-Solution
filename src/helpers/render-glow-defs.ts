@@ -25,7 +25,7 @@ export const renderGlowDefs = (enabled: boolean, intensity: number = 2) => {
 
   return svg`
 		<defs>
-			<filter id="ss-glow-line" x="-60%" y="-60%" width="220%" height="220%">
+			<filter id="ss-glow-line" filterUnits="userSpaceOnUse" x="-60" y="-60" width="840" height="525">
 				<feGaussianBlur in="SourceGraphic" stdDeviation="${lineBlur}" result="b" />
 				<feMerge>
 					<feMergeNode in="b" />

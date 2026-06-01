@@ -7,7 +7,8 @@ import { renderPath } from '../src/helpers/render-path';
 import { renderSocRing } from '../src/helpers/render-soc-ring';
 import { styles } from '../src/style';
 
-// Three representative flows: solar (orange), battery (pink), grid (blue).
+// Representative flows incl. a straight HORIZONTAL (bat) and VERTICAL (vert)
+// line to verify the filter fix renders axis-aligned lines.
 const FLOWS = [
   { id: 'pv', color: '#ffa500', d: 'M 60 40 C 140 40 140 110 220 110', dur: 2 },
   { id: 'bat', color: '#ff5fa2', d: 'M 60 110 L 220 110', dur: 1.4 },
@@ -17,6 +18,7 @@ const FLOWS = [
     d: 'M 60 180 C 140 180 140 110 220 110',
     dur: 2.6,
   },
+  { id: 'vert', color: '#5fd0c5', d: 'M 270 30 L 270 190', dur: 2.2 },
 ];
 
 // Build the flow group. Reads globalData.glow at call time, so toggle before calling.
