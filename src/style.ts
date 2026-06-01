@@ -84,8 +84,11 @@ export const styles: CSSResultGroup = css`
   /* ===== Neon glow flow effects (opt-in via the \`glow\` config) ===== */
   /* The filters referenced here are injected as <defs> inside the card SVG
 	   when glow is enabled, so they resolve within this shadow root. */
+  /* Region-free glow: drop-shadow uses the element's own colour (set inline as
+     CSS color) and never collapses on horizontal/vertical lines the way an
+     objectBoundingBox SVG filter does. */
   .ss-glow .ss-flow-line {
-    filter: url(#ss-glow-line);
+    filter: drop-shadow(0 0 2px currentColor) drop-shadow(0 0 5px currentColor);
   }
 
   .ss-glow .ss-flow-dot {
@@ -112,13 +115,13 @@ export const styles: CSSResultGroup = css`
   /* Mono actually desaturates the glowing elements (grayscale before the
 	   colour-preserving glow filter). */
   .ss-glow.ss-theme-mono .ss-flow-line {
-    filter: grayscale(1) url(#ss-glow-line);
+    filter: grayscale(1) drop-shadow(0 0 2px #fff) drop-shadow(0 0 5px #fff);
   }
   .ss-glow.ss-theme-mono .ss-flow-dot {
     filter: grayscale(1) url(#ss-glow-dot);
   }
   .ss-glow.ss-theme-mono .ss-soc-ring {
-    filter: grayscale(1) url(#ss-glow-line);
+    filter: grayscale(1) drop-shadow(0 0 3px #fff);
   }
   .ss-glow.ss-theme-mono svg#sun {
     filter: grayscale(1) url(#ss-glow-node);
@@ -161,7 +164,8 @@ export const styles: CSSResultGroup = css`
     pointer-events: none;
     stroke-dasharray: 34 1000;
     stroke-dashoffset: 1000;
-    filter: url(#ss-glow-line);
+    filter: drop-shadow(0 0 3px var(--ss-hot, #fff))
+      drop-shadow(0 0 6px var(--ss-hot, #fff));
     animation: ss-pulse-move var(--ss-pulse-dur, 2.6s) linear infinite;
     will-change: stroke-dashoffset;
   }
@@ -222,7 +226,7 @@ export const styles: CSSResultGroup = css`
 
   /* ===== Battery SOC ring ===== */
   .ss-glow .ss-soc-ring {
-    filter: url(#ss-glow-line);
+    filter: drop-shadow(0 0 3px currentColor);
   }
 
   .ss-glow .ss-soc-arc {

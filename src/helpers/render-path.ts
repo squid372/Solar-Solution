@@ -26,6 +26,7 @@ export const renderPath = (
         <path id="${id}" d="${d}" fill="none" display="${display ? '' : 'none'}"
             stroke="${color}" stroke-width="${lineWidth}"
             stroke-miterlimit="10" pointer-events="stroke" class="${glowClass}"
+            style="${glow ? `color:${color}` : ''}"
             pathLength="${glow ? '1000' : ''}"/>
     `;
 };

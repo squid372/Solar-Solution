@@ -19,20 +19,14 @@ export const renderGlowDefs = (enabled: boolean, intensity: number = 2) => {
 
   const k = Number.isFinite(intensity) && intensity > 0 ? intensity : 2;
   // Tame blur radii so the bloom is striking but doesn't smear the diagram.
-  const lineBlur = Math.min(1 + k * 0.6, 4).toFixed(2);
   const dotBlur = Math.min(1.4 + k * 0.9, 6).toFixed(2);
   const nodeBlur = Math.min(1 + k * 0.8, 5).toFixed(2);
 
+  // Note: flow lines, the pulse wave and the SOC ring glow via CSS drop-shadow
+  // (region-free) rather than an SVG filter, because an objectBoundingBox filter
+  // region collapses to zero for horizontal/vertical lines and hides them.
   return svg`
 		<defs>
-			<filter id="ss-glow-line" filterUnits="userSpaceOnUse" x="-60" y="-60" width="840" height="525">
-				<feGaussianBlur in="SourceGraphic" stdDeviation="${lineBlur}" result="b" />
-				<feMerge>
-					<feMergeNode in="b" />
-					<feMergeNode in="b" />
-					<feMergeNode in="SourceGraphic" />
-				</feMerge>
-			</filter>
 			<filter id="ss-glow-dot" x="-150%" y="-150%" width="400%" height="400%">
 				<feGaussianBlur in="SourceGraphic" stdDeviation="${dotBlur}" result="b" />
 				<feMerge>

@@ -42,7 +42,8 @@ export function renderSocRing(
 
   return svg`
 		<g class="ss-soc-ring${charging ? ' ss-soc-ring--charging' : ''}"
-			transform="rotate(-90 ${cx} ${cy})" pointer-events="none">
+			transform="rotate(-90 ${cx} ${cy})" pointer-events="none"
+			style="color:${color}">
 			<circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
 				stroke="${color}" stroke-opacity="0.16" stroke-width="2.5" />
 			<circle class="ss-soc-arc" cx="${cx}" cy="${cy}" r="${r}" fill="none"

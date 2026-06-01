@@ -68,6 +68,7 @@ export function renderPVFlow(
 				stroke-miterlimit="10"
 				pointer-events="stroke"
 				class="${lineClass}"
+				style="${glow ? `color:${color}` : ''}"
 				pathLength="${glow ? '1000' : ''}"
 			/>
 			${lineOverlays}
