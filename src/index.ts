@@ -42,6 +42,7 @@ import { compactCard } from './cards/compact-card';
 import './cards/grid-balance-card';
 import './cards/energy-summary-card';
 import './cards/self-sufficiency-card';
+import './cards/battery-status-card';
 import { globalData } from './helpers/globals';
 import { InverterFactory } from './inverters/inverter-factory';
 import { BatteryIconManager } from './helpers/battery-icon-manager';

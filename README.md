@@ -205,6 +205,29 @@ grid_import: sensor.solarsynkv3_YOURSERIAL_grid_etoday_from
 # colour: '#5fd07a'                   # optional fixed colour
 ```
 
+### Battery status — `custom:solar-solution-battery`
+
+A battery glyph with an **animated liquid fill**: the level rises and falls with
+your state-of-charge, the surface ripples like real fluid, bubbles rise while
+charging, and the liquid **changes colour with SOC** — green when high, amber
+around half, red when low.
+
+```yaml
+type: custom:solar-solution-battery
+title: Battery
+glow: true
+soc: sensor.solarsynkv3_YOURSERIAL_battery_soc # % — required
+power: sensor.solarsynkv3_YOURSERIAL_battery_power # W — drives charging/discharging
+# invert_power: false   # flip if charging shows as discharging
+voltage: sensor.solarsynkv3_YOURSERIAL_battery_voltage
+current: sensor.solarsynkv3_YOURSERIAL_battery_current
+temp: sensor.solarsynkv3_YOURSERIAL_battery_temp
+# colour: '#33c463'     # optional: force a fixed liquid colour
+```
+
+By default the liquid is green at/above 70 %, amber between 30–70 %, and red at
+or below 30 %. `prefers-reduced-motion` pauses the waves and hides the bubbles.
+
 ## Configuration
 
 Every option is documented in [`docs/configuration.md`](docs/configuration.md).
