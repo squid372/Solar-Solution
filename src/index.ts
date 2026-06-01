@@ -38,8 +38,10 @@ import merge from 'lodash.merge';
 import { Utils } from './helpers/utils';
 import { fullCard } from './cards/full-card';
 import { compactCard } from './cards/compact-card';
-// Side-effect import: registers the <solar-solution-grid-balance> companion card.
+// Side-effect imports: register the companion cards.
 import './cards/grid-balance-card';
+import './cards/energy-summary-card';
+import './cards/self-sufficiency-card';
 import { globalData } from './helpers/globals';
 import { InverterFactory } from './inverters/inverter-factory';
 import { BatteryIconManager } from './helpers/battery-icon-manager';

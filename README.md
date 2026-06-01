@@ -156,6 +156,39 @@ glow: true # optional, matches the main card's neon look
 # decimals: 2                # optional
 ```
 
+### Daily energy summary — `custom:solar-solution-energy-summary`
+
+Today's energy totals (solar / load / charged / discharged / imported /
+exported) as proportional bars. Map only the rows you have:
+
+```yaml
+type: custom:solar-solution-energy-summary
+title: Daily energy
+glow: true
+solar: sensor.solarsynkv3_YOURSERIAL_pv_etoday
+load: sensor.solarsynkv3_YOURSERIAL_load_daily_used
+battery_charge: sensor.solarsynkv3_YOURSERIAL_battery_etoday_charge
+battery_discharge: sensor.solarsynkv3_YOURSERIAL_battery_etoday_discharge
+grid_import: sensor.solarsynkv3_YOURSERIAL_grid_etoday_from
+grid_export: sensor.solarsynkv3_YOURSERIAL_grid_etoday_to
+```
+
+### Self-sufficiency gauge — `custom:solar-solution-self-sufficiency`
+
+A glowing radial gauge for the share of your load powered by solar + battery
+(colour shifts red → amber → green). Either read a `%` sensor directly, or let
+it compute from daily load + grid-import energy:
+
+```yaml
+type: custom:solar-solution-self-sufficiency
+title: Self-sufficiency
+glow: true
+load: sensor.solarsynkv3_YOURSERIAL_load_daily_used
+grid_import: sensor.solarsynkv3_YOURSERIAL_grid_etoday_from
+# value: sensor.my_autarky_percent   # alternative: a direct % sensor
+# colour: '#5fd07a'                   # optional fixed colour
+```
+
 ## Configuration
 
 Every option is documented in [`docs/configuration.md`](docs/configuration.md).
