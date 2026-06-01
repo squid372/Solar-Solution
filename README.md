@@ -140,20 +140,36 @@ a ready-to-use, pre-mapped card preset (with the glow theme enabled) lives in
 
 The same resource also registers extra cards you can drop onto a dashboard:
 
-### Grid energy balance — `custom:solar-solution-grid-balance`
+### Energy balance — `custom:solar-solution-grid-balance`
 
-Shows **imported − exported = net** grid energy with a proportional diverging
-bar (export purple, import blue). Point it at two energy (kWh) sensors:
+Compares **any two energy values** on a proportional diverging bar. Each side
+takes an entity, label and colour — so it does **Solar vs Grid** (energy mix),
+**Imported vs Exported**, or anything else.
+
+```yaml
+# Solar vs Grid (energy source mix)
+type: custom:solar-solution-grid-balance
+title: Solar vs Grid
+glow: true
+left:
+  entity: sensor.solarsynkv3_YOURSERIAL_pv_etoday
+  label: Solar
+  colour: '#ffa500'
+right:
+  entity: sensor.solarsynkv3_YOURSERIAL_grid_etoday_from
+  label: Grid
+  colour: '#5490c2'
+# show_net: true   # optional: also show (left − right)
+```
+
+Shorthand for grid bought vs sold (`import − export = net`) still works:
 
 ```yaml
 type: custom:solar-solution-grid-balance
 title: Grid energy balance
+glow: true
 import: sensor.solarsynkv3_YOURSERIAL_grid_etotal_from
 export: sensor.solarsynkv3_YOURSERIAL_grid_etotal_to
-glow: true # optional, matches the main card's neon look
-# import_colour: '#5490c2'   # optional
-# export_colour: '#b48be0'   # optional
-# decimals: 2                # optional
 ```
 
 ### Daily energy summary — `custom:solar-solution-energy-summary`
