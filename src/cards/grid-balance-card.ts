@@ -98,7 +98,7 @@ export class SolarSolutionGridBalance extends LitElement {
 
     const dp = this._config.decimals ?? 2;
     const fmt = (n: number) => n.toFixed(dp);
-    const glow = this._config.glow === true;
+    const glow = this._config.glow !== false; // glow on by default; set glow: false to disable
     const legacy = this._legacy();
 
     let leftV: number;

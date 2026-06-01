@@ -60,7 +60,7 @@ export class SolarSolutionEnergySummary extends LitElement {
   protected render() {
     if (!this._config || !this.hass) return nothing;
     const dp = this._config.decimals ?? 1;
-    const glow = this._config.glow === true;
+    const glow = this._config.glow !== false; // glow on by default; set glow: false to disable
 
     const rows = ROWS.filter((r) => this._config[r.key]).map((r) => ({
       ...r,

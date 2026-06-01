@@ -79,7 +79,7 @@ export class SolarSolutionSelfSufficiency extends LitElement {
     const colour =
       this._config.colour ??
       (pct >= 67 ? '#5fd07a' : pct >= 34 ? '#ffb14e' : '#ff6b6b');
-    const glow = this._config.glow === true;
+    const glow = this._config.glow !== false; // glow on by default; set glow: false to disable
     const cx = 60;
     const cy = 60;
     const r = 46;
