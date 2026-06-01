@@ -43,6 +43,9 @@ the card's entity slots so the card works out of the box.
    match your system. The `full` style shows up to 4 MPPT strings; use
    `cardstyle: lite`/`compact` (with `wide: true`) to display 5–6 strings.
 
+The preset enables `wide: true` (16:9) so the full layout isn't cramped. Remove
+that line for the narrower 4:3 layout.
+
 ## Entity mapping
 
 | Card slot | SolarSynk sensor (`…_<name>`) |
