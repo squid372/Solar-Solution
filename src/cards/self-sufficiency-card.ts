@@ -84,6 +84,38 @@ export class SolarSolutionSelfSufficiency extends LitElement {
     const cy = 60;
     const r = 46;
 
+    // Tick marks every 10% around the dial.
+    const ticks: { x1: string; y1: string; x2: string; y2: string }[] = [];
+    for (let i = 0; i < 10; i++) {
+      const a = ((-90 + i * 36) * Math.PI) / 180;
+      ticks.push({
+        x1: (cx + 53 * Math.cos(a)).toFixed(2),
+        y1: (cy + 53 * Math.sin(a)).toFixed(2),
+        x2: (cx + 58 * Math.cos(a)).toFixed(2),
+        y2: (cy + 58 * Math.sin(a)).toFixed(2),
+      });
+    }
+    // Glowing knob at the leading edge of the fill.
+    const ka = ((-90 + pct * 3.6) * Math.PI) / 180;
+    const kx = (cx + r * Math.cos(ka)).toFixed(2);
+    const ky = (cy + r * Math.sin(ka)).toFixed(2);
+
+    // kWh breakdown (only when derived from load + grid_import).
+    let breakdown: unknown = nothing;
+    if (!this._config.value && this._config.load && this._config.grid_import) {
+      const load = this._num(this._config.load);
+      const imp = this._num(this._config.grid_import);
+      const self = Math.max(0, load - imp);
+      const unit =
+        this.hass?.states?.[this._config.load]?.attributes
+          ?.unit_of_measurement || 'kWh';
+      breakdown = html`<div class="breakdown">
+        <span style="color:${colour}">${self.toFixed(1)} ${unit} self</span>
+        <span class="dot">·</span>
+        <span class="grid">${imp.toFixed(1)} ${unit} grid</span>
+      </div>`;
+    }
+
     return html`
       <ha-card class="${glow ? 'ss-ss-glow' : ''}">
         <div class="head">
@@ -92,6 +124,12 @@ export class SolarSolutionSelfSufficiency extends LitElement {
         </div>
         <div class="gauge">
           <svg viewBox="0 0 120 120" style="--c:${colour}">
+            <g class="ticks">
+              ${ticks.map(
+                (t) =>
+                  svg`<line x1="${t.x1}" y1="${t.y1}" x2="${t.x2}" y2="${t.y2}" />`,
+              )}
+            </g>
             <circle
               cx="${cx}"
               cy="${cy}"
@@ -105,10 +143,13 @@ export class SolarSolutionSelfSufficiency extends LitElement {
               stroke="${colour}" stroke-width="11" stroke-linecap="round"
               pathLength="100" stroke-dasharray="${pct.toFixed(2)} 100"
               transform="rotate(-90 ${cx} ${cy})" />`}
+            ${svg`<circle class="knob" cx="${kx}" cy="${ky}" r="5.5" fill="${colour}" />`}
+            ${svg`<circle class="knob-core" cx="${kx}" cy="${ky}" r="2.3" fill="#ffffff" />`}
             <text x="60" y="58" class="pct">${pct.toFixed(dp)}%</text>
             <text x="60" y="76" class="sub">self-sufficient</text>
           </svg>
         </div>
+        ${breakdown}
       </ha-card>
     `;
   }
@@ -162,6 +203,29 @@ export class SolarSolutionSelfSufficiency extends LitElement {
       fill: var(--secondary-text-color);
       letter-spacing: 0.5px;
     }
+    .ticks line {
+      stroke: var(--primary-text-color);
+      stroke-opacity: 0.22;
+      stroke-width: 1.6;
+      stroke-linecap: round;
+    }
+    .knob-core {
+      pointer-events: none;
+    }
+    .breakdown {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 4px;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .breakdown .dot {
+      color: var(--secondary-text-color);
+    }
+    .breakdown .grid {
+      color: #5490c2;
+    }
     /* A full-circle arc has a valid bounding box, so drop-shadow glows safely. */
     .ss-ss-glow {
       --ha-card-background: color-mix(
@@ -188,6 +252,17 @@ export class SolarSolutionSelfSufficiency extends LitElement {
     .ss-ss-glow .pct {
       filter: drop-shadow(0 0 4px var(--c));
     }
+    .knob {
+      transition:
+        cx 0.9s ease,
+        cy 0.9s ease;
+    }
+    .ss-ss-glow .knob {
+      animation: ss-gauge-breathe 2.8s ease-in-out infinite;
+    }
+    .ss-ss-glow .knob-core {
+      filter: drop-shadow(0 0 2px #fff);
+    }
     @keyframes ss-gauge-breathe {
       0%,
       100% {
@@ -198,9 +273,12 @@ export class SolarSolutionSelfSufficiency extends LitElement {
       }
     }
     @media (prefers-reduced-motion: reduce) {
-      .arc {
+      .arc,
+      .knob {
         animation: none;
         transition: none;
+      }
+      .arc {
         filter: drop-shadow(0 0 5px var(--c));
       }
     }
