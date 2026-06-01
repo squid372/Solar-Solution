@@ -26,7 +26,7 @@ export function renderSocRing(
   show: boolean = true,
   charging: boolean = false,
 ) {
-  if (!globalData.glow || !show) {
+  if (!globalData.glow || !globalData.socRing || !show) {
     return svg``;
   }
 

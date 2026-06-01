@@ -7,6 +7,7 @@ export default {
   glow: false,
   glow_intensity: 2,
   glow_theme: 'neon',
+  soc_ring: true,
   show_solar: true,
   show_battery: true,
   show_grid: true,

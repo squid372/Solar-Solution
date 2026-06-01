@@ -86,6 +86,8 @@ export class SunSynkCardEditor
       'Strength of the neon glow bloom (1 = subtle, 5 = intense).',
     glow_theme:
       'Colour theme for the glowing cores and pulse waves: neon (white-hot), ice, fire, aurora, or mono.',
+    soc_ring:
+      'Show the glowing battery state-of-charge ring around the battery icon. Turn off if it crowds the battery readouts.',
     additional_loads: 'Number of additional loads to configure (0–6).',
     colour: 'Primary colour for this element.',
     efficiency:
@@ -557,6 +559,7 @@ export class SunSynkCardEditor
     }
     if (this._config.glow) {
       generalGridSchema.push(
+        { name: 'soc_ring', selector: { boolean: {} } },
         {
           name: 'glow_intensity',
           selector: { number: { min: 1, max: 5, step: 1, mode: 'box' } },

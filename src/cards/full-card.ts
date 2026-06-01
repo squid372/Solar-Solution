@@ -22,7 +22,7 @@ export const fullCard = (
   const reducedMotion =
     typeof window !== 'undefined' &&
     !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-  setGlow(glow, config.glow_intensity, reducedMotion);
+  setGlow(glow, config.glow_intensity, reducedMotion, config.soc_ring !== false);
   const ambientVars = ambientStyle(config, data);
   const glowClasses = glow
     ? ` ss-glow ss-theme-${config.glow_theme ?? 'neon'}`
