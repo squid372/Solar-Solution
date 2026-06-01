@@ -40,13 +40,8 @@ export class SolarSolutionEnergySummary extends LitElement {
   @state() private _config!: EnergySummaryConfig;
 
   public setConfig(config: EnergySummaryConfig): void {
-    const hasAny = ROWS.some((r) => config?.[r.key]);
-    if (!hasAny) {
-      throw new Error(
-        'solar-solution-energy-summary: define at least one energy entity (solar, load, grid_import, …).',
-      );
-    }
-    this._config = config;
+    // Lenient: never hard-error (keeps the card-picker preview working).
+    this._config = config || ({} as EnergySummaryConfig);
   }
 
   public getCardSize(): number {
@@ -71,6 +66,18 @@ export class SolarSolutionEnergySummary extends LitElement {
       ...r,
       value: this._num(this._config[r.key] as string),
     }));
+    if (!rows.length) {
+      return html`<ha-card
+        ><div class="head">
+          <ha-icon icon="mdi:chart-box-outline"></ha-icon
+          ><span class="title">${this._config.title ?? 'Daily energy'}</span>
+        </div>
+        <div class="hint">
+          Add energy entities: <code>solar</code>, <code>load</code>,
+          <code>grid_import</code>, …
+        </div>
+      </ha-card>`;
+    }
     const max = Math.max(...rows.map((r) => r.value), 0.001);
 
     return html`
@@ -102,6 +109,15 @@ export class SolarSolutionEnergySummary extends LitElement {
   static styles = css`
     ha-card {
       padding: 16px;
+    }
+    .hint {
+      color: var(--secondary-text-color);
+      font-size: 0.9rem;
+    }
+    .hint code {
+      background: var(--divider-color, rgba(127, 127, 127, 0.2));
+      padding: 1px 4px;
+      border-radius: 4px;
     }
     .head {
       display: flex;

@@ -27,12 +27,15 @@ export class SolarSolutionSelfSufficiency extends LitElement {
   @state() private _config!: SelfSufficiencyConfig;
 
   public setConfig(config: SelfSufficiencyConfig): void {
-    if (!config || (!config.value && !(config.load && config.grid_import))) {
-      throw new Error(
-        'solar-solution-self-sufficiency: set `value` (a % sensor) or both `load` and `grid_import` energy entities.',
-      );
-    }
-    this._config = config;
+    // Lenient: never hard-error (keeps the card-picker preview working).
+    this._config = config || ({} as SelfSufficiencyConfig);
+  }
+
+  private _configured(): boolean {
+    return !!(
+      this._config?.value ||
+      (this._config?.load && this._config?.grid_import)
+    );
   }
 
   public getCardSize(): number {
@@ -58,6 +61,18 @@ export class SolarSolutionSelfSufficiency extends LitElement {
 
   protected render() {
     if (!this._config || !this.hass) return nothing;
+    if (!this._configured()) {
+      return html`<ha-card
+        ><div class="head">
+          <ha-icon icon="mdi:leaf"></ha-icon
+          ><span class="title">${this._config.title ?? 'Self-sufficiency'}</span>
+        </div>
+        <div class="hint">
+          Set a <code>value</code> (% sensor) or both <code>load</code> and
+          <code>grid_import</code>.
+        </div>
+      </ha-card>`;
+    }
     const raw = this._pct();
     const pct = Math.max(0, Math.min(100, raw));
     const dp = this._config.decimals ?? 0;
@@ -119,6 +134,15 @@ export class SolarSolutionSelfSufficiency extends LitElement {
     .gauge {
       display: flex;
       justify-content: center;
+    }
+    .hint {
+      color: var(--secondary-text-color);
+      font-size: 0.9rem;
+    }
+    .hint code {
+      background: var(--divider-color, rgba(127, 127, 127, 0.2));
+      padding: 1px 4px;
+      border-radius: 4px;
     }
     svg {
       width: 200px;

@@ -25,12 +25,9 @@ export class SolarSolutionGridBalance extends LitElement {
   @state() private _config!: GridBalanceConfig;
 
   public setConfig(config: GridBalanceConfig): void {
-    if (!config || (!config.import && !config.export)) {
-      throw new Error(
-        'solar-solution-grid-balance: define at least one of `import` / `export` (entity IDs).',
-      );
-    }
-    this._config = config;
+    // Lenient: store the config and show a hint if entities are missing, so the
+    // card-picker preview (preview: true) and partial configs never hard-error.
+    this._config = config || ({} as GridBalanceConfig);
   }
 
   public getCardSize(): number {
@@ -59,6 +56,15 @@ export class SolarSolutionGridBalance extends LitElement {
 
   protected render() {
     if (!this._config || !this.hass) return nothing;
+    if (!this._config.import && !this._config.export) {
+      return html`<ha-card
+        ><div class="head">
+          <ha-icon icon="mdi:transmission-tower"></ha-icon
+          ><span class="title">${this._config.title ?? 'Grid energy balance'}</span>
+        </div>
+        <div class="hint">Set <code>import</code> and/or <code>export</code> energy entities.</div>
+      </ha-card>`;
+    }
 
     const imp = this._num(this._config.import);
     const exp = this._num(this._config.export);
@@ -104,6 +110,16 @@ export class SolarSolutionGridBalance extends LitElement {
   static styles = css`
     ha-card {
       padding: 16px;
+    }
+    .hint {
+      margin-top: 8px;
+      color: var(--secondary-text-color);
+      font-size: 0.9rem;
+    }
+    .hint code {
+      background: var(--divider-color, rgba(127, 127, 127, 0.2));
+      padding: 1px 4px;
+      border-radius: 4px;
     }
     .head {
       display: flex;
