@@ -19,6 +19,9 @@ interface BatteryStatusConfig {
 // One wave cycle is 41 wide; the path is 164 wide (4 cycles) so a -82 shift loops.
 const WAVE =
   'M0 0 q10.25 -5 20.5 0 t20.5 0 t20.5 0 t20.5 0 t20.5 0 t20.5 0 t20.5 0 t20.5 0 L164 230 L0 230 Z';
+// Just the crest line of the wave (a bright surface highlight).
+const WAVE_LINE =
+  'M0 0 q10.25 -5 20.5 0 t20.5 0 t20.5 0 t20.5 0 t20.5 0 t20.5 0 t20.5 0 t20.5 0';
 
 /**
  * Solar-Solution — Battery status.
@@ -120,36 +123,68 @@ export class SolarSolutionBattery extends LitElement {
         </div>
 
         <div class="body" style="--liq:${liq}">
-          <svg viewBox="0 0 120 226" class="batt">
+          <svg viewBox="0 0 120 232" class="batt">
             <defs>
               <clipPath id="bclip">
-                <rect x="19" y="19" width="82" height="190" rx="11" />
+                <rect x="19" y="19" width="82" height="190" rx="12" />
               </clipPath>
+              <linearGradient id="surf" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#ffffff" stop-opacity="0.5" />
+                <stop offset="1" stop-color="#ffffff" stop-opacity="0" />
+              </linearGradient>
+              <linearGradient id="caseg" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#ffffff" stop-opacity="0.75" />
+                <stop offset="1" stop-color="#ffffff" stop-opacity="0.3" />
+              </linearGradient>
             </defs>
-            <!-- liquid -->
             <g clip-path="url(#bclip)">
               <rect x="19" y="19" width="82" height="190" class="empty" />
+              <g class="guides">
+                <line x1="19" y1="66.5" x2="101" y2="66.5" />
+                <line x1="19" y1="114" x2="101" y2="114" />
+                <line x1="19" y1="161.5" x2="101" y2="161.5" />
+              </g>
               <g
-                class="liquid"
+                class="liquid ${charging ? 'chg' : ''}"
                 style="transform: translate(19px, ${surfaceY.toFixed(2)}px)"
               >
                 ${svg`<path class="wave back" d="${WAVE}" />`}
                 ${svg`<path class="wave front" d="${WAVE}" />`}
+                <rect
+                  class="surface-lit"
+                  x="0"
+                  y="0"
+                  width="164"
+                  height="50"
+                  fill="url(#surf)"
+                />
+                ${svg`<path class="surface-line" d="${WAVE_LINE}" />`}
               </g>
               ${bubbles}
+              <rect class="sheen" x="27" y="27" width="15" height="150" rx="7.5" />
             </g>
             <!-- casing -->
-            <rect x="46" y="4" width="28" height="11" rx="3" class="cap" />
+            <rect x="44" y="3" width="32" height="12" rx="3.5" class="cap" />
             <rect
-              x="14"
-              y="14"
-              width="92"
-              height="200"
-              rx="16"
+              x="13"
+              y="13"
+              width="94"
+              height="202"
+              rx="18"
               class="case"
               fill="none"
+              stroke="url(#caseg)"
             />
-            <text x="60" y="112" class="soc">${pct.toFixed(dp)}%</text>
+            <rect
+              x="16.5"
+              y="16.5"
+              width="87"
+              height="195"
+              rx="15"
+              class="case-inner"
+              fill="none"
+            />
+            <text x="60" y="120" class="soc">${pct.toFixed(dp)}%</text>
           </svg>
 
           <div class="stats">
@@ -207,20 +242,40 @@ export class SolarSolutionBattery extends LitElement {
     }
     .batt {
       width: 120px;
-      height: 226px;
+      height: 232px;
       flex: none;
     }
     .case {
-      stroke: var(--primary-text-color);
-      stroke-opacity: 0.55;
       stroke-width: 3;
+    }
+    .case-inner {
+      stroke: rgba(255, 255, 255, 0.1);
+      stroke-width: 1.5;
     }
     .cap {
       fill: var(--primary-text-color);
-      fill-opacity: 0.55;
+      fill-opacity: 0.6;
     }
     .empty {
       fill: var(--divider-color, rgba(127, 127, 127, 0.16));
+    }
+    .guides line {
+      stroke: var(--primary-text-color);
+      stroke-opacity: 0.1;
+      stroke-width: 1;
+      stroke-dasharray: 2 4;
+    }
+    .surface-lit {
+      opacity: 0.85;
+    }
+    .surface-line {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.65);
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+    .sheen {
+      fill: rgba(255, 255, 255, 0.1);
     }
     .soc {
       text-anchor: middle;
@@ -262,6 +317,33 @@ export class SolarSolutionBattery extends LitElement {
       }
       to {
         transform: translateX(0) translateY(2px);
+      }
+    }
+    /* While charging, the surface highlight and rim glow pulse. */
+    .liquid.chg .surface-line {
+      animation: ss-bat-surf 1.8s ease-in-out infinite;
+    }
+    @keyframes ss-bat-surf {
+      0%,
+      100% {
+        opacity: 0.5;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+    .ss-bat-glow .liquid.chg .wave.front {
+      animation:
+        ss-wave 3s linear infinite,
+        ss-bat-pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes ss-bat-pulse {
+      0%,
+      100% {
+        filter: drop-shadow(0 0 6px var(--liq));
+      }
+      50% {
+        filter: drop-shadow(0 0 15px var(--liq)) drop-shadow(0 0 6px var(--liq));
       }
     }
     .bubbles circle {
@@ -331,6 +413,7 @@ export class SolarSolutionBattery extends LitElement {
     }
     @media (prefers-reduced-motion: reduce) {
       .wave,
+      .surface-line,
       .bubbles circle {
         animation: none;
       }

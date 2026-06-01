@@ -228,6 +228,52 @@ temp: sensor.solarsynkv3_YOURSERIAL_battery_temp
 By default the liquid is green at/above 70 %, amber between 30–70 %, and red at
 or below 30 %. `prefers-reduced-motion` pauses the waves and hides the bubbles.
 
+### Inverter settings — `custom:solar-solution-inverter`
+
+A clean tile grid of **any inverter settings and readouts** you care about — work
+mode, priority/energy mode, solar-sell, max-sell power, output power, frequency,
+temperatures, capacity, and so on — with an optional colour-coded **status
+badge**. Numeric values are formatted with their unit; text states (like
+`selfuse`) are tidied to `Self Use`. Every tile is clickable (opens more-info).
+
+```yaml
+type: custom:solar-solution-inverter
+title: Inverter
+glow: true
+status: sensor.solarsynkv3_YOURSERIAL_status # big status badge
+# columns: 3              # optional: force a fixed column count
+entities:
+  - entity: sensor.solarsynkv3_YOURSERIAL_sysworkmode
+    label: Work mode
+    icon: mdi:cog
+  - entity: sensor.solarsynkv3_YOURSERIAL_energymode
+    label: Priority
+    icon: mdi:flash
+  - entity: sensor.solarsynkv3_YOURSERIAL_solarsell
+    label: Solar sell
+    icon: mdi:cash
+  - entity: sensor.solarsynkv3_YOURSERIAL_solarmaxsellpower
+    label: Max sell
+    icon: mdi:transmission-tower-export
+  - entity: sensor.solarsynkv3_YOURSERIAL_inverter_power
+    label: Output
+    icon: mdi:power-plug
+  - entity: sensor.solarsynkv3_YOURSERIAL_load_frequency
+    label: Frequency
+    icon: mdi:sine-wave
+  - entity: sensor.solarsynkv3_YOURSERIAL_inverter_dc_temperature
+    label: DC temp
+    icon: mdi:thermometer
+  - entity: sensor.solarsynkv3_YOURSERIAL_inverter_ac_temperature
+    label: AC temp
+    icon: mdi:thermometer
+  - sensor.solarsynkv3_YOURSERIAL_battery_capacity # shorthand: just the id
+```
+
+Each entry can be a bare entity-id string, or an object with optional `label`,
+`icon` and `unit` overrides. The grid is responsive (auto-fits to the card
+width) unless you set `columns`.
+
 ## Configuration
 
 Every option is documented in [`docs/configuration.md`](docs/configuration.md).
