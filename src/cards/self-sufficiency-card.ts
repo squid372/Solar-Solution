@@ -173,11 +173,31 @@ export class SolarSolutionSelfSufficiency extends LitElement {
       backdrop-filter: blur(8px) saturate(130%);
       border: 1px solid rgba(255, 255, 255, 0.12);
     }
+    /* Animate the arc filling in, and breathe its glow. */
+    .arc {
+      transition: stroke-dasharray 0.9s ease;
+    }
     .ss-ss-glow .arc {
-      filter: drop-shadow(0 0 5px var(--c));
+      animation: ss-gauge-breathe 2.8s ease-in-out infinite;
     }
     .ss-ss-glow .pct {
       filter: drop-shadow(0 0 4px var(--c));
+    }
+    @keyframes ss-gauge-breathe {
+      0%,
+      100% {
+        filter: drop-shadow(0 0 4px var(--c));
+      }
+      50% {
+        filter: drop-shadow(0 0 11px var(--c));
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .arc {
+        animation: none;
+        transition: none;
+        filter: drop-shadow(0 0 5px var(--c));
+      }
     }
   `;
 }

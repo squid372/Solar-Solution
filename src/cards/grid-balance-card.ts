@@ -264,6 +264,39 @@ export class SolarSolutionGridBalance extends LitElement {
     .ss-gb-glow .seg.r {
       box-shadow: 0 0 12px -2px var(--right);
     }
+    .ss-gb-glow .divider {
+      box-shadow: 0 0 8px 1px rgba(255, 255, 255, 0.85);
+    }
+    /* Light shimmer sweeping across the whole bar. */
+    .ss-gb-glow .bar::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+      );
+      transform: translateX(-130%);
+      animation: ss-gb-shimmer 3s ease-in-out infinite;
+    }
+    @keyframes ss-gb-shimmer {
+      0% {
+        transform: translateX(-130%);
+      }
+      55%,
+      100% {
+        transform: translateX(230%);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ss-gb-glow .bar::after {
+        animation: none;
+        opacity: 0;
+      }
+    }
   `;
 }
 

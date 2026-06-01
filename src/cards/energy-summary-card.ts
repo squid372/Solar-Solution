@@ -180,7 +180,39 @@ export class SolarSolutionEnergySummary extends LitElement {
       border: 1px solid rgba(255, 255, 255, 0.12);
     }
     .ss-es-glow .fill {
-      box-shadow: 0 0 12px -3px var(--c);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 14px -2px var(--c);
+      filter: drop-shadow(0 0 3px var(--c));
+    }
+    /* Light shimmer sweeping along each glowing bar. */
+    .ss-es-glow .fill::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.45),
+        transparent
+      );
+      transform: translateX(-130%);
+      animation: ss-shimmer 2.8s ease-in-out infinite;
+    }
+    @keyframes ss-shimmer {
+      0% {
+        transform: translateX(-130%);
+      }
+      55%,
+      100% {
+        transform: translateX(230%);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ss-es-glow .fill::after {
+        animation: none;
+        opacity: 0;
+      }
     }
   `;
 }
