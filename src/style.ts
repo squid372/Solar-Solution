@@ -120,6 +120,9 @@ export const styles: CSSResultGroup = css`
   .ss-glow.ss-theme-mono .ss-flow-dot {
     filter: grayscale(1) url(#ss-glow-dot);
   }
+  .ss-glow.ss-theme-mono .ss-flow-stream {
+    filter: grayscale(1) drop-shadow(0 0 3px #fff);
+  }
   .ss-glow.ss-theme-mono .ss-soc-ring {
     filter: grayscale(1) drop-shadow(0 0 3px #fff);
   }
@@ -172,6 +175,46 @@ export const styles: CSSResultGroup = css`
 
   .ss-glow .ss-flow-pulse--rev {
     animation-name: ss-pulse-move-rev;
+  }
+
+  /* Continuously flowing energy: a repeating dash that scrolls along the whole
+	   pipe non-stop, so active lines feel like liquid is running through them.
+	   The dash period (9 + 27 = 36 in the normalised pathLength of 1000) is what
+	   the keyframe shifts by, giving a seamless infinite loop. Speed rises with
+	   system activity via --ss-stream-dur. */
+  .ss-glow .ss-flow-stream {
+    fill: none;
+    stroke: var(--ss-hot, #ffffff);
+    stroke-opacity: 0.5;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    pointer-events: none;
+    stroke-dasharray: 9 27;
+    filter: drop-shadow(0 0 3px var(--ss-hot, #fff));
+    animation: ss-stream-move var(--ss-stream-dur, 1.1s) linear infinite;
+    will-change: stroke-dashoffset;
+  }
+
+  .ss-glow .ss-flow-stream--rev {
+    animation-name: ss-stream-move-rev;
+  }
+
+  @keyframes ss-stream-move {
+    from {
+      stroke-dashoffset: 36;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes ss-stream-move-rev {
+    from {
+      stroke-dashoffset: 0;
+    }
+    to {
+      stroke-dashoffset: 36;
+    }
   }
 
   @keyframes ss-pulse-move {
@@ -342,6 +385,7 @@ export const styles: CSSResultGroup = css`
       filter: drop-shadow(0 0 3px currentColor);
     }
     .ss-glow .ss-flow-pulse,
+    .ss-glow .ss-flow-stream,
     .ss-glow .ss-soc-arc,
     .ss-glow .ss-soc-sweep,
     .ss-glow.card::before {

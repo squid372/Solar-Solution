@@ -66,6 +66,15 @@ export const renderCircle = (
   const pulseOverlay = extras
     ? svg`<use href="${mpathHref}" xlink:href="${mpathHref}" class="${pulseClass}" />`
     : svg``;
+
+  // Continuously flowing energy: a repeating dash that scrolls along the whole
+  // pipe non-stop (reads like liquid flowing through it), direction-aware.
+  const streamClass = invertFlow
+    ? 'ss-flow-stream ss-flow-stream--rev'
+    : 'ss-flow-stream';
+  const streamOverlay = extras
+    ? svg`<use href="${mpathHref}" xlink:href="${mpathHref}" class="${streamClass}" />`
+    : svg``;
   const trail = extras
     ? [
         { r: radius * 0.75, o: 0.45, lag: 0.06 },
@@ -75,6 +84,7 @@ export const renderCircle = (
 
   return svg`
         ${coreOverlay}
+        ${streamOverlay}
         ${pulseOverlay}
         ${trail.map(
           (t) => svg`

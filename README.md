@@ -41,6 +41,8 @@ glow_theme: neon # neon | ice | fire | aurora | mono
 What it adds (all off by default, so the classic look is untouched):
 
 - Glowing flow lines with white-hot cores and comet-trail dots
+- **Continuously flowing energy** streaming along every active line, rushing
+  faster as power rises
 - Energy pulse waves that sweep each active line
 - Pulsing node halos and a softly glowing solar node
 - A frosted-glass card with a **live ambient aura** tinted to the dominant flow

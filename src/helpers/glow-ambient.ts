@@ -45,6 +45,9 @@ export function ambientStyle(
 
   // Pulse waves speed up as activity rises (3.4s idle -> 1.4s busy).
   const pulseDur = (3.4 - activity * 2).toFixed(2);
+  // The continuous flowing stream runs faster overall, also activity-reactive
+  // (1.5s idle -> 0.6s busy) so busy lines visibly rush.
+  const streamDur = (1.5 - activity * 0.9).toFixed(2);
 
   return [
     `--ss-c-solar:${solarColour}`,
@@ -54,5 +57,6 @@ export function ambientStyle(
     `--ss-ambient-2:${secondary}`,
     `--ss-activity:${activity.toFixed(3)}`,
     `--ss-pulse-dur:${pulseDur}s`,
+    `--ss-stream-dur:${streamDur}s`,
   ].join(';');
 }

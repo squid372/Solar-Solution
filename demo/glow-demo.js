@@ -571,19 +571,10 @@ var renderGlowDefs = (enabled, intensity = 2) => {
     return w``;
   }
   const k2 = Number.isFinite(intensity) && intensity > 0 ? intensity : 2;
-  const lineBlur = Math.min(1 + k2 * 0.6, 4).toFixed(2);
   const dotBlur = Math.min(1.4 + k2 * 0.9, 6).toFixed(2);
   const nodeBlur = Math.min(1 + k2 * 0.8, 5).toFixed(2);
   return w`
 		<defs>
-			<filter id="ss-glow-line" filterUnits="userSpaceOnUse" x="-60" y="-60" width="840" height="525">
-				<feGaussianBlur in="SourceGraphic" stdDeviation="${lineBlur}" result="b" />
-				<feMerge>
-					<feMergeNode in="b" />
-					<feMergeNode in="b" />
-					<feMergeNode in="SourceGraphic" />
-				</feMerge>
-			</filter>
 			<filter id="ss-glow-dot" x="-150%" y="-150%" width="400%" height="400%">
 				<feGaussianBlur in="SourceGraphic" stdDeviation="${dotBlur}" result="b" />
 				<feMerge>
@@ -881,6 +872,7 @@ function renderPVFlow(id, path, color, lineWidth, powerWatts, duration, invertFl
 				stroke-miterlimit="10"
 				pointer-events="stroke"
 				class="${lineClass}"
+				style="${glow ? `color:${color}` : ""}"
 				pathLength="${glow ? "1000" : ""}"
 			/>
 			${lineOverlays}
@@ -955,12 +947,15 @@ var renderCircle = (id, radius, fill, duration, keyPoints, mpathHref, invertFlow
   const coreOverlay = w`<use href="${mpathHref}" xlink:href="${mpathHref}" class="ss-flow-core" />`;
   const pulseClass = invertFlow ? "ss-flow-pulse ss-flow-pulse--rev" : "ss-flow-pulse";
   const pulseOverlay = extras ? w`<use href="${mpathHref}" xlink:href="${mpathHref}" class="${pulseClass}" />` : w``;
+  const streamClass = invertFlow ? "ss-flow-stream ss-flow-stream--rev" : "ss-flow-stream";
+  const streamOverlay = extras ? w`<use href="${mpathHref}" xlink:href="${mpathHref}" class="${streamClass}" />` : w``;
   const trail = extras ? [
     { r: radius * 0.75, o: 0.45, lag: 0.06 },
     { r: radius * 0.5, o: 0.22, lag: 0.12 }
   ] : [];
   return w`
         ${coreOverlay}
+        ${streamOverlay}
         ${pulseOverlay}
         ${trail.map(
     (t4) => w`
@@ -992,6 +987,7 @@ var renderPath = (id, d3, display, color, lineWidth) => {
         <path id="${id}" d="${d3}" fill="none" display="${display ? "" : "none"}"
             stroke="${color}" stroke-width="${lineWidth}"
             stroke-miterlimit="10" pointer-events="stroke" class="${glowClass}"
+            style="${glow ? `color:${color}` : ""}"
             pathLength="${glow ? "1000" : ""}"/>
     `;
 };
@@ -1008,7 +1004,8 @@ function renderSocRing(cx, cy, r5, soc, color, show = true, charging = false) {
 				style="transform-origin:${cx}px ${cy}px" />` : w``;
   return w`
 		<g class="ss-soc-ring${charging ? " ss-soc-ring--charging" : ""}"
-			transform="rotate(-90 ${cx} ${cy})" pointer-events="none">
+			transform="rotate(-90 ${cx} ${cy})" pointer-events="none"
+			style="color:${color}">
 			<circle cx="${cx}" cy="${cy}" r="${r5}" fill="none"
 				stroke="${color}" stroke-opacity="0.16" stroke-width="2.5" />
 			<circle class="ss-soc-arc" cx="${cx}" cy="${cy}" r="${r5}" fill="none"
@@ -1104,8 +1101,11 @@ var styles = i`
   /* ===== Neon glow flow effects (opt-in via the \`glow\` config) ===== */
   /* The filters referenced here are injected as <defs> inside the card SVG
 	   when glow is enabled, so they resolve within this shadow root. */
+  /* Region-free glow: drop-shadow uses the element's own colour (set inline as
+     CSS color) and never collapses on horizontal/vertical lines the way an
+     objectBoundingBox SVG filter does. */
   .ss-glow .ss-flow-line {
-    filter: url(#ss-glow-line);
+    filter: drop-shadow(0 0 2px currentColor) drop-shadow(0 0 5px currentColor);
   }
 
   .ss-glow .ss-flow-dot {
@@ -1132,13 +1132,16 @@ var styles = i`
   /* Mono actually desaturates the glowing elements (grayscale before the
 	   colour-preserving glow filter). */
   .ss-glow.ss-theme-mono .ss-flow-line {
-    filter: grayscale(1) url(#ss-glow-line);
+    filter: grayscale(1) drop-shadow(0 0 2px #fff) drop-shadow(0 0 5px #fff);
   }
   .ss-glow.ss-theme-mono .ss-flow-dot {
     filter: grayscale(1) url(#ss-glow-dot);
   }
+  .ss-glow.ss-theme-mono .ss-flow-stream {
+    filter: grayscale(1) drop-shadow(0 0 3px #fff);
+  }
   .ss-glow.ss-theme-mono .ss-soc-ring {
-    filter: grayscale(1) url(#ss-glow-line);
+    filter: grayscale(1) drop-shadow(0 0 3px #fff);
   }
   .ss-glow.ss-theme-mono svg#sun {
     filter: grayscale(1) url(#ss-glow-node);
@@ -1181,13 +1184,54 @@ var styles = i`
     pointer-events: none;
     stroke-dasharray: 34 1000;
     stroke-dashoffset: 1000;
-    filter: url(#ss-glow-line);
+    filter: drop-shadow(0 0 3px var(--ss-hot, #fff))
+      drop-shadow(0 0 6px var(--ss-hot, #fff));
     animation: ss-pulse-move var(--ss-pulse-dur, 2.6s) linear infinite;
     will-change: stroke-dashoffset;
   }
 
   .ss-glow .ss-flow-pulse--rev {
     animation-name: ss-pulse-move-rev;
+  }
+
+  /* Continuously flowing energy: a repeating dash that scrolls along the whole
+	   pipe non-stop, so active lines feel like liquid is running through them.
+	   The dash period (9 + 27 = 36 in the normalised pathLength of 1000) is what
+	   the keyframe shifts by, giving a seamless infinite loop. Speed rises with
+	   system activity via --ss-stream-dur. */
+  .ss-glow .ss-flow-stream {
+    fill: none;
+    stroke: var(--ss-hot, #ffffff);
+    stroke-opacity: 0.5;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    pointer-events: none;
+    stroke-dasharray: 9 27;
+    filter: drop-shadow(0 0 3px var(--ss-hot, #fff));
+    animation: ss-stream-move var(--ss-stream-dur, 1.1s) linear infinite;
+    will-change: stroke-dashoffset;
+  }
+
+  .ss-glow .ss-flow-stream--rev {
+    animation-name: ss-stream-move-rev;
+  }
+
+  @keyframes ss-stream-move {
+    from {
+      stroke-dashoffset: 36;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes ss-stream-move-rev {
+    from {
+      stroke-dashoffset: 0;
+    }
+    to {
+      stroke-dashoffset: 36;
+    }
   }
 
   @keyframes ss-pulse-move {
@@ -1242,7 +1286,7 @@ var styles = i`
 
   /* ===== Battery SOC ring ===== */
   .ss-glow .ss-soc-ring {
-    filter: url(#ss-glow-line);
+    filter: drop-shadow(0 0 3px currentColor);
   }
 
   .ss-glow .ss-soc-arc {
@@ -1358,6 +1402,7 @@ var styles = i`
       filter: drop-shadow(0 0 3px currentColor);
     }
     .ss-glow .ss-flow-pulse,
+    .ss-glow .ss-flow-stream,
     .ss-glow .ss-soc-arc,
     .ss-glow .ss-soc-sweep,
     .ss-glow.card::before {
