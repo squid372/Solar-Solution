@@ -13,7 +13,7 @@ import {
 import { customElement, property } from 'lit/decorators.js';
 import { localize } from './localize/localize';
 import defaults from './defaults';
-import { EDITOR_NAME, SensorDeviceClass } from './const';
+import { EDITOR_NAME } from './const';
 import { LovelaceConfig } from 'custom-card-helpers/src/types';
 
 // Local replacement for lodash's `capitalize` (first char upper, rest lower)
@@ -518,53 +518,28 @@ export class SunSynkCardEditor
       return html``;
     }
 
-    // Build General section schema with conditional fields
-    const generalGridSchema: Array<Record<string, unknown>> = [
-      { name: 'large_font', selector: { boolean: {} } },
-      { name: 'wide', selector: { boolean: {} } },
-      { name: 'card_height', selector: { text: {} } },
-      { name: 'card_width', selector: { text: {} } },
-      { name: 'show_solar', selector: { boolean: {} } },
-      { name: 'show_battery', selector: { boolean: {} } },
-      { name: 'show_grid', selector: { boolean: {} } },
-      { name: 'center_no_grid', selector: { boolean: {} } },
-      {
-        name: 'decimal_places',
-        selector: { number: { min: 0, max: 3, step: 1, mode: 'box' } },
-      },
-      {
-        name: 'decimal_places_energy',
-        selector: { number: { min: 0, max: 3, step: 1, mode: 'box' } },
-      },
-      { name: 'dynamic_line_width', selector: { boolean: {} } },
-      {
-        name: 'glow_theme',
-        selector: {
-          select: {
-            mode: 'dropdown',
-            options: [
-              { value: 'neon', label: 'Neon' },
-              { value: 'ice', label: 'Ice' },
-              { value: 'fire', label: 'Fire' },
-              { value: 'aurora', label: 'Aurora' },
-              { value: 'mono', label: 'Mono' },
-            ],
-          },
-        },
-      },
+    const themeOptions = [
+      { value: 'neon', label: 'Neon' },
+      { value: 'ice', label: 'Ice' },
+      { value: 'fire', label: 'Fire' },
+      { value: 'aurora', label: 'Aurora' },
+      { value: 'mono', label: 'Mono' },
     ];
-    if (this._config.dynamic_line_width) {
-      generalGridSchema.push(
-        {
-          name: 'max_line_width',
-          selector: { number: { min: 1, max: 8, step: 1, mode: 'box' } },
+    const ent = (name: string) => ({ name, selector: { entity: {} } });
+    const bool = (name: string) => ({ name, selector: { boolean: {} } });
+    const num = (name: string, max: number) => ({
+      name,
+      selector: { number: { min: 0, max, step: 1, mode: 'box' } },
+    });
+    const pick = (name: string, options: string[]) => ({
+      name,
+      selector: {
+        select: {
+          options: options.map((x) => ({ label: capitalize(x), value: x })),
         },
-        {
-          name: 'min_line_width',
-          selector: { number: { min: 1, max: 8, step: 1, mode: 'box' } },
-        },
-      );
-    }
+      },
+    });
+
     return html`
       <ha-form
         .hass=${this.hass}
@@ -574,1339 +549,174 @@ export class SunSynkCardEditor
         .schema=${[
           {
             type: 'expandable',
-            title: this._title('title'),
+            title: 'Card',
+            expanded: true,
             schema: [
               {
                 type: 'grid',
                 schema: [
                   { name: 'title', selector: { text: {} } },
-                  { name: 'title_colour', selector: { color_rgb: {} } },
-                  { name: 'title_size', selector: { text: {} } },
-                ],
-              },
-            ],
-          },
-          {
-            type: 'expandable',
-            title: this._title('general'),
-            schema: [
-              { type: 'grid', schema: generalGridSchema },
-              {
-                type: 'expandable',
-                title: this._title('sensor'),
-                schema: [
                   {
-                    type: 'grid',
-                    schema: [
-                      { name: 'card_height', selector: { entity: {} } },
-                      { name: 'card_width', selector: { entity: {} } },
-                    ],
+                    name: 'glow_theme',
+                    selector: {
+                      select: { mode: 'dropdown', options: themeOptions },
+                    },
                   },
+                  ent('sun_entity'),
+                  ent('weather_entity'),
+                  num('decimal_places', 3),
+                ],
+              },
+              {
+                type: 'grid',
+                schema: [
+                  bool('show_solar'),
+                  bool('show_battery'),
+                  bool('show_grid'),
                 ],
               },
             ],
           },
           {
             type: 'expandable',
-            title: this._title('inverter'),
+            title: 'Inverter',
             schema: [
               {
                 name: 'inverter',
                 type: 'grid',
                 schema: [
-                  { name: 'three_phase', selector: { boolean: {} } },
-                  { name: 'auto_scale', selector: { boolean: {} } },
-                  {
-                    name: 'model',
-                    selector: {
-                      select: {
-                        options: Object.values(InverterModel).map((x) => ({
-                          label: capitalize(x),
-                          value: x,
-                        })),
-                      },
-                    },
-                  },
-                  { name: 'modern', selector: { boolean: {} } },
-                  {
-                    name: 'autarky',
-                    selector: {
-                      select: {
-                        options: Object.values(AutarkyType).map((x) => ({
-                          label: capitalize(x),
-                          value: x,
-                        })),
-                      },
-                    },
-                  },
-                  { name: 'colour', selector: { color_rgb: {} } },
-                  { name: 'navigate', selector: { text: {} } },
-                  { name: 'label_autarky', selector: { text: {} } },
-                  { name: 'label_ratio', selector: { text: {} } },
+                  pick('model', Object.values(InverterModel)),
+                  pick('autarky', Object.values(AutarkyType)),
+                  bool('auto_scale'),
+                ],
+              },
+              {
+                name: 'entities',
+                type: 'grid',
+                schema: [
+                  ent('inverter_power_175'),
+                  ent('inverter_status_59'),
+                  ent('inverter_voltage_154'),
+                  ent('inverter_current_164'),
+                  ent('load_frequency_192'),
+                  ent('radiator_temp_91'),
+                  ent('dc_transformer_temp_90'),
+                  ent('environment_temp'),
                 ],
               },
             ],
           },
-          ...(this._config.show_solar
-            ? [
-                {
-                  type: 'expandable',
-                  title: this._title('solar'),
-                  schema: [
-                    {
-                      name: 'solar',
-                      type: 'grid',
-                      schema: [
-                        {
-                          name: 'mppts',
-                          selector: { number: { min: 1, max: 6 } },
-                        },
-                        { name: 'show_daily', selector: { boolean: {} } },
-                        { name: 'pv1_name', selector: { text: {} } },
-                        { name: 'pv2_name', selector: { text: {} } },
-                        { name: 'pv3_name', selector: { text: {} } },
-                        { name: 'pv4_name', selector: { text: {} } },
-                        { name: 'pv5_name', selector: { text: {} } },
-                        { name: 'pv6_name', selector: { text: {} } },
-                        { name: 'auto_scale', selector: { boolean: {} } },
-                        {
-                          name: 'display_mode',
-                          selector: { number: { mode: 'box', min: 1, max: 3 } },
-                        },
-                        { name: 'colour', selector: { color_rgb: {} } },
-                        { name: 'dynamic_colour', selector: { boolean: {} } },
-                        { name: 'animation_speed', selector: { number: {} } },
-                        { name: 'max_power', selector: { number: {} } },
-                        { name: 'pv1_max_power', selector: { number: {} } },
-                        { name: 'pv2_max_power', selector: { number: {} } },
-                        { name: 'pv3_max_power', selector: { number: {} } },
-                        { name: 'pv4_max_power', selector: { number: {} } },
-                        { name: 'pv5_max_power', selector: { number: {} } },
-                        { name: 'pv6_max_power', selector: { number: {} } },
-                        {
-                          name: 'efficiency',
-                          selector: { number: { mode: 'box', min: 0, max: 3 } },
-                        },
-                        { name: 'off_threshold', selector: { number: {} } },
-                        { name: 'navigate', selector: { text: {} } },
-                        { name: 'custom_label', selector: { text: {} } },
-                        { name: 'invert_flow', selector: { boolean: {} } },
-                      ],
-                    },
-                    {
-                      type: 'expandable',
-                      title: this._title('sensor'),
-                      schema: [
-                        {
-                          name: 'solar',
-                          type: 'grid',
-                          schema: [
-                            { name: 'max_power', selector: { entity: {} } },
-                            { name: 'pv1_max_power', selector: { entity: {} } },
-                            { name: 'pv2_max_power', selector: { entity: {} } },
-                            { name: 'pv3_max_power', selector: { entity: {} } },
-                            { name: 'pv4_max_power', selector: { entity: {} } },
-                            { name: 'pv5_max_power', selector: { entity: {} } },
-                            { name: 'pv6_max_power', selector: { entity: {} } },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ]
-            : []),
-          ...(this._config.show_battery
-            ? [
-                {
-                  type: 'expandable',
-                  title: this._title('battery'),
-                  schema: [
-                    {
-                      name: 'battery',
-                      type: 'grid',
-                      schema: [
-                        {
-                          name: 'count',
-                          selector: { number: { mode: 'box', min: 1, max: 2 } },
-                        },
-                        { name: 'show_daily', selector: { boolean: {} } },
-                        { name: 'animation_speed', selector: { number: {} } },
-                        { name: 'max_power', selector: { number: {} } },
-                        { name: 'path_threshold', selector: { number: {} } },
-                        { name: 'label_daily_chrg', selector: { text: {} } },
-                        { name: 'label_daily_dischrg', selector: { text: {} } },
-                      ],
-                    },
-                    {
-                      type: 'expandable',
-                      title: this._title('bat1'),
-                      schema: [
-                        {
-                          name: 'battery',
-                          type: 'grid',
-                          schema: [
-                            {
-                              name: 'energy',
-                              selector: { number: { min: 0 } },
-                            },
-                            {
-                              name: 'shutdown_soc',
-                              selector: {
-                                number: { mode: 'box', min: 0, max: 100 },
-                              },
-                            },
-                            {
-                              name: 'shutdown_soc_offgrid',
-                              selector: {
-                                number: { mode: 'box', min: 0, max: 100 },
-                              },
-                            },
-                            {
-                              name: 'soc_end_of_charge',
-                              selector: {
-                                number: { mode: 'box', min: 80, max: 100 },
-                              },
-                            },
-                            {
-                              name: 'soc_decimal_places',
-                              selector: {
-                                number: {
-                                  min: 0,
-                                  max: 3,
-                                  step: 1,
-                                  mode: 'box',
-                                },
-                              },
-                            },
-                            { name: 'auto_scale', selector: { boolean: {} } },
-                            { name: 'invert_power', selector: { boolean: {} } },
-                            {
-                              name: 'show_absolute',
-                              selector: { boolean: {} },
-                            },
-                            { name: 'colour', selector: { color_rgb: {} } },
-                            {
-                              name: 'charge_colour',
-                              selector: { color_rgb: {} },
-                            },
-                            {
-                              name: 'dynamic_colour',
-                              selector: { boolean: {} },
-                            },
-                            {
-                              name: 'linear_gradient',
-                              selector: { boolean: {} },
-                            },
-                            { name: 'animate', selector: { boolean: {} } },
-                            { name: 'hide_soc', selector: { boolean: {} } },
-                            {
-                              name: 'show_remaining_energy',
-                              selector: { boolean: {} },
-                            },
-                            {
-                              name: 'remaining_energy_to_shutdown',
-                              selector: { boolean: {} },
-                            },
-                            { name: 'navigate', selector: { text: {} } },
-                            { name: 'invert_flow', selector: { boolean: {} } },
-                          ],
-                        },
-                        {
-                          type: 'expandable',
-                          title: this._title('sensor'),
-                          schema: [
-                            {
-                              name: 'battery',
-                              type: 'grid',
-                              schema: [
-                                { name: 'energy', selector: { entity: {} } },
-                                {
-                                  name: 'shutdown_soc',
-                                  selector: { entity: {} },
-                                },
-                                {
-                                  name: 'shutdown_soc_offgrid',
-                                  selector: { entity: {} },
-                                },
-                                {
-                                  name: 'soc_end_of_charge',
-                                  selector: { entity: {} },
-                                },
-                                { name: 'max_power', selector: { entity: {} } },
-                              ],
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                    ...(Number(this._config.battery?.count ?? 1) === 2
-                      ? [
-                          {
-                            type: 'expandable',
-                            title: this._title('bat2'),
-                            schema: [
-                              {
-                                name: 'battery2',
-                                type: 'grid',
-                                schema: [
-                                  {
-                                    name: 'energy',
-                                    selector: { number: { min: 0 } },
-                                  },
-                                  {
-                                    name: 'shutdown_soc',
-                                    selector: {
-                                      number: { mode: 'box', min: 0, max: 100 },
-                                    },
-                                  },
-                                  {
-                                    name: 'shutdown_soc_offgrid',
-                                    selector: {
-                                      number: { mode: 'box', min: 0, max: 100 },
-                                    },
-                                  },
-                                  {
-                                    name: 'soc_end_of_charge',
-                                    selector: {
-                                      number: {
-                                        mode: 'box',
-                                        min: 80,
-                                        max: 100,
-                                      },
-                                    },
-                                  },
-                                  {
-                                    name: 'soc_decimal_places',
-                                    selector: { number: {} },
-                                  },
-                                  {
-                                    name: 'auto_scale',
-                                    selector: { boolean: {} },
-                                  },
-                                  {
-                                    name: 'invert_power',
-                                    selector: { boolean: {} },
-                                  },
-                                  {
-                                    name: 'show_absolute',
-                                    selector: { boolean: {} },
-                                  },
-                                  {
-                                    name: 'colour',
-                                    selector: { color_rgb: {} },
-                                  },
-                                  {
-                                    name: 'charge_colour',
-                                    selector: { color_rgb: {} },
-                                  },
-                                  {
-                                    name: 'dynamic_colour',
-                                    selector: { boolean: {} },
-                                  },
-                                  {
-                                    name: 'linear_gradient',
-                                    selector: { boolean: {} },
-                                  },
-                                  {
-                                    name: 'animate',
-                                    selector: { boolean: {} },
-                                  },
-                                  {
-                                    name: 'hide_soc',
-                                    selector: { boolean: {} },
-                                  },
-                                  {
-                                    name: 'show_remaining_energy',
-                                    selector: { boolean: {} },
-                                  },
-                                  {
-                                    name: 'remaining_energy_to_shutdown',
-                                    selector: { boolean: {} },
-                                  },
-                                  { name: 'navigate', selector: { text: {} } },
-                                  {
-                                    name: 'invert_flow',
-                                    selector: { boolean: {} },
-                                  },
-                                ],
-                              },
-                              {
-                                type: 'expandable',
-                                title: this._title('sensor'),
-                                schema: [
-                                  {
-                                    name: 'battery2',
-                                    type: 'grid',
-                                    schema: [
-                                      {
-                                        name: 'energy',
-                                        selector: { entity: {} },
-                                      },
-                                      {
-                                        name: 'shutdown_soc',
-                                        selector: { entity: {} },
-                                      },
-                                      {
-                                        name: 'shutdown_soc_offgrid',
-                                        selector: { entity: {} },
-                                      },
-                                      {
-                                        name: 'soc_end_of_charge',
-                                        selector: { entity: {} },
-                                      },
-                                    ],
-                                  },
-                                ],
-                              },
-                            ],
-                          },
-                        ]
-                      : []),
-                  ],
-                },
-              ]
-            : []),
-          // Load options section (restored)
           {
             type: 'expandable',
-            title: this._title('load'),
+            title: 'Solar',
+            schema: [
+              {
+                name: 'solar',
+                type: 'grid',
+                schema: [
+                  {
+                    name: 'mppts',
+                    selector: {
+                      number: { min: 1, max: 6, step: 1, mode: 'box' },
+                    },
+                  },
+                  bool('dynamic_colour'),
+                  { name: 'colour', selector: { color_rgb: {} } },
+                ],
+              },
+              {
+                name: 'entities',
+                type: 'grid',
+                schema: [
+                  ent('pv1_power_186'),
+                  ent('pv2_power_187'),
+                  ent('pv3_power_188'),
+                  ent('pv4_power_189'),
+                  ent('pv5_power'),
+                  ent('pv6_power'),
+                  ent('day_pv_energy_108'),
+                  ent('total_pv_generation'),
+                  ent('solar_sell_247'),
+                  ent('max_sell_power'),
+                ],
+              },
+            ],
+          },
+          {
+            type: 'expandable',
+            title: 'Battery',
+            schema: [
+              {
+                name: 'battery',
+                type: 'grid',
+                schema: [
+                  num('shutdown_soc', 100),
+                  bool('invert_power'),
+                  bool('dynamic_colour'),
+                  { name: 'colour', selector: { color_rgb: {} } },
+                ],
+              },
+              {
+                name: 'entities',
+                type: 'grid',
+                schema: [
+                  ent('battery_soc_184'),
+                  ent('battery_power_190'),
+                  ent('battery_voltage_183'),
+                  ent('battery_current_191'),
+                  ent('battery_temp_182'),
+                  ent('battery_rated_capacity'),
+                  ent('battery_efficiency'),
+                  ent('battery_soh'),
+                  ent('battery_status'),
+                ],
+              },
+            ],
+          },
+          {
+            type: 'expandable',
+            title: 'Grid',
+            schema: [
+              {
+                name: 'grid',
+                type: 'grid',
+                schema: [
+                  bool('invert_grid'),
+                  bool('dynamic_colour'),
+                  { name: 'colour', selector: { color_rgb: {} } },
+                ],
+              },
+              {
+                name: 'entities',
+                type: 'grid',
+                schema: [
+                  ent('grid_power_169'),
+                  ent('grid_ct_power_172'),
+                  ent('grid_voltage'),
+                  ent('grid_connected_status_194'),
+                  ent('day_grid_import_76'),
+                  ent('day_grid_export_77'),
+                  ent('prepaid_units'),
+                ],
+              },
+            ],
+          },
+          {
+            type: 'expandable',
+            title: 'Home / Load',
             schema: [
               {
                 name: 'load',
                 type: 'grid',
                 schema: [
-                  { name: 'show_daily', selector: { boolean: {} } },
-                  { name: 'auto_scale', selector: { boolean: {} } },
+                  bool('dynamic_colour'),
                   { name: 'colour', selector: { color_rgb: {} } },
-                  { name: 'off_colour', selector: { color_rgb: {} } },
-                  { name: 'max_colour', selector: { color_rgb: {} } },
-                  { name: 'dynamic_colour', selector: { boolean: {} } },
-                  { name: 'dynamic_icon', selector: { boolean: {} } },
-                  { name: 'invert_load', selector: { boolean: {} } },
-                  { name: 'essential_name', selector: { text: {} } },
-                  {
-                    name: 'additional_loads',
-                    selector: { number: { mode: 'box', min: 0, max: 6 } },
-                  },
-                  ...((this._config.load?.additional_loads ?? 0) >= 1
-                    ? [
-                        { name: 'load1_name', selector: { text: {} } },
-                        { name: 'load1_icon', selector: { icon: {} } },
-                        { name: 'load1_switch', selector: { entity: {} } },
-                        {
-                          name: 'load1_max_threshold',
-                          selector: { number: {} },
-                        },
-                      ]
-                    : []),
-                  ...((this._config.load?.additional_loads ?? 0) >= 2
-                    ? [
-                        { name: 'load2_name', selector: { text: {} } },
-                        { name: 'load2_icon', selector: { icon: {} } },
-                        { name: 'load2_switch', selector: { entity: {} } },
-                        {
-                          name: 'load2_max_threshold',
-                          selector: { number: {} },
-                        },
-                      ]
-                    : []),
-                  ...((this._config.load?.additional_loads ?? 0) >= 3
-                    ? [
-                        { name: 'load3_name', selector: { text: {} } },
-                        { name: 'load3_icon', selector: { icon: {} } },
-                        { name: 'load3_switch', selector: { entity: {} } },
-                        {
-                          name: 'load3_max_threshold',
-                          selector: { number: {} },
-                        },
-                      ]
-                    : []),
-                  ...((this._config.load?.additional_loads ?? 0) >= 4
-                    ? [
-                        { name: 'load4_name', selector: { text: {} } },
-                        { name: 'load4_icon', selector: { icon: {} } },
-                        { name: 'load4_switch', selector: { entity: {} } },
-                        {
-                          name: 'load4_max_threshold',
-                          selector: { number: {} },
-                        },
-                      ]
-                    : []),
-                  ...((this._config.load?.additional_loads ?? 0) >= 5
-                    ? [
-                        { name: 'load5_name', selector: { text: {} } },
-                        { name: 'load5_icon', selector: { icon: {} } },
-                        { name: 'load5_switch', selector: { entity: {} } },
-                        {
-                          name: 'load5_max_threshold',
-                          selector: { number: {} },
-                        },
-                      ]
-                    : []),
-                  ...((this._config.load?.additional_loads ?? 0) >= 6
-                    ? [
-                        { name: 'load6_name', selector: { text: {} } },
-                        { name: 'load6_icon', selector: { icon: {} } },
-                        { name: 'load6_switch', selector: { entity: {} } },
-                        {
-                          name: 'load6_max_threshold',
-                          selector: { number: {} },
-                        },
-                      ]
-                    : []),
-                  { name: 'animation_speed', selector: { number: {} } },
-                  { name: 'max_power', selector: { number: {} } },
-                  { name: 'off_threshold', selector: { number: {} } },
-                  { name: 'path_threshold', selector: { number: {} } },
-                  { name: 'navigate', selector: { text: {} } },
-                  { name: 'label_daily_load', selector: { text: {} } },
-                  { name: 'invert_flow', selector: { boolean: {} } },
-                  { name: 'show_aux', selector: { boolean: {} } },
-                ],
-              },
-              ...(this._config.load?.show_aux
-                ? [
-                    {
-                      type: 'expandable',
-                      title: this._title('aux'),
-                      schema: [
-                        {
-                          name: 'load',
-                          type: 'grid',
-                          schema: [
-                            { name: 'aux_name', selector: { text: {} } },
-                            { name: 'aux_daily_name', selector: { text: {} } },
-                            { name: 'aux_type', selector: { icon: {} } },
-                            { name: 'invert_aux', selector: { boolean: {} } },
-                            {
-                              name: 'show_absolute_aux',
-                              selector: { boolean: {} },
-                            },
-                            {
-                              name: 'aux_dynamic_colour',
-                              selector: { boolean: {} },
-                            },
-                            { name: 'aux_colour', selector: { color_rgb: {} } },
-                            {
-                              name: 'aux_off_colour',
-                              selector: { color_rgb: {} },
-                            },
-                            {
-                              name: 'aux_loads',
-                              selector: {
-                                number: { mode: 'box', min: 0, max: 2 },
-                              },
-                            },
-                            ...((this._config.load?.aux_loads ?? 0) >= 1
-                              ? [
-                                  {
-                                    name: 'aux_load1_name',
-                                    selector: { text: {} },
-                                  },
-                                  {
-                                    name: 'aux_load1_icon',
-                                    selector: { icon: {} },
-                                  },
-                                ]
-                              : []),
-                            ...((this._config.load?.aux_loads ?? 0) >= 2
-                              ? [
-                                  {
-                                    name: 'aux_load2_name',
-                                    selector: { text: {} },
-                                  },
-                                  {
-                                    name: 'aux_load2_icon',
-                                    selector: { icon: {} },
-                                  },
-                                ]
-                              : []),
-                            {
-                              name: 'show_daily_aux',
-                              selector: { boolean: {} },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ]
-                : []),
-              {
-                type: 'expandable',
-                title: this._title('sensor'),
-                schema: [
-                  {
-                    name: 'load',
-                    type: 'grid',
-                    schema: [
-                      ...((this._config.load?.additional_loads ?? 0) >= 1
-                        ? [{ name: 'load1_icon', selector: { entity: {} } }]
-                        : []),
-                      ...((this._config.load?.additional_loads ?? 0) >= 2
-                        ? [{ name: 'load2_icon', selector: { entity: {} } }]
-                        : []),
-                      ...((this._config.load?.additional_loads ?? 0) >= 3
-                        ? [{ name: 'load3_icon', selector: { entity: {} } }]
-                        : []),
-                      ...((this._config.load?.additional_loads ?? 0) >= 4
-                        ? [{ name: 'load4_icon', selector: { entity: {} } }]
-                        : []),
-                      ...((this._config.load?.aux_loads ?? 0) >= 1
-                        ? [{ name: 'aux_load1_icon', selector: { entity: {} } }]
-                        : []),
-                      ...((this._config.load?.aux_loads ?? 0) >= 2
-                        ? [{ name: 'aux_load2_icon', selector: { entity: {} } }]
-                        : []),
-                      { name: 'max_power', selector: { entity: {} } },
-                    ],
-                  },
-                ],
-              },
-            ],
-          },
-          ...(this._config.show_grid
-            ? [
-                {
-                  type: 'expandable',
-                  title: this._title('grid'),
-                  schema: [
-                    {
-                      name: 'grid',
-                      type: 'grid',
-                      schema: [
-                        { name: 'show_daily_buy', selector: { boolean: {} } },
-                        { name: 'show_daily_sell', selector: { boolean: {} } },
-                        { name: 'auto_scale', selector: { boolean: {} } },
-                        { name: 'invert_grid', selector: { boolean: {} } },
-                        { name: 'colour', selector: { color_rgb: {} } },
-                        { name: 'no_grid_colour', selector: { color_rgb: {} } },
-                        { name: 'export_colour', selector: { color_rgb: {} } },
-                        {
-                          name: 'grid_off_colour',
-                          selector: { color_rgb: {} },
-                        },
-                        { name: 'grid_name', selector: { text: {} } },
-                        {
-                          name: 'label_daily_grid_buy',
-                          selector: { text: {} },
-                        },
-                        {
-                          name: 'label_daily_grid_sell',
-                          selector: { text: {} },
-                        },
-                        { name: 'show_absolute', selector: { boolean: {} } },
-                        {
-                          name: 'energy_cost_decimals',
-                          selector: { number: { mode: 'box', min: 0, max: 3 } },
-                        },
-                        {
-                          name: 'show_nonessential',
-                          selector: { boolean: {} },
-                        },
-                        {
-                          name: 'additional_loads',
-                          selector: { number: { mode: 'box', min: 0, max: 3 } },
-                        },
-                        { name: 'nonessential_name', selector: { text: {} } },
-                        { name: 'nonessential_icon', selector: { icon: {} } },
-                        { name: 'load1_name', selector: { text: {} } },
-                        { name: 'load1_icon', selector: { icon: {} } },
-                        { name: 'load2_name', selector: { text: {} } },
-                        { name: 'load2_icon', selector: { icon: {} } },
-                        { name: 'load3_name', selector: { text: {} } },
-                        { name: 'load3_icon', selector: { icon: {} } },
-                        { name: 'animation_speed', selector: { number: {} } },
-                        { name: 'max_power', selector: { number: {} } },
-                        { name: 'off_threshold', selector: { number: {} } },
-                        { name: 'import_icon', selector: { icon: {} } },
-                        { name: 'export_icon', selector: { icon: {} } },
-                        { name: 'disconnected_icon', selector: { icon: {} } },
-                        { name: 'navigate', selector: { text: {} } },
-                        { name: 'invert_flow', selector: { boolean: {} } },
-                      ],
-                    },
-                    {
-                      type: 'expandable',
-                      title: this._title('sensor'),
-                      schema: [
-                        {
-                          name: 'grid',
-                          type: 'grid',
-                          schema: [
-                            { name: 'load1_icon', selector: { entity: {} } },
-                            { name: 'load2_icon', selector: { entity: {} } },
-                            { name: 'load3_icon', selector: { entity: {} } },
-                            { name: 'max_power', selector: { entity: {} } },
-                            { name: 'import_icon', selector: { entity: {} } },
-                            { name: 'export_icon', selector: { entity: {} } },
-                            {
-                              name: 'disconnected_icon',
-                              selector: { entity: {} },
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ]
-            : []),
-          {
-            type: 'expandable',
-            title: this._title('entities'),
-            schema: [
-              {
-                type: 'expandable',
-                title: this._title('sol'),
-                schema: [
-                  {
-                    name: 'entities',
-                    type: 'grid',
-                    schema: [
-                      {
-                        name: 'day_pv_energy_108',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.ENERGY },
-                        },
-                      },
-                      {
-                        name: 'pv1_power_186',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'pv2_power_187',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'pv3_power_188',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'pv4_power_189',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'pv5_power',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'pv6_power',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'pv1_voltage_109',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.VOLTAGE },
-                        },
-                      },
-                      {
-                        name: 'pv1_current_110',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.CURRENT },
-                        },
-                      },
-                      {
-                        name: 'pv2_voltage_111',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.VOLTAGE },
-                        },
-                      },
-                      {
-                        name: 'pv2_current_112',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.CURRENT },
-                        },
-                      },
-                      {
-                        name: 'pv3_voltage_113',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.VOLTAGE },
-                        },
-                      },
-                      {
-                        name: 'pv3_current_114',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.CURRENT },
-                        },
-                      },
-                      {
-                        name: 'pv4_voltage_115',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.VOLTAGE },
-                        },
-                      },
-                      {
-                        name: 'pv4_current_116',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.CURRENT },
-                        },
-                      },
-                      {
-                        name: 'pv5_voltage',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.VOLTAGE },
-                        },
-                      },
-                      {
-                        name: 'pv5_current',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.CURRENT },
-                        },
-                      },
-                      {
-                        name: 'pv6_voltage',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.VOLTAGE },
-                        },
-                      },
-                      {
-                        name: 'pv6_current',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.CURRENT },
-                        },
-                      },
-                      {
-                        name: 'pv_total',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      { name: 'solar_sell_247', selector: { entity: {} } },
-                      {
-                        name: 'total_pv_generation',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.ENERGY },
-                        },
-                      },
-                      {
-                        name: 'remaining_solar',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.ENERGY },
-                        },
-                      },
-                      {
-                        name: 'environment_temp',
-                        selector: {
-                          entity: {
-                            device_class: SensorDeviceClass.TEMPERATURE,
-                          },
-                        },
-                      },
-                    ],
-                  },
                 ],
               },
               {
-                type: 'expandable',
-                title: this._title('bat'),
-                schema: [
-                  {
-                    name: 'entities',
-                    type: 'grid',
-                    schema: [
-                      {
-                        name: 'day_battery_charge_70',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.ENERGY },
-                        },
-                      },
-                      {
-                        name: 'day_battery_discharge_71',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.ENERGY },
-                        },
-                      },
-                    ],
-                  },
-                  {
-                    type: 'expandable',
-                    title: this._title('bat1'),
-                    schema: [
-                      {
-                        name: 'entities',
-                        type: 'grid',
-                        schema: [
-                          {
-                            name: 'battery_power_190',
-                            selector: {
-                              entity: { device_class: SensorDeviceClass.POWER },
-                            },
-                          },
-                          {
-                            name: 'battery_current_191',
-                            selector: {
-                              entity: {
-                                device_class: SensorDeviceClass.CURRENT,
-                              },
-                            },
-                          },
-                          {
-                            name: 'battery_temp_182',
-                            selector: {
-                              entity: {
-                                device_class: SensorDeviceClass.TEMPERATURE,
-                              },
-                            },
-                          },
-                          {
-                            name: 'battery_voltage_183',
-                            selector: {
-                              entity: {
-                                device_class: SensorDeviceClass.VOLTAGE,
-                              },
-                            },
-                          },
-                          {
-                            name: 'battery_soc_184',
-                            selector: {
-                              entity: {
-                                device_class: SensorDeviceClass.BATTERY,
-                              },
-                            },
-                          },
-                          {
-                            name: 'battery_rated_capacity',
-                            selector: { entity: {} },
-                          },
-                          {
-                            name: 'battery_efficiency',
-                            selector: { entity: {} },
-                          },
-                          { name: 'battery_soh', selector: { entity: {} } },
-                          {
-                            name: 'battery_current_direction',
-                            selector: { entity: {} },
-                          },
-                          { name: 'battery_status', selector: { entity: {} } },
-                        ],
-                      },
-                    ],
-                  },
-                  ...(Number(this._config.battery?.count ?? 1) === 2
-                    ? [
-                        {
-                          type: 'expandable',
-                          title: this._title('bat2'),
-                          schema: [
-                            {
-                              name: 'entities',
-                              type: 'grid',
-                              schema: [
-                                {
-                                  name: 'battery2_power_190',
-                                  selector: {
-                                    entity: {
-                                      device_class: SensorDeviceClass.POWER,
-                                    },
-                                  },
-                                },
-                                {
-                                  name: 'battery2_current_191',
-                                  selector: {
-                                    entity: {
-                                      device_class: SensorDeviceClass.CURRENT,
-                                    },
-                                  },
-                                },
-                                {
-                                  name: 'battery2_temp_182',
-                                  selector: {
-                                    entity: {
-                                      device_class:
-                                        SensorDeviceClass.TEMPERATURE,
-                                    },
-                                  },
-                                },
-                                {
-                                  name: 'battery2_voltage_183',
-                                  selector: {
-                                    entity: {
-                                      device_class: SensorDeviceClass.VOLTAGE,
-                                    },
-                                  },
-                                },
-                                {
-                                  name: 'battery2_soc_184',
-                                  selector: {
-                                    entity: {
-                                      device_class: SensorDeviceClass.BATTERY,
-                                    },
-                                  },
-                                },
-                                {
-                                  name: 'battery2_rated_capacity',
-                                  selector: { entity: {} },
-                                },
-                                {
-                                  name: 'battery2_soh',
-                                  selector: { entity: {} },
-                                },
-                                {
-                                  name: 'battery2_current_direction',
-                                  selector: { entity: {} },
-                                },
-                                {
-                                  name: 'battery2_status',
-                                  selector: { entity: {} },
-                                },
-                              ],
-                            },
-                          ],
-                        },
-                      ]
-                    : []),
-                ],
-              },
-              {
-                type: 'expandable',
-                title: this._title('inv'),
-                schema: [
-                  {
-                    name: 'entities',
-                    type: 'grid',
-                    schema: [
-                      { name: 'inverter_status_59', selector: { entity: {} } },
-                      { name: 'use_timer_248', selector: { entity: {} } },
-                      { name: 'priority_load_243', selector: { entity: {} } },
-                      {
-                        name: 'inverter_voltage_154',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.VOLTAGE },
-                        },
-                      },
-                      {
-                        name: 'inverter_voltage_L2',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.VOLTAGE },
-                        },
-                      },
-                      {
-                        name: 'inverter_voltage_L3',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.VOLTAGE },
-                        },
-                      },
-                      {
-                        name: 'load_frequency_192',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.FREQUENCY },
-                        },
-                      },
-                      {
-                        name: 'inverter_current_164',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.CURRENT },
-                        },
-                      },
-                      {
-                        name: 'inverter_current_L2',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.CURRENT },
-                        },
-                      },
-                      {
-                        name: 'inverter_current_L3',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.CURRENT },
-                        },
-                      },
-                      {
-                        name: 'inverter_power_175',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'grid_power_169',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'dc_transformer_temp_90',
-                        selector: {
-                          entity: {
-                            device_class: SensorDeviceClass.TEMPERATURE,
-                          },
-                        },
-                      },
-                      {
-                        name: 'radiator_temp_91',
-                        selector: {
-                          entity: {
-                            device_class: SensorDeviceClass.TEMPERATURE,
-                          },
-                        },
-                      },
-                      { name: 'prog1_time', selector: { entity: {} } },
-                      { name: 'prog1_capacity', selector: { entity: {} } },
-                      { name: 'prog1_charge', selector: { entity: {} } },
-                      { name: 'prog2_time', selector: { entity: {} } },
-                      { name: 'prog2_capacity', selector: { entity: {} } },
-                      { name: 'prog2_charge', selector: { entity: {} } },
-                      { name: 'prog3_time', selector: { entity: {} } },
-                      { name: 'prog3_capacity', selector: { entity: {} } },
-                      { name: 'prog3_charge', selector: { entity: {} } },
-                      { name: 'prog4_time', selector: { entity: {} } },
-                      { name: 'prog4_capacity', selector: { entity: {} } },
-                      { name: 'prog4_charge', selector: { entity: {} } },
-                      { name: 'prog5_time', selector: { entity: {} } },
-                      { name: 'prog5_capacity', selector: { entity: {} } },
-                      { name: 'prog5_charge', selector: { entity: {} } },
-                      { name: 'prog6_time', selector: { entity: {} } },
-                      { name: 'prog6_capacity', selector: { entity: {} } },
-                      { name: 'prog6_charge', selector: { entity: {} } },
-                    ],
-                  },
-                ],
-              },
-              {
-                type: 'expandable',
-                title: this._title('ld'),
-                schema: [
-                  {
-                    name: 'entities',
-                    type: 'grid',
-                    schema: [
-                      {
-                        name: 'day_load_energy_84',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.ENERGY },
-                        },
-                      },
-                      {
-                        name: 'day_aux_energy',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.ENERGY },
-                        },
-                      },
-                      {
-                        name: 'essential_power',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'essential_load1',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'essential_load2',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'essential_load3',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'essential_load4',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'essential_load5',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'essential_load6',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'essential_load1_extra',
-                        selector: { entity: {} },
-                      },
-                      {
-                        name: 'essential_load2_extra',
-                        selector: { entity: {} },
-                      },
-                      {
-                        name: 'essential_load3_extra',
-                        selector: { entity: {} },
-                      },
-                      {
-                        name: 'essential_load4_extra',
-                        selector: { entity: {} },
-                      },
-                      {
-                        name: 'essential_load5_extra',
-                        selector: { entity: {} },
-                      },
-                      {
-                        name: 'essential_load6_extra',
-                        selector: { entity: {} },
-                      },
-                      {
-                        name: 'load_power_L1',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'load_power_L2',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'load_power_L3',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'aux_power_166',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'aux_load1',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'aux_load2',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      { name: 'aux_load1_extra', selector: { entity: {} } },
-                      { name: 'aux_load2_extra', selector: { entity: {} } },
-                      {
-                        name: 'aux_connected_status',
-                        selector: { entity: {} },
-                      },
-                    ],
-                  },
-                ],
-              },
-              {
-                type: 'expandable',
-                title: this._title('gri'),
-                schema: [
-                  {
-                    name: 'entities',
-                    type: 'grid',
-                    schema: [
-                      {
-                        name: 'day_grid_import_76',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.ENERGY },
-                        },
-                      },
-                      {
-                        name: 'day_grid_export_77',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.ENERGY },
-                        },
-                      },
-                      {
-                        name: 'grid_ct_power_172',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'grid_ct_power_L2',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'grid_ct_power_L3',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'grid_ct_power_total',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'grid_voltage',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.VOLTAGE },
-                        },
-                      },
-                      {
-                        name: 'nonessential_power',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'non_essential_load1',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'non_essential_load2',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'non_essential_load3',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                      {
-                        name: 'non_essential_load1_extra',
-                        selector: { entity: {} },
-                      },
-                      {
-                        name: 'non_essential_load2_extra',
-                        selector: { entity: {} },
-                      },
-                      {
-                        name: 'non_essential_load3_extra',
-                        selector: { entity: {} },
-                      },
-                      {
-                        name: 'grid_connected_status_194',
-                        selector: { entity: {} },
-                      },
-                      { name: 'energy_cost_buy', selector: { entity: {} } },
-                      { name: 'energy_cost_sell', selector: { entity: {} } },
-                      { name: 'prepaid_units', selector: { entity: {} } },
-                      {
-                        name: 'max_sell_power',
-                        selector: {
-                          entity: { device_class: SensorDeviceClass.POWER },
-                        },
-                      },
-                    ],
-                  },
-                ],
+                name: 'entities',
+                type: 'grid',
+                schema: [ent('essential_power'), ent('day_load_energy_84')],
               },
             ],
           },
