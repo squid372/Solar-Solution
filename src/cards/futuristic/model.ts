@@ -57,6 +57,8 @@ export interface FuturisticModel {
   solarSell?: string;
   maxSellW?: number;
   lifetimePV?: number;
+  envTemp?: number;
+  prepaidKwh?: number;
 
   // Colours
   solarColour: string;
@@ -231,6 +233,8 @@ export function buildFuturisticModel(
     solarSell: sStr((config.entities as any)?.solar_sell_247),
     maxSellW: sNum((config.entities as any)?.max_sell_power),
     lifetimePV: sNum((config.entities as any)?.total_pv_generation),
+    envTemp: sNum((config.entities as any)?.environment_temp),
+    prepaidKwh: sNum((config.entities as any)?.prepaid_units),
 
     solarColour: (data as any).solarColour || '#ffb300',
     batteryColour: (data as any).batteryColour || '#ff5fa2',

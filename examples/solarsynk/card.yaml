@@ -90,6 +90,10 @@ entities:
   battery_rated_capacity: sensor.solarsynkv3_YOURSERIAL_battery_capacity # Ah
   battery_efficiency: sensor.solarsynkv3_YOURSERIAL_battery_efficiency
   battery_soh: sensor.solarsynkv3_YOURSERIAL_battery_soh # state of health (if published)
+
+  # ---- Optional extras (map if you have them) ----
+  # environment_temp: sensor.outside_temperature        # ambient temp (any source)
+  # prepaid_units: input_number.prepaid_kwh             # manual kWh credit helper
   day_battery_charge_70: sensor.solarsynkv3_YOURSERIAL_battery_etoday_charge
   day_battery_discharge_71: sensor.solarsynkv3_YOURSERIAL_battery_etoday_discharge
 

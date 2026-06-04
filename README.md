@@ -74,6 +74,11 @@ What it shows:
   ```
 
 - A corona **sun** that flares with production.
+- A **themeable HUD** — `glow_theme` (neon / ice / fire / aurora / mono) recolours
+  the whole reactor, rings, gauges, grid floor and brackets, with a holographic
+  **scanline** overlay and a slow scan sweep.
+- Optional **environment temperature** (in the status bar) and a **prepaid
+  credit** chip (kWh) at the grid — map `environment_temp` / `prepaid_units`.
 - The **liquid battery cell** (green→amber→red by SOC, charge bubbles).
 - A **glowing home** whose windows brighten with load, plus an energised grid
   pylon.

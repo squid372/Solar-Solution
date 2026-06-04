@@ -109,6 +109,8 @@
     "battery_rated_capacity": "Battery capacity (Ah)",
     "battery_efficiency": "Battery efficiency",
     "grid_connected_status_194": "Grid signal / connected status",
+    "environment_temp": "Environment temperature",
+    "prepaid_units": "Prepaid units (kWh)",
     "cardstyle": "Card Style",
     "large_font": "Large Font",
     "wide": "Wide Screen Layout",

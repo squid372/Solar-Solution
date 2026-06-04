@@ -143,6 +143,16 @@ export const futuristicCard = (m: FuturisticModel) => {
   const starOp = night ? Math.max(0, 1 - cloud) * 0.9 : 0;
   const moonR = 22;
 
+  // HUD accent palette, themeable via glow_theme.
+  const THEMES: Record<string, { a: string; soft: string; deep: string }> = {
+    neon: { a: '#7fd0ff', soft: '#cfeaff', deep: '#13386b' },
+    ice: { a: '#9fe8ff', soft: '#e2f7ff', deep: '#0d4a66' },
+    fire: { a: '#ff9e5c', soft: '#ffd8b0', deep: '#5c2410' },
+    aurora: { a: '#73f0b0', soft: '#c6ffe4', deep: '#0d5a3a' },
+    mono: { a: '#dfe7ff', soft: '#ffffff', deep: '#2a3550' },
+  };
+  const th = THEMES[m.theme] || THEMES.neon;
+
   const soc = Math.max(0, Math.min(100, m.batterySoc));
   const liq = soc >= 70 ? '#33c463' : soc > 30 ? '#ffc63a' : '#ff5252';
   const surfaceY = BAT.top + (1 - soc / 100) * BAT.h;
@@ -295,6 +305,25 @@ export const futuristicCard = (m: FuturisticModel) => {
           font-weight: 600;
           letter-spacing: 0.5px;
         }
+        .fz-val,
+        .fz-core-val,
+        .fz-sub,
+        .fz-bar,
+        .fz-chip-v,
+        .fz-hero {
+          font-variant-numeric: tabular-nums;
+        }
+        .fz-sweep {
+          animation: fz-sweep 7s linear infinite;
+        }
+        @keyframes fz-sweep {
+          from {
+            transform: translateY(0);
+          }
+          to {
+            transform: translateY(580px);
+          }
+        }
         .fz-star {
           fill: #cfe0ff;
           animation: fz-tw 3s ease-in-out infinite;
@@ -399,12 +428,12 @@ export const futuristicCard = (m: FuturisticModel) => {
           }
         }
         .fz-floor {
-          stroke: #4aa8ff;
+          stroke: var(--fz-a);
           stroke-opacity: 0.16;
           stroke-width: 1;
         }
         .fz-floor-rung {
-          stroke: #4aa8ff;
+          stroke: var(--fz-a);
           stroke-opacity: 0.12;
           stroke-width: 1;
           animation: fz-rung 2.6s linear infinite;
@@ -452,7 +481,7 @@ export const futuristicCard = (m: FuturisticModel) => {
         /* reactor core */
         .fz-hex {
           fill: none;
-          stroke: #5aa8ff;
+          stroke: var(--fz-a);
           stroke-opacity: 0.22;
           stroke-width: 1.5;
         }
@@ -469,17 +498,17 @@ export const futuristicCard = (m: FuturisticModel) => {
         }
         .fz-gauge {
           fill: none;
-          stroke: #7fe0ff;
+          stroke: var(--fz-a);
           stroke-width: 4;
           stroke-linecap: round;
-          filter: drop-shadow(0 0 5px #7fe0ff);
+          filter: drop-shadow(0 0 5px var(--fz-a));
           transition: stroke-dasharray 0.8s ease;
         }
         .fz-ring,
         .fz-ring2,
         .fz-ring3 {
           fill: none;
-          stroke: #bfe3ff;
+          stroke: var(--fz-soft);
         }
         .fz-ring {
           stroke-width: 2;
@@ -513,8 +542,8 @@ export const futuristicCard = (m: FuturisticModel) => {
           }
         }
         .fz-bolt {
-          fill: #cfeaff;
-          filter: drop-shadow(0 0 3px #7fd0ff);
+          fill: var(--fz-soft);
+          filter: drop-shadow(0 0 3px var(--fz-a));
         }
         .fz-core-aura {
           fill: url(#fz-core-grad);
@@ -524,7 +553,7 @@ export const futuristicCard = (m: FuturisticModel) => {
         }
         .fz-core-body {
           fill: url(#fz-core-grad);
-          filter: drop-shadow(0 0 10px #7fd0ff) drop-shadow(0 0 24px #3aa0ff);
+          filter: drop-shadow(0 0 12px var(--fz-a)) drop-shadow(0 0 28px var(--fz-a));
         }
         .fz-spokes {
           stroke: #ffffff;
@@ -536,7 +565,7 @@ export const futuristicCard = (m: FuturisticModel) => {
         }
         .fz-core-pulse {
           fill: none;
-          stroke: #cfeaff;
+          stroke: var(--fz-soft);
           stroke-width: 2;
           transform-box: fill-box;
           transform-origin: center;
@@ -743,13 +772,17 @@ export const futuristicCard = (m: FuturisticModel) => {
           .fz-rain line,
           .fz-snow,
           .fz-fog-band,
-          .fz-lightning {
+          .fz-lightning,
+          .fz-sweep {
             animation: none;
           }
         }
       </style>
 
-      <div class="fz-wrap">
+      <div
+        class="fz-wrap"
+        style="--fz-a:${th.a};--fz-soft:${th.soft};--fz-deep:${th.deep}"
+      >
         <svg class="fz-svg" viewBox="0 0 800 520" preserveAspectRatio="xMidYMid meet">
           <defs>
             <linearGradient id="fz-sky" x1="0" y1="0" x2="0" y2="1">
@@ -758,8 +791,8 @@ export const futuristicCard = (m: FuturisticModel) => {
             </linearGradient>
             <radialGradient id="fz-core-grad" cx="0.5" cy="0.5" r="0.5">
               <stop offset="0" stop-color="#ffffff" />
-              <stop offset="0.35" stop-color="#7fd0ff" />
-              <stop offset="1" stop-color="#13386b" />
+              <stop offset="0.35" stop-color="${th.a}" />
+              <stop offset="1" stop-color="${th.deep}" />
             </radialGradient>
             <radialGradient id="fz-sun-grad" cx="0.5" cy="0.5" r="0.5">
               <stop offset="0" stop-color="#fff7e0" />
@@ -780,8 +813,21 @@ export const futuristicCard = (m: FuturisticModel) => {
               <stop offset="1" stop-color="${m.gridColour}" stop-opacity="0" />
             </radialGradient>
             <linearGradient id="fz-radar" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stop-color="#7fe0ff" stop-opacity="0.5" />
-              <stop offset="1" stop-color="#7fe0ff" stop-opacity="0" />
+              <stop offset="0" stop-color="${th.a}" stop-opacity="0.5" />
+              <stop offset="1" stop-color="${th.a}" stop-opacity="0" />
+            </linearGradient>
+            <pattern
+              id="fz-scan"
+              width="3"
+              height="3"
+              patternUnits="userSpaceOnUse"
+            >
+              <rect width="3" height="1" fill="#ffffff" opacity="0.035" />
+            </pattern>
+            <linearGradient id="fz-sweep" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="${th.a}" stop-opacity="0" />
+              <stop offset="0.5" stop-color="${th.a}" stop-opacity="0.12" />
+              <stop offset="1" stop-color="${th.a}" stop-opacity="0" />
             </linearGradient>
             <radialGradient id="fz-vign" cx="0.5" cy="0.5" r="0.65">
               <stop offset="0.6" stop-color="#000000" stop-opacity="0" />
@@ -814,14 +860,14 @@ export const futuristicCard = (m: FuturisticModel) => {
           </g>
 
           <!-- HUD corner brackets + status bar -->
-          <g stroke="#7fd0ff" stroke-opacity="0.35" fill="none" stroke-width="2">
+          <g stroke="${th.a}" stroke-opacity="0.4" fill="none" stroke-width="2">
             <path d="M16 42 L16 16 L42 16" />
             <path d="M784 42 L784 16 L758 16" />
             <path d="M16 480 L16 506 L42 506" />
             <path d="M784 480 L784 506 L758 506" />
           </g>
           <text class="fz-bar" x="64" y="26" text-anchor="start">
-            ${night ? 'NIGHT' : 'DAY'}${m.frequency !== undefined ? ` · ${m.frequency.toFixed(2)} Hz` : ''}${m.acTemp !== undefined ? ` · AC ${m.acTemp.toFixed(0)}°` : ''}
+            ${night ? 'NIGHT' : 'DAY'}${m.frequency !== undefined ? ` · ${m.frequency.toFixed(2)} Hz` : ''}${m.acTemp !== undefined ? ` · AC ${m.acTemp.toFixed(0)}°` : ''}${m.envTemp !== undefined ? ` · AMB ${m.envTemp.toFixed(0)}°` : ''}
           </text>
           <text class="fz-bar" x="736" y="26" text-anchor="end">
             ${m.dcTemp !== undefined ? `DC ${m.dcTemp.toFixed(0)}° · ` : ''}${m.acVoltage !== undefined ? `${m.acVoltage.toFixed(0)} V · ` : ''}<tspan class="fz-st-${runTone}">● ${runText}</tspan>
@@ -941,6 +987,7 @@ export const futuristicCard = (m: FuturisticModel) => {
               ? svg`<text class="fz-sub" x="${GRID.x}" y="${GRID.y + 84}"><tspan class="fz-st-${gridOn ? 'ok' : 'bad'}">●</tspan> ${gridOn ? 'ON-GRID' : 'OFF-GRID'}</text>`
               : nothing
           }
+          ${m.prepaidKwh !== undefined ? chip(GRID.x, GRID.y + 112, 'PREPAID', `${m.prepaidKwh.toFixed(1)} kWh`) : nothing}
 
           <!-- ===== home ===== -->
           <g transform="translate(${HOME.x} ${HOME.y})" style="color:${m.loadColour}">
@@ -967,6 +1014,8 @@ export const futuristicCard = (m: FuturisticModel) => {
           ${m.dailyImport !== undefined ? chip(500, 452, 'IMPORT', `${m.dailyImport.toFixed(1)} kWh`) : nothing}
           ${m.dailyExport !== undefined ? chip(592, 452, 'EXPORT', `${m.dailyExport.toFixed(1)} kWh`) : nothing}
 
+          <rect x="0" y="0" width="800" height="520" fill="url(#fz-scan)" pointer-events="none" />
+          ${reduced ? nothing : svg`<rect class="fz-sweep" x="0" y="-60" width="800" height="60" fill="url(#fz-sweep)" pointer-events="none" />`}
           <rect x="0" y="0" width="800" height="520" fill="url(#fz-vign)" pointer-events="none" />
         </svg>
       </div>
