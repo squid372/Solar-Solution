@@ -44,6 +44,7 @@ export enum CardStyle {
   Compact = 'compact',
   Lite = 'lite',
   Full = 'full',
+  Futuristic = 'futuristic',
 }
 
 export enum AutarkyType {

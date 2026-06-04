@@ -16,7 +16,7 @@
 # ============================================================================
 
 type: custom:solar-solution
-cardstyle: full
+cardstyle: futuristic # futuristic | full | lite | compact
 wide: true # 16:9 layout — spreads the full card out so it's not cramped
 
 # ---- Neon glow visual upgrade (the enhanced look) ----

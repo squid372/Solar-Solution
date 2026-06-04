@@ -16,7 +16,11 @@ and pairs out of the box with the [SolarSynk](examples/solarsynk/) add-on.
   comet-trail dots, energy pulse waves, pulsing nodes, a frosted-glass card with
   a live ambient aura, charging-aware battery state-of-charge rings, and five
   colour themes. See [below](#neon-glow-theme).
-- Three card styles — `compact`, `lite` or `full`, plus a wide 16:9 layout.
+- **Futuristic** card style — a living energy HUD with a glowing reactor-core
+  inverter, particle energy flows, a day/night starfield sky, a liquid battery
+  cell and a self-powered hero readout. See [below](#futuristic-card-style).
+- Four card styles — `futuristic`, `compact`, `lite` or `full`, plus a wide
+  16:9 layout.
 - Animated power flow with configurable, power-reactive speed (supports inverted
   battery / AUX / grid power).
 - Dynamic battery image based on SOC, with optional runtime-to-shutdown estimate.
@@ -25,6 +29,41 @@ and pairs out of the box with the [SolarSynk](examples/solarsynk/) add-on.
   each toggleable.
 - Dynamic colours, custom colours and images, and clickable entities (more-info).
 - Per-inverter status and battery messages (Sunsynk, Lux, Goodwe, Solis, …).
+
+## Futuristic card style
+
+A complete reimagining of the power-flow view as a **living energy HUD**. Set
+`cardstyle: futuristic` (it reuses the exact same `entities:` mapping as the
+other styles):
+
+```yaml
+type: custom:solar-solution
+cardstyle: futuristic
+title: Power Flow
+inverter: { model: sunsynk }
+battery: { shutdown_soc: 20 }
+solar: { mppts: 2 }
+grid: {}
+entities:
+  # …same entity mapping as the other styles…
+```
+
+What it shows:
+
+- A glowing **reactor-core inverter** with counter-rotating rings and a live
+  power readout at the centre.
+- **Particle energy** streaming through each conduit — packet count and speed
+  scale with power, and direction follows real charge/discharge & import/export.
+- A **day/night sky** with a twinkling starfield (driven by local time) and a
+  corona **sun** that flares with production.
+- The **liquid battery cell** (green→amber→red by SOC, charge bubbles).
+- A **glowing home** whose windows brighten with load, plus an energised grid
+  pylon.
+- A **hero headline** — e.g. `94% SELF-POWERED · +1.2 kW exporting` — and chips
+  for daily totals and inverter temps.
+
+It honours `prefers-reduced-motion` (particles and spin pause). The `full`,
+`lite` and `compact` styles are unchanged.
 
 ## Neon glow theme
 

@@ -38,6 +38,8 @@ import merge from 'lodash.merge';
 import { Utils } from './helpers/utils';
 import { fullCard } from './cards/full-card';
 import { compactCard } from './cards/compact-card';
+import { futuristicCard } from './cards/futuristic/render';
+import { buildFuturisticModel } from './cards/futuristic/model';
 // Side-effect imports: register the companion cards.
 import './cards/grid-balance-card';
 import './cards/energy-summary-card';
@@ -2772,8 +2774,11 @@ export class SunsynkPowerFlowCard extends LitElement {
     };
 
     let template: TemplateResult | null = null;
-    let variantKey: 'full' | 'compact' | undefined;
-    if (this.isFullCard) {
+    let variantKey: 'full' | 'compact' | 'futuristic' | undefined;
+    if (this.isFuturisticCard) {
+      variantKey = 'futuristic';
+      template = futuristicCard(buildFuturisticModel(config, data));
+    } else if (this.isFullCard) {
       variantKey = 'full';
       template = fullCard(config, inverterImg, data);
     } else if (this.isLiteCard || this.isCompactCard) {
@@ -2914,6 +2919,10 @@ export class SunsynkPowerFlowCard extends LitElement {
 
   get isFullCard() {
     return this._config.cardstyle == CardStyle.Full;
+  }
+
+  get isFuturisticCard() {
+    return this._config.cardstyle == CardStyle.Futuristic;
   }
 
   colourConvert(colour: string) {
