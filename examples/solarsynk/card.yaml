@@ -19,6 +19,11 @@ type: custom:solar-solution
 cardstyle: futuristic # futuristic | full | lite | compact
 wide: true # 16:9 layout — spreads the full card out so it's not cramped
 
+# Futuristic sky (optional): auto-detects sun.sun + your first weather.* entity.
+# Uncomment to pin specific ones (sun → real day/night & moon; weather → sky FX).
+# sun_entity: sun.sun
+# weather_entity: weather.forecast_home
+
 # ---- Neon glow visual upgrade (the enhanced look) ----
 glow: true
 glow_intensity: 3

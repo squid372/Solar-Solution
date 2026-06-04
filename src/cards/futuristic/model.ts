@@ -53,6 +53,20 @@ export interface FuturisticModel {
 
   // Sky (0 = night … 1 = noon)
   sunElevation: number;
+  isNight: boolean;
+  weather: 'clear' | 'clouds' | 'rain' | 'snow' | 'fog' | 'storm';
+  cloudiness: number; // 0 … 1
+}
+
+// Normalise a HA weather condition string into our render buckets.
+function normWeather(cond: string): FuturisticModel['weather'] {
+  const c = (cond || '').toLowerCase();
+  if (/pour|rain|hail|drizzle/.test(c)) return 'rain';
+  if (/snow|sleet/.test(c)) return 'snow';
+  if (/fog|mist|haz/.test(c)) return 'fog';
+  if (/light|thunder|storm|exceptional/.test(c)) return 'storm';
+  if (/cloud|overcast/.test(c)) return 'clouds';
+  return 'clear';
 }
 
 const safeNum = (v: unknown, d = 0): number => {
@@ -69,6 +83,7 @@ const maybe = (e: any, dp = 1): number | undefined =>
 export function buildFuturisticModel(
   config: sunsynkPowerFlowCardConfig,
   data: DataDto,
+  hass?: any,
 ): FuturisticModel {
   const invertBat = config.battery?.invert_flow === true;
   const batteryPower = safeNum((data as any).batteryPowerTotal);
@@ -99,13 +114,43 @@ export function buildFuturisticModel(
     pvStrings.push({ name: `PV${i + 1}`, power: safeNum(pvWatts[i]) });
   }
 
-  // Sun elevation from local time: a smooth bell, 0 at 06:00/18:00, ~1 at noon.
-  let sunElevation = 0.5;
+  // ---- Sky: prefer a real sun entity, else fall back to local time. ----
+  const states = hass?.states ?? {};
+  const sunId =
+    (config as any).sun_entity || (states['sun.sun'] ? 'sun.sun' : undefined);
+  const sunEnt = sunId ? states[sunId] : undefined;
+  const elevation = sunEnt ? parseFloat(sunEnt.attributes?.elevation) : NaN;
+
+  let hr = 12;
   if (typeof Date !== 'undefined') {
     const now = new Date();
-    const hr = now.getHours() + now.getMinutes() / 60;
-    sunElevation = Math.max(0, Math.sin(((hr - 6) / 12) * Math.PI));
+    hr = now.getHours() + now.getMinutes() / 60;
   }
+
+  let sunElevation: number;
+  let isNight: boolean;
+  if (Number.isFinite(elevation)) {
+    sunElevation = Math.max(0, Math.min(1, elevation / 35));
+    isNight = sunEnt?.state === 'below_horizon' || elevation < 0;
+  } else {
+    sunElevation = Math.max(0, Math.sin(((hr - 6) / 12) * Math.PI));
+    isNight = hr < 6.5 || hr >= 18.5;
+  }
+
+  // ---- Weather: from a configured entity, else the first weather.* entity. ----
+  const weatherId =
+    (config as any).weather_entity ||
+    Object.keys(states).find((k) => k.startsWith('weather.'));
+  const weatherEnt = weatherId ? states[weatherId] : undefined;
+  const weather = normWeather(weatherEnt?.state ?? '');
+  const cover = parseFloat(weatherEnt?.attributes?.cloud_coverage);
+  const cloudiness = Number.isFinite(cover)
+    ? Math.max(0, Math.min(1, cover / 100))
+    : weather === 'clear'
+      ? 0
+      : weather === 'clouds'
+        ? 0.65
+        : 0.9;
 
   return {
     title: config.title,
@@ -147,5 +192,8 @@ export function buildFuturisticModel(
     loadColour: (data as any).loadColour || '#5fb6ad',
 
     sunElevation,
+    isNight,
+    weather,
+    cloudiness,
   };
 }

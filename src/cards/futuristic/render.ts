@@ -15,8 +15,12 @@ const hx = (n: number) =>
   Math.max(0, Math.min(255, Math.round(n)))
     .toString(16)
     .padStart(2, '0');
-const mix = (c1: number[], c2: number[], t: number) =>
-  `#${hx(lerp(c1[0], c2[0], t))}${hx(lerp(c1[1], c2[1], t))}${hx(lerp(c1[2], c2[2], t))}`;
+const lerpA = (c1: number[], c2: number[], t: number) => [
+  lerp(c1[0], c2[0], t),
+  lerp(c1[1], c2[1], t),
+  lerp(c1[2], c2[2], t),
+];
+const toHexA = (c: number[]) => `#${hx(c[0])}${hx(c[1])}${hx(c[2])}`;
 const fmtW = (w: number) =>
   Math.abs(w) >= 1000 ? `${(w / 1000).toFixed(2)} kW` : `${Math.round(w)} W`;
 
@@ -72,13 +76,72 @@ const chip = (x: number, y: number, label: string, value: string) => svg`
     <text class="fz-chip-l" y="11">${label}</text>
   </g>`;
 
+const cloudPuff = (
+  x: number,
+  y: number,
+  s: number,
+  op: number,
+  dur: number,
+  delay: number,
+) => svg`
+  <g class="fz-cloud" style="opacity:${op.toFixed(2)};animation-duration:${dur}s;animation-delay:${delay}s">
+    <g transform="translate(${x} ${y}) scale(${s})">
+      <ellipse cx="0" cy="7" rx="42" ry="15" />
+      <circle cx="-19" cy="2" r="14" />
+      <circle cx="2" cy="-7" r="19" />
+      <circle cx="21" cy="0" r="14" />
+    </g>
+  </g>`;
+
+const cloudsGroup = (cloudiness: number) => {
+  const defs = [
+    { x: 150, y: 92, s: 1.1, dur: 36 },
+    { x: 540, y: 70, s: 0.9, dur: 44 },
+    { x: 680, y: 150, s: 1.0, dur: 40 },
+    { x: 330, y: 132, s: 0.8, dur: 48 },
+    { x: 70, y: 168, s: 0.7, dur: 42 },
+  ];
+  const n = 2 + Math.round(cloudiness * 3);
+  const op = 0.14 + cloudiness * 0.2;
+  return svg`<g>${defs
+    .slice(0, n)
+    .map((c, i) => cloudPuff(c.x, c.y, c.s, op, c.dur, i * -7))}</g>`;
+};
+
+const rainGroup = () => svg`<g class="fz-rain">
+  ${Array.from({ length: 26 }, (_, i) => {
+    const x = ((i * 61) % 788) + 6;
+    return svg`<line x1="${x}" y1="-12" x2="${x - 5}" y2="6" style="animation-delay:${((i % 11) * 0.11).toFixed(2)}s" />`;
+  })}
+</g>`;
+
+const snowGroup = () => svg`<g class="fz-snowg">
+  ${Array.from({ length: 30 }, (_, i) => {
+    const x = ((i * 53) % 788) + 6;
+    return svg`<circle class="fz-snow" cx="${x}" cy="-6" r="${(1.4 + (i % 3) * 0.5).toFixed(1)}" style="animation-delay:${((i % 13) * 0.2).toFixed(2)}s" />`;
+  })}
+</g>`;
+
+const fogGroup = () => svg`<g class="fz-fog">
+  <rect class="fz-fog-band" x="-220" y="118" width="1240" height="60" rx="30" />
+  <rect class="fz-fog-band slow" x="-220" y="214" width="1240" height="84" rx="42" />
+</g>`;
+
 export const futuristicCard = (m: FuturisticModel) => {
   const reduced = m.reducedMotion;
   const e = m.sunElevation;
+  const cloud = m.cloudiness;
+  const night = m.isNight;
 
-  const skyTop = mix([5, 7, 16], [9, 24, 49], e);
-  const skyBot = mix([10, 14, 30], [20, 50, 92], e);
-  const starOp = (1 - e) * 0.95;
+  // Sky: a clear-sky gradient (night→day) blended toward overcast grey by cloud.
+  const baseTop = lerpA([5, 7, 16], [9, 24, 49], e);
+  const baseBot = lerpA([10, 14, 30], [20, 50, 92], e);
+  const overTop = lerpA([20, 24, 32], [60, 66, 76], e);
+  const overBot = lerpA([28, 32, 40], [88, 92, 100], e);
+  const skyTop = toHexA(lerpA(baseTop, overTop, cloud * 0.7));
+  const skyBot = toHexA(lerpA(baseBot, overBot, cloud * 0.7));
+  const starOp = night ? Math.max(0, 1 - cloud) * 0.9 : 0;
+  const moonR = 22;
 
   const soc = Math.max(0, Math.min(100, m.batterySoc));
   const liq = soc >= 70 ? '#33c463' : soc > 30 ? '#ffc63a' : '#ff5252';
@@ -182,6 +245,96 @@ export const futuristicCard = (m: FuturisticModel) => {
           }
           50% {
             opacity: 1;
+          }
+        }
+        /* weather */
+        .fz-cloud {
+          fill: #c6d2e6;
+          filter: blur(0.4px);
+          animation-name: fz-drift;
+          animation-timing-function: ease-in-out;
+          animation-iteration-count: infinite;
+          animation-direction: alternate;
+        }
+        @keyframes fz-drift {
+          from {
+            transform: translateX(-24px);
+          }
+          to {
+            transform: translateX(24px);
+          }
+        }
+        .fz-rain line {
+          stroke: #a9ccff;
+          stroke-width: 1.4;
+          stroke-linecap: round;
+          opacity: 0.5;
+          animation: fz-rainfall 0.8s linear infinite;
+        }
+        @keyframes fz-rainfall {
+          from {
+            transform: translateY(0);
+          }
+          to {
+            transform: translateY(492px);
+          }
+        }
+        .fz-snow {
+          fill: #eaf2ff;
+          opacity: 0;
+          animation: fz-snowfall 4.6s linear infinite;
+        }
+        @keyframes fz-snowfall {
+          0% {
+            transform: translate(0, 0);
+            opacity: 0;
+          }
+          10% {
+            opacity: 0.9;
+          }
+          50% {
+            transform: translate(12px, 244px);
+          }
+          100% {
+            transform: translate(0, 488px);
+            opacity: 0.2;
+          }
+        }
+        .fz-fog-band {
+          fill: #b3c2da;
+          opacity: 0.1;
+          filter: blur(9px);
+          animation: fz-fog 26s linear infinite alternate;
+        }
+        .fz-fog-band.slow {
+          animation-duration: 38s;
+          opacity: 0.07;
+        }
+        @keyframes fz-fog {
+          from {
+            transform: translateX(-60px);
+          }
+          to {
+            transform: translateX(60px);
+          }
+        }
+        .fz-lightning {
+          fill: #ffffff;
+          opacity: 0;
+          animation: fz-flash 7s linear infinite;
+        }
+        @keyframes fz-flash {
+          0%,
+          92%,
+          100% {
+            opacity: 0;
+          }
+          93%,
+          95% {
+            opacity: 0.22;
+          }
+          94% {
+            opacity: 0.02;
           }
         }
         .fz-floor {
@@ -379,6 +532,21 @@ export const futuristicCard = (m: FuturisticModel) => {
           transform-origin: center;
           animation: fz-spin 30s linear infinite;
         }
+        .fz-moon {
+          fill: url(#fz-moon-grad);
+          filter: drop-shadow(0 0 10px #b9ccff) drop-shadow(0 0 22px #6f8fd8);
+        }
+        .fz-moon-halo {
+          fill: none;
+          stroke: #b9ccff;
+          stroke-opacity: 0.3;
+          stroke-width: 6;
+          filter: blur(3px);
+        }
+        .fz-crater {
+          fill: #b3c0e2;
+          opacity: 0.55;
+        }
         /* battery */
         .fz-cell {
           fill: none;
@@ -509,7 +677,12 @@ export const futuristicCard = (m: FuturisticModel) => {
           .fz-bubble,
           .fz-floor-rung,
           .fz-spark,
-          .fz-stream {
+          .fz-stream,
+          .fz-cloud,
+          .fz-rain line,
+          .fz-snow,
+          .fz-fog-band,
+          .fz-lightning {
             animation: none;
           }
         }
@@ -531,6 +704,11 @@ export const futuristicCard = (m: FuturisticModel) => {
               <stop offset="0" stop-color="#fff7e0" />
               <stop offset="0.5" stop-color="${m.solarColour}" />
               <stop offset="1" stop-color="${m.solarColour}" stop-opacity="0.2" />
+            </radialGradient>
+            <radialGradient id="fz-moon-grad" cx="0.42" cy="0.4" r="0.62">
+              <stop offset="0" stop-color="#ffffff" />
+              <stop offset="0.6" stop-color="#dfe7fb" />
+              <stop offset="1" stop-color="#aab8df" />
             </radialGradient>
             <radialGradient id="fz-neb1" cx="0.5" cy="0.5" r="0.5">
               <stop offset="0" stop-color="${m.solarColour}" stop-opacity="0.25" />
@@ -559,6 +737,13 @@ export const futuristicCard = (m: FuturisticModel) => {
           <ellipse cx="160" cy="120" rx="260" ry="200" fill="url(#fz-neb1)" />
           <ellipse cx="660" cy="330" rx="260" ry="200" fill="url(#fz-neb2)" />
 
+          <!-- weather -->
+          ${cloud > 0.12 ? cloudsGroup(cloud) : nothing}
+          ${(m.weather === 'rain' || m.weather === 'storm') && !reduced ? rainGroup() : nothing}
+          ${m.weather === 'snow' && !reduced ? snowGroup() : nothing}
+          ${m.weather === 'fog' ? fogGroup() : nothing}
+          ${m.weather === 'storm' && !reduced ? svg`<rect class="fz-lightning" x="0" y="0" width="800" height="470" />` : nothing}
+
           <!-- perspective grid floor -->
           <g class="fz-floor">${floorLines}</g>
           <g class="fz-floor-rung">
@@ -575,7 +760,7 @@ export const futuristicCard = (m: FuturisticModel) => {
             <path d="M784 428 L784 454 L758 454" />
           </g>
           <text class="fz-bar" x="64" y="26" text-anchor="start">
-            ${e > 0.15 ? 'DAY' : 'NIGHT'}${m.frequency !== undefined ? ` · ${m.frequency.toFixed(2)} Hz` : ''}${m.acTemp !== undefined ? ` · AC ${m.acTemp.toFixed(0)}°` : ''}
+            ${night ? 'NIGHT' : 'DAY'}${m.frequency !== undefined ? ` · ${m.frequency.toFixed(2)} Hz` : ''}${m.acTemp !== undefined ? ` · AC ${m.acTemp.toFixed(0)}°` : ''}
           </text>
           <text class="fz-bar" x="736" y="26" text-anchor="end">
             ${m.dcTemp !== undefined ? `DC ${m.dcTemp.toFixed(0)}° · ` : ''}${m.acVoltage !== undefined ? `${m.acVoltage.toFixed(0)} V · ` : ''}<tspan class="fz-online">● ONLINE</tspan>
@@ -616,14 +801,25 @@ export const futuristicCard = (m: FuturisticModel) => {
             <text class="fz-core-unit" y="14">INVERTER</text>
           </g>
 
-          <!-- ===== sun ===== -->
-          <g transform="translate(${SUN.x} ${SUN.y})" style="color:${m.solarColour}">
-            <circle class="fz-sun-halo" r="${sunR + 10}" />
-            <g class="fz-rays">${rays}</g>
-            <circle class="fz-sun" r="${sunR}" />
-          </g>
-          <text class="fz-label" x="${SUN.x}" y="${SUN.y + sunR + 28}">SOLAR</text>
-          <text class="fz-val" x="${SUN.x}" y="${SUN.y + sunR + 44}">${fmtW(m.solarW)}</text>
+          <!-- ===== sun / moon ===== -->
+          ${
+            night
+              ? svg`<g transform="translate(${SUN.x} ${SUN.y})">
+                  <circle class="fz-moon-halo" r="${moonR + 10}" />
+                  <circle class="fz-moon" r="${moonR}" />
+                  <circle class="fz-crater" cx="-7" cy="-6" r="4.5" />
+                  <circle class="fz-crater" cx="6" cy="3" r="6" />
+                  <circle class="fz-crater" cx="9" cy="-8" r="3" />
+                  <circle class="fz-crater" cx="-9" cy="8" r="3.4" />
+                </g>`
+              : svg`<g transform="translate(${SUN.x} ${SUN.y})" style="color:${m.solarColour}">
+                  <circle class="fz-sun-halo" r="${sunR + 10}" />
+                  <g class="fz-rays">${rays}</g>
+                  <circle class="fz-sun" r="${sunR}" />
+                </g>`
+          }
+          <text class="fz-label" x="${SUN.x}" y="${SUN.y + (night ? moonR : sunR) + 28}">SOLAR</text>
+          <text class="fz-val" x="${SUN.x}" y="${SUN.y + (night ? moonR : sunR) + 44}">${fmtW(m.solarW)}</text>
 
           <!-- ===== battery cell ===== -->
           <g clip-path="url(#fz-bclip)">

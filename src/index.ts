@@ -2777,7 +2777,7 @@ export class SunsynkPowerFlowCard extends LitElement {
     let variantKey: 'full' | 'compact' | 'futuristic' | undefined;
     if (this.isFuturisticCard) {
       variantKey = 'futuristic';
-      template = futuristicCard(buildFuturisticModel(config, data));
+      template = futuristicCard(buildFuturisticModel(config, data, this.hass));
     } else if (this.isFullCard) {
       variantKey = 'full';
       template = fullCard(config, inverterImg, data);

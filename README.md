@@ -58,8 +58,18 @@ What it shows:
   and an edge vignette.
 - **Particle energy** streaming through each conduit — packet count and speed
   scale with power, and direction follows real charge/discharge & import/export.
-- A **day/night sky** with a twinkling starfield (driven by local time) and a
-  corona **sun** that flares with production.
+- A **weather-aware day/night sky**: the sun **becomes a moon at night**, a
+  twinkling starfield appears, and clouds / rain / snow / fog roll in to match
+  your weather. It auto-detects your `sun.sun` and first `weather.*` entity — or
+  point it at specific ones:
+
+  ```yaml
+  cardstyle: futuristic
+  sun_entity: sun.sun # optional — real day/night & elevation
+  weather_entity: weather.forecast_home # optional — clouds/rain/snow/fog
+  ```
+
+- A corona **sun** that flares with production.
 - The **liquid battery cell** (green→amber→red by SOC, charge bubbles).
 - A **glowing home** whose windows brighten with load, plus an energised grid
   pylon.
