@@ -273,6 +273,7 @@ export interface CardConfigEntities {
   battery_power_190: string;
   battery_current_191: string;
   battery_rated_capacity: string;
+  battery_efficiency: string;
   battery_soh: string;
   battery2_voltage_183: string;
   battery2_soc_184: string;

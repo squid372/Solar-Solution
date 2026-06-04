@@ -54,8 +54,11 @@ What it shows:
   a load gauge, counter-rotating segmented rings, seated bolts and a plasma core
   with the live power readout at the centre.
 - Depth layers: a drifting **nebula**, a Tron-style **perspective grid floor**,
-  a **top status bar** (day/night, frequency, AC/DC temps, grid voltage, status)
-  and an edge vignette.
+  a **top status bar** (day/night, frequency, AC/DC temps, grid voltage, and a
+  colour-coded inverter **run status**) and an edge vignette.
+- Live **status readouts**: battery **capacity (Ah)** and **efficiency** under the
+  cell, and an **ON-GRID / OFF-GRID** badge at the pylon from your grid-signal
+  entity.
 - **Particle energy** streaming through each conduit — packet count and speed
   scale with power, and direction follows real charge/discharge & import/export.
 - A **weather-aware day/night sky**: the sun **becomes a moon at night**, a

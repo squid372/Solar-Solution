@@ -88,6 +88,7 @@ entities:
   battery_temp_182: sensor.solarsynkv3_YOURSERIAL_battery_bms_temperature # some inverters: _battery_temperature
   battery_status: sensor.solarsynkv3_YOURSERIAL_battery_status
   battery_rated_capacity: sensor.solarsynkv3_YOURSERIAL_battery_capacity # Ah
+  battery_efficiency: sensor.solarsynkv3_YOURSERIAL_battery_efficiency
   day_battery_charge_70: sensor.solarsynkv3_YOURSERIAL_battery_etoday_charge
   day_battery_discharge_71: sensor.solarsynkv3_YOURSERIAL_battery_etoday_discharge
 

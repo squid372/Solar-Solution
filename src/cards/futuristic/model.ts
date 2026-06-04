@@ -45,6 +45,12 @@ export interface FuturisticModel {
   frequency?: number;
   acVoltage?: number;
 
+  // Status / extra readouts
+  runStatus?: string;
+  gridSignal?: string;
+  batteryCapacityAh?: number;
+  batteryEfficiency?: number;
+
   // Colours
   solarColour: string;
   batteryColour: string;
@@ -185,6 +191,23 @@ export function buildFuturisticModel(
     dcTemp: maybe((data as any).stateDCTransformerTemp),
     frequency: maybe((data as any).loadFrequency, 2),
     acVoltage: maybe((data as any).inverterVoltage, 0),
+
+    runStatus: (() => {
+      const id = (config.entities as any)?.inverter_status_59;
+      const s = id ? states[id]?.state : undefined;
+      return s && !['unknown', 'unavailable', ''].includes(s) ? s : undefined;
+    })(),
+    gridSignal: (data as any).gridStatus,
+    batteryCapacityAh: (() => {
+      const id = (config.entities as any)?.battery_rated_capacity;
+      const n = id ? parseFloat(states[id]?.state) : NaN;
+      return Number.isFinite(n) ? n : undefined;
+    })(),
+    batteryEfficiency: (() => {
+      const id = (config.entities as any)?.battery_efficiency;
+      const n = id ? parseFloat(states[id]?.state) : NaN;
+      return Number.isFinite(n) ? n : undefined;
+    })(),
 
     solarColour: (data as any).solarColour || '#ffb300',
     batteryColour: (data as any).batteryColour || '#ff5fa2',

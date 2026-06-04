@@ -1509,6 +1509,10 @@ export class SunSynkCardEditor
                             name: 'battery_rated_capacity',
                             selector: { entity: {} },
                           },
+                          {
+                            name: 'battery_efficiency',
+                            selector: { entity: {} },
+                          },
                           { name: 'battery_soh', selector: { entity: {} } },
                           {
                             name: 'battery_current_direction',

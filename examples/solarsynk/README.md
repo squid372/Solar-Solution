@@ -81,6 +81,7 @@ so no live data is left unseen:
 | `battery_temp_182` | `battery_bms_temperature` (some inverters: `battery_temperature`) |
 | `battery_status` | `battery_status` |
 | `battery_rated_capacity` | `battery_capacity` (Ah) |
+| `battery_efficiency` | `battery_efficiency` (%) |
 | `day_battery_charge_70` | `battery_etoday_charge` |
 | `day_battery_discharge_71` | `battery_etoday_discharge` |
 | `battery2_soc_184` | `battery_soc2` |
