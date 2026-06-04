@@ -36,7 +36,7 @@ export default {
   output: {
     file: 'dist/solar-solution.js',
     format: 'esm',
-    name: 'SunsynkPowerFlowCard',
+    name: 'SolarSolution',
     inlineDynamicImports: true,
     sourcemap: true,
   },

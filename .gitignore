@@ -10,15 +10,6 @@ node_modules/
 .rpt2_cache/
 *.tsbuildinfo
 
-# Python (solarsynk add-on)
-__pycache__/
-*.pyc
-.venv/
-venv/
-
-# Nested repo created outside this project (separate GitHub repo)
+# Local-only / stray artifacts
 Solar/
-
-# Stray husky mis-invocation artifact
 --version/
-
