@@ -169,16 +169,45 @@ export const futuristicCard = (m: FuturisticModel) => {
       ? 'warn'
       : 'ok';
   const gridOn = (m.gridSignal || 'on').toLowerCase() !== 'off';
-  const batExtra = [
+
+  const fmtE = (kwh: number) =>
+    kwh >= 1000 ? `${(kwh / 1000).toFixed(1)} MWh` : `${kwh.toFixed(0)} kWh`;
+
+  // Battery readout lines.
+  const batHeader = `BATTERY${m.batteryStatusMsg ? ` · ${m.batteryStatusMsg.toUpperCase()}` : ''}`;
+  const batLine1 = [
+    m.batteryVoltage !== undefined ? `${m.batteryVoltage.toFixed(1)} V` : null,
+    m.batteryCurrent !== undefined ? `${m.batteryCurrent.toFixed(1)} A` : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+  const batLine2 = [
+    m.batteryTemp !== undefined ? `${m.batteryTemp.toFixed(0)}°C` : null,
     m.batteryCapacityAh !== undefined
       ? `${m.batteryCapacityAh.toFixed(0)} Ah`
-      : null,
-    m.batteryEfficiency !== undefined
-      ? `${m.batteryEfficiency.toFixed(0)}% eff`
       : null,
   ]
     .filter(Boolean)
     .join(' · ');
+  const batLine3 = [
+    m.batteryEfficiency !== undefined
+      ? `${m.batteryEfficiency.toFixed(0)}% eff`
+      : null,
+    m.batterySoh !== undefined ? `SOH ${m.batterySoh.toFixed(0)}%` : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
+  // Solar readout lines.
+  const pvLine =
+    m.pvStrings.length > 1
+      ? m.pvStrings
+          .slice(0, 3)
+          .map((s) => `${s.name} ${(s.power / 1000).toFixed(2)}`)
+          .join(' · ') + ' kW'
+      : '';
+  const sellRaw = (m.solarSell || '').toLowerCase();
+  const sellOn = /^(on|1|true|enabled|yes)$/.test(sellRaw);
 
   const stars = Array.from({ length: 34 }, (_, i) => {
     const x = ((i * 137) % 786) + 8;
@@ -191,7 +220,7 @@ export const futuristicCard = (m: FuturisticModel) => {
   const floorLines: unknown[] = [];
   for (let bx = -220; bx <= 1020; bx += 120) {
     const tx = 400 + (bx - 400) * 0.72;
-    floorLines.push(svg`<line x1="${tx.toFixed(0)}" y1="404" x2="${bx}" y2="486" />`);
+    floorLines.push(svg`<line x1="${tx.toFixed(0)}" y1="404" x2="${bx}" y2="520" />`);
   }
 
   // Reactor sun rays (alternating length).
@@ -721,7 +750,7 @@ export const futuristicCard = (m: FuturisticModel) => {
       </style>
 
       <div class="fz-wrap">
-        <svg class="fz-svg" viewBox="0 0 800 486" preserveAspectRatio="xMidYMid meet">
+        <svg class="fz-svg" viewBox="0 0 800 520" preserveAspectRatio="xMidYMid meet">
           <defs>
             <linearGradient id="fz-sky" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stop-color="${skyTop}" />
@@ -764,7 +793,7 @@ export const futuristicCard = (m: FuturisticModel) => {
           </defs>
 
           <!-- background -->
-          <rect x="0" y="0" width="800" height="486" fill="url(#fz-sky)" />
+          <rect x="0" y="0" width="800" height="520" fill="url(#fz-sky)" />
           <g style="opacity:${starOp.toFixed(2)}">${stars}</g>
           <ellipse cx="160" cy="120" rx="260" ry="200" fill="url(#fz-neb1)" />
           <ellipse cx="660" cy="330" rx="260" ry="200" fill="url(#fz-neb2)" />
@@ -774,7 +803,7 @@ export const futuristicCard = (m: FuturisticModel) => {
           ${(m.weather === 'rain' || m.weather === 'storm') && !reduced ? rainGroup() : nothing}
           ${m.weather === 'snow' && !reduced ? snowGroup() : nothing}
           ${m.weather === 'fog' ? fogGroup() : nothing}
-          ${m.weather === 'storm' && !reduced ? svg`<rect class="fz-lightning" x="0" y="0" width="800" height="486" />` : nothing}
+          ${m.weather === 'storm' && !reduced ? svg`<rect class="fz-lightning" x="0" y="0" width="800" height="520" />` : nothing}
 
           <!-- perspective grid floor -->
           <g class="fz-floor">${floorLines}</g>
@@ -788,8 +817,8 @@ export const futuristicCard = (m: FuturisticModel) => {
           <g stroke="#7fd0ff" stroke-opacity="0.35" fill="none" stroke-width="2">
             <path d="M16 42 L16 16 L42 16" />
             <path d="M784 42 L784 16 L758 16" />
-            <path d="M16 428 L16 454 L42 454" />
-            <path d="M784 428 L784 454 L758 454" />
+            <path d="M16 480 L16 506 L42 506" />
+            <path d="M784 480 L784 506 L758 506" />
           </g>
           <text class="fz-bar" x="64" y="26" text-anchor="start">
             ${night ? 'NIGHT' : 'DAY'}${m.frequency !== undefined ? ` · ${m.frequency.toFixed(2)} Hz` : ''}${m.acTemp !== undefined ? ` · AC ${m.acTemp.toFixed(0)}°` : ''}
@@ -852,6 +881,13 @@ export const futuristicCard = (m: FuturisticModel) => {
           }
           <text class="fz-label" x="${SUN.x}" y="${SUN.y + (night ? moonR : sunR) + 28}">SOLAR</text>
           <text class="fz-val" x="${SUN.x}" y="${SUN.y + (night ? moonR : sunR) + 44}">${fmtW(m.solarW)}</text>
+          ${pvLine ? svg`<text class="fz-sub" x="${SUN.x}" y="${SUN.y + (night ? moonR : sunR) + 59}">${pvLine}</text>` : nothing}
+          ${
+            m.solarSell !== undefined
+              ? svg`<text class="fz-sub" x="${SUN.x}" y="${SUN.y + (night ? moonR : sunR) + 73}"><tspan class="fz-st-${sellOn ? 'ok' : 'bad'}">●</tspan> SELL${m.maxSellW !== undefined ? ` · ${(m.maxSellW / 1000).toFixed(1)} kW max` : ''}</text>`
+              : nothing
+          }
+          ${m.lifetimePV !== undefined ? svg`<text class="fz-sub" x="${SUN.x}" y="${SUN.y + (night ? moonR : sunR) + 87}">Σ ${fmtE(m.lifetimePV)} lifetime</text>` : nothing}
 
           <!-- ===== battery cell ===== -->
           <g clip-path="url(#fz-bclip)">
@@ -878,11 +914,13 @@ export const futuristicCard = (m: FuturisticModel) => {
           <rect x="${batLeft}" y="${BAT.top}" width="${BAT.w}" height="${BAT.h}" rx="9" class="fz-cell-glow" />
           <rect x="${batLeft}" y="${BAT.top}" width="${BAT.w}" height="${BAT.h}" rx="9" class="fz-cell" />
           ${m.batteryValid ? svg`<text class="fz-soc" x="${BAT.cx}" y="${BAT.top + 56}">${soc.toFixed(0)}%</text>` : nothing}
-          <text class="fz-label" x="${BAT.cx}" y="${BAT.top + BAT.h + 18}">BATTERY</text>
+          <text class="fz-label" x="${BAT.cx}" y="${BAT.top + BAT.h + 18}">${batHeader}</text>
           <text class="fz-val" x="${BAT.cx}" y="${BAT.top + BAT.h + 34}">
             ${m.batteryCharging ? '▲ ' : m.batteryW > 15 ? '▼ ' : ''}${fmtW(m.batteryW)}
           </text>
-          ${batExtra ? svg`<text class="fz-sub" x="${BAT.cx}" y="${BAT.top + BAT.h + 49}">${batExtra}</text>` : nothing}
+          ${batLine1 ? svg`<text class="fz-sub" x="${BAT.cx}" y="${BAT.top + BAT.h + 49}">${batLine1}</text>` : nothing}
+          ${batLine2 ? svg`<text class="fz-sub" x="${BAT.cx}" y="${BAT.top + BAT.h + 63}">${batLine2}</text>` : nothing}
+          ${batLine3 ? svg`<text class="fz-sub" x="${BAT.cx}" y="${BAT.top + BAT.h + 77}">${batLine3}</text>` : nothing}
 
           <!-- ===== grid pylon ===== -->
           <g transform="translate(${GRID.x} ${GRID.y})" style="color:${m.gridColour}">
@@ -929,7 +967,7 @@ export const futuristicCard = (m: FuturisticModel) => {
           ${m.dailyImport !== undefined ? chip(500, 452, 'IMPORT', `${m.dailyImport.toFixed(1)} kWh`) : nothing}
           ${m.dailyExport !== undefined ? chip(592, 452, 'EXPORT', `${m.dailyExport.toFixed(1)} kWh`) : nothing}
 
-          <rect x="0" y="0" width="800" height="486" fill="url(#fz-vign)" pointer-events="none" />
+          <rect x="0" y="0" width="800" height="520" fill="url(#fz-vign)" pointer-events="none" />
         </svg>
       </div>
     </ha-card>

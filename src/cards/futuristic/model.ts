@@ -50,6 +50,13 @@ export interface FuturisticModel {
   gridSignal?: string;
   batteryCapacityAh?: number;
   batteryEfficiency?: number;
+  batteryVoltage?: number;
+  batteryCurrent?: number;
+  batterySoh?: number;
+  batteryStatusMsg?: string;
+  solarSell?: string;
+  maxSellW?: number;
+  lifetimePV?: number;
 
   // Colours
   solarColour: string;
@@ -122,6 +129,15 @@ export function buildFuturisticModel(
 
   // ---- Sky: prefer a real sun entity, else fall back to local time. ----
   const states = hass?.states ?? {};
+  // Read a numeric / string state straight from an entity id.
+  const sNum = (id?: string): number | undefined => {
+    const n = id ? parseFloat(states[id]?.state) : NaN;
+    return Number.isFinite(n) ? n : undefined;
+  };
+  const sStr = (id?: string): string | undefined => {
+    const s = id ? states[id]?.state : undefined;
+    return s && !['unknown', 'unavailable', ''].includes(s) ? s : undefined;
+  };
   const sunId =
     (config as any).sun_entity || (states['sun.sun'] ? 'sun.sun' : undefined);
   const sunEnt = sunId ? states[sunId] : undefined;
@@ -208,6 +224,13 @@ export function buildFuturisticModel(
       const n = id ? parseFloat(states[id]?.state) : NaN;
       return Number.isFinite(n) ? n : undefined;
     })(),
+    batteryVoltage: sNum((config.entities as any)?.battery_voltage_183),
+    batteryCurrent: sNum((config.entities as any)?.battery_current_191),
+    batterySoh: sNum((config.entities as any)?.battery_soh),
+    batteryStatusMsg: sStr((config.entities as any)?.battery_status),
+    solarSell: sStr((config.entities as any)?.solar_sell_247),
+    maxSellW: sNum((config.entities as any)?.max_sell_power),
+    lifetimePV: sNum((config.entities as any)?.total_pv_generation),
 
     solarColour: (data as any).solarColour || '#ffb300',
     batteryColour: (data as any).batteryColour || '#ff5fa2',

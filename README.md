@@ -56,9 +56,10 @@ What it shows:
 - Depth layers: a drifting **nebula**, a Tron-style **perspective grid floor**,
   a **top status bar** (day/night, frequency, AC/DC temps, grid voltage, and a
   colour-coded inverter **run status**) and an edge vignette.
-- Live **status readouts**: battery **capacity (Ah)** and **efficiency** under the
-  cell, and an **ON-GRID / OFF-GRID** badge at the pylon from your grid-signal
-  entity.
+- Live **status readouts**: under the solar node, **per-MPPT** strings,
+  **solar-sell** state + max-sell power and **lifetime PV**; under the battery,
+  **voltage / current / temperature / capacity / efficiency / SOH** and the
+  battery **status message**; and an **ON-GRID / OFF-GRID** badge at the pylon.
 - **Particle energy** streaming through each conduit — packet count and speed
   scale with power, and direction follows real charge/discharge & import/export.
 - A **weather-aware day/night sky**: the sun **becomes a moon at night**, a
