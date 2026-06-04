@@ -36,8 +36,6 @@ import {
 import { localize } from './localize/localize';
 import merge from 'lodash.merge';
 import { Utils } from './helpers/utils';
-import { fullCard } from './cards/full-card';
-import { compactCard } from './cards/compact-card';
 import { futuristicCard } from './cards/futuristic/render';
 import { buildFuturisticModel } from './cards/futuristic/model';
 // Side-effect imports: register the companion cards.
@@ -2773,24 +2771,11 @@ export class SunsynkPowerFlowCard extends LitElement {
       batteryCount,
     };
 
-    let template: TemplateResult | null = null;
-    let variantKey: 'full' | 'compact' | 'futuristic' | undefined;
-    if (this.isFuturisticCard) {
-      variantKey = 'futuristic';
-      template = futuristicCard(buildFuturisticModel(config, data, this.hass));
-    } else if (this.isFullCard) {
-      variantKey = 'full';
-      template = fullCard(config, inverterImg, data);
-    } else if (this.isLiteCard || this.isCompactCard) {
-      variantKey = 'compact';
-      template = compactCard(config, inverterImg, data);
-    }
-
-    if (template && variantKey) {
-      return cache(keyed(variantKey, template));
-    }
-
-    return template ?? null;
+    // The futuristic HUD is the only card view.
+    const template = futuristicCard(
+      buildFuturisticModel(config, data, this.hass),
+    );
+    return cache(keyed('futuristic', template));
   }
 
   /**

@@ -19,10 +19,7 @@ views:
       - type: grid
         cards:
           - type: custom:solar-solution
-            cardstyle: futuristic # futuristic | full | lite | compact
-            wide: true
-            glow: true
-            glow_intensity: 3
+            glow_theme: neon # HUD accent: neon | ice | fire | aurora | mono
             show_solar: true
             show_battery: true
             show_grid: true

@@ -7,7 +7,6 @@ import {
 
 import {
   AutarkyType,
-  CardStyle,
   InverterModel,
   sunsynkPowerFlowCardConfig,
 } from './types';
@@ -81,13 +80,8 @@ export class SunSynkCardEditor
   private static readonly HELP_TEXT: Record<string, string> = {
     large_font: 'Use a larger font for card entities.',
     wide: 'Use a wide layout for the card.',
-    glow: 'Enable neon glow effects: glowing flow lines with comet trails, energy pulse waves, pulsing nodes, a glass card with ambient glow, and a battery SOC ring.',
-    glow_intensity:
-      'Strength of the neon glow bloom (1 = subtle, 5 = intense).',
     glow_theme:
-      'Colour theme for the glowing cores and pulse waves: neon (white-hot), ice, fire, aurora, or mono.',
-    soc_ring:
-      'Show the glowing battery state-of-charge ring around the battery icon. Turn off if it crowds the battery readouts.',
+      'Colour theme for the futuristic HUD: neon, ice, fire, aurora or mono.',
     additional_loads: 'Number of additional loads to configure (0–6).',
     colour: 'Primary colour for this element.',
     efficiency:
@@ -543,7 +537,21 @@ export class SunSynkCardEditor
         selector: { number: { min: 0, max: 3, step: 1, mode: 'box' } },
       },
       { name: 'dynamic_line_width', selector: { boolean: {} } },
-      { name: 'glow', selector: { boolean: {} } },
+      {
+        name: 'glow_theme',
+        selector: {
+          select: {
+            mode: 'dropdown',
+            options: [
+              { value: 'neon', label: 'Neon' },
+              { value: 'ice', label: 'Ice' },
+              { value: 'fire', label: 'Fire' },
+              { value: 'aurora', label: 'Aurora' },
+              { value: 'mono', label: 'Mono' },
+            ],
+          },
+        },
+      },
     ];
     if (this._config.dynamic_line_width) {
       generalGridSchema.push(
@@ -557,31 +565,6 @@ export class SunSynkCardEditor
         },
       );
     }
-    if (this._config.glow) {
-      generalGridSchema.push(
-        { name: 'soc_ring', selector: { boolean: {} } },
-        {
-          name: 'glow_intensity',
-          selector: { number: { min: 1, max: 5, step: 1, mode: 'box' } },
-        },
-        {
-          name: 'glow_theme',
-          selector: {
-            select: {
-              mode: 'dropdown',
-              options: [
-                { value: 'neon', label: 'Neon (white-hot)' },
-                { value: 'ice', label: 'Ice' },
-                { value: 'fire', label: 'Fire' },
-                { value: 'aurora', label: 'Aurora' },
-                { value: 'mono', label: 'Mono' },
-              ],
-            },
-          },
-        },
-      );
-    }
-
     return html`
       <ha-form
         .hass=${this.hass}
@@ -602,17 +585,6 @@ export class SunSynkCardEditor
                 ],
               },
             ],
-          },
-          {
-            name: 'cardstyle',
-            selector: {
-              select: {
-                options: Object.values(CardStyle).map((x) => ({
-                  label: capitalize(x),
-                  value: x,
-                })),
-              },
-            },
           },
           {
             type: 'expandable',

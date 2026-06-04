@@ -2,7 +2,7 @@
 
 A ready-to-use preset that wires the [SolarSynk V3 add-on](https://github.com/martinville/solarsynkv3)
 (which pulls your Sunsynk cloud data into Home Assistant) directly into the
-Solar-Solution card — with the **neon glow** visuals enabled.
+Solar-Solution **futuristic** card.
 
 > ✅ The entity names below are validated against a **real SolarSynk V3** install.
 > **The only thing you change is your serial number** — everything else maps
@@ -40,12 +40,9 @@ the card's entity slots so the card works out of the box.
    - **Whole view** → paste [`dashboard.yaml`](dashboard.yaml)'s `views:` entry
      into your dashboard's raw configuration editor. This lays out the
      **full suite**: the power-flow card plus all the companion cards below.
-5. Adjust `solar.mppts` (1–6), `battery.energy`, and the `max_power` values to
-   match your system. The `full` style shows up to 4 MPPT strings; use
-   `cardstyle: lite`/`compact` (with `wide: true`) to display 5–6 strings.
-
-The preset enables `wide: true` (16:9) so the full layout isn't cramped. Remove
-that line for the narrower 4:3 layout.
+5. Adjust `solar.mppts` (1–6) and `battery.shutdown_soc` to match your system.
+   Set `glow_theme:` to recolour the HUD (`neon` / `ice` / `fire` / `aurora` /
+   `mono`).
 
 ## Companion cards in the preset
 
@@ -126,7 +123,7 @@ Everything SolarSynk *does* publish is mapped above, so the card shows the full
 flow plus per-MPPT, both-battery, grid, temps, daily totals, solar-sell and
 self-sufficiency.
 
-## Turning the glow off
+## Theming
 
-The preset ships with the neon glow on (`glow: true`). To return to the classic
-look, set `glow: false` (or remove the `glow` / `glow_intensity` lines).
+Recolour the whole futuristic HUD with `glow_theme:` — `neon`, `ice`, `fire`,
+`aurora` or `mono`.

@@ -95,6 +95,17 @@ const maybe = (e: any, dp = 1): number | undefined =>
     ? e.toNum(dp)
     : undefined;
 
+// Read a number from a value that may be a plain number, a numeric string, or
+// a CustomEntity — used for DTO fields that aren't wrapped CustomEntities.
+const numOf = (v: any): number | undefined => {
+  if (v == null) return undefined;
+  if (typeof v === 'number') return Number.isFinite(v) ? v : undefined;
+  if (typeof v.isValid === 'function')
+    return v.isValid() ? v.toNum(2) : undefined;
+  const n = parseFloat(v);
+  return Number.isFinite(n) ? n : undefined;
+};
+
 export function buildFuturisticModel(
   config: sunsynkPowerFlowCardConfig,
   data: DataDto,
@@ -207,8 +218,8 @@ export function buildFuturisticModel(
     batteryTemp: maybe((data as any).stateBatteryTemp),
     acTemp: maybe((data as any).stateRadiatorTemp),
     dcTemp: maybe((data as any).stateDCTransformerTemp),
-    frequency: maybe((data as any).loadFrequency, 2),
-    acVoltage: maybe((data as any).inverterVoltage, 0),
+    frequency: numOf((data as any).loadFrequency),
+    acVoltage: numOf((data as any).inverterVoltage),
 
     runStatus: (() => {
       const id = (config.entities as any)?.inverter_status_59;

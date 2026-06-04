@@ -58,10 +58,7 @@ export interface sunsynkPowerFlowCardConfig extends LovelaceCardConfig {
   cardstyle: CardStyle;
   wide?: boolean;
   large_font?: boolean;
-  glow?: boolean;
-  glow_intensity?: number;
   glow_theme?: string;
-  soc_ring?: boolean;
   show_solar: boolean;
   show_battery: boolean;
   show_grid: boolean;

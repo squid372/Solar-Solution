@@ -1,51 +1,52 @@
 # Solar-Solution
 
-An animated Home Assistant dashboard card for visualizing solar, battery, grid
-and load power flow — with an optional **neon glow** theme that makes the card
-really stand out. It works with many inverter brands (Sunsynk, Deye, Solis, Lux,
-FoxESS, Goodwe, Huawei and more) as long as you have the required sensor data,
-and pairs out of the box with the [SolarSynk](examples/solarsynk/) add-on.
+A **futuristic, animated Home Assistant dashboard card** that visualises your
+solar, battery, grid and load power flow as a living sci-fi energy HUD. It works
+with many inverter brands (Sunsynk, Deye, Solis, Lux, FoxESS, Goodwe, Huawei and
+more) as long as you have the required sensor data, and pairs out of the box with
+the [SolarSynk](examples/solarsynk/) add-on.
 
 [![Open your Home Assistant instance and open this repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=squid372&repository=Solar-Solution&category=plugin)
 
-![Solar-Solution power flow card with the neon glow theme](docs/images/solar-solution-glow.svg)
+![Solar-Solution futuristic power-flow card](docs/images/solar-solution-glow.svg)
 
 ## Features
 
-- **Neon glow theme** (opt-in) — glowing flow lines with white-hot cores,
-  comet-trail dots, energy pulse waves, pulsing nodes, a frosted-glass card with
-  a live ambient aura, charging-aware battery state-of-charge rings, and five
-  colour themes. See [below](#neon-glow-theme).
-- **Futuristic** card style — a living energy HUD with a glowing reactor-core
-  inverter, particle energy flows, a day/night starfield sky, a liquid battery
-  cell and a self-powered hero readout. See [below](#futuristic-card-style).
-- Four card styles — `futuristic`, `compact`, `lite` or `full`, plus a wide
-  16:9 layout.
-- Animated power flow with configurable, power-reactive speed (supports inverted
-  battery / AUX / grid power).
-- Dynamic battery image based on SOC, with optional runtime-to-shutdown estimate.
-- Up to **6 MPPT** solar strings and **dual-battery** support.
-- Daily totals, self-sufficiency / ratio, temperatures, energy cost and more —
-  each toggleable.
-- Dynamic colours, custom colours and images, and clickable entities (more-info).
-- Per-inverter status and battery messages (Sunsynk, Lux, Goodwe, Solis, …).
+- A **living energy HUD** — a glowing arc-reactor inverter, particle energy
+  flowing through each conduit, and a weather-aware day/night sky (the sun
+  becomes a moon at night, with clouds / rain / snow / fog).
+- **Themeable** via `glow_theme` (neon / ice / fire / aurora / mono), with a
+  holographic scanline overlay.
+- A **liquid battery cell** (green→amber→red by SOC) and a **glowing home**
+  whose windows brighten with load.
+- Rich readouts: per-MPPT strings, solar-sell + lifetime PV, battery
+  voltage / current / temp / capacity / efficiency / SOH, grid signal, inverter
+  run status, daily totals and a self-powered hero headline.
+- Up to **6 MPPT** solar strings, dynamic colours and clickable entities.
+- Bundled **companion cards** (battery, inverter, daily energy, self-sufficiency,
+  solar-vs-grid) — see [below](#companion-cards).
+- Honours `prefers-reduced-motion`.
 
-## Futuristic card style
+## The card
 
-A complete reimagining of the power-flow view as a **living energy HUD**. Set
-`cardstyle: futuristic` (it reuses the exact same `entities:` mapping as the
-other styles):
+The power-flow view is rendered as a single **living energy HUD**. A minimal card
+looks like this — map your entities and you're done:
 
 ```yaml
 type: custom:solar-solution
-cardstyle: futuristic
 title: Power Flow
+glow_theme: neon # neon | ice | fire | aurora | mono
 inverter: { model: sunsynk }
 battery: { shutdown_soc: 20 }
 solar: { mppts: 2 }
 grid: {}
 entities:
-  # …same entity mapping as the other styles…
+  # 👇 your Home Assistant entity IDs 👇
+  battery_soc_184: sensor.battery_soc
+  battery_power_190: sensor.battery_power
+  pv1_power_186: sensor.pv1_power
+  grid_power_169: sensor.grid_power
+  inverter_power_175: sensor.inverter_power
 ```
 
 What it shows:
@@ -85,40 +86,7 @@ What it shows:
 - A **hero headline** — e.g. `94% SELF-POWERED · +1.2 kW exporting` — and chips
   for daily totals and inverter temps.
 
-It honours `prefers-reduced-motion` (particles and spin pause). The `full`,
-`lite` and `compact` styles are unchanged.
-
-## Neon glow theme
-
-An optional, opt-in visual theme. Enable it with:
-
-```yaml
-type: custom:solar-solution
-cardstyle: full
-glow: true
-glow_intensity: 3 # 1 (subtle / lighter render) … 5 (intense)
-glow_theme: neon # neon | ice | fire | aurora | mono
-```
-
-What it adds (all off by default, so the classic look is untouched):
-
-- Glowing flow lines with white-hot cores and comet-trail dots
-- **Continuously flowing energy** streaming along every active line, rushing
-  faster as power rises
-- Energy pulse waves that sweep each active line
-- Pulsing node halos and a softly glowing solar node
-- A frosted-glass card with a **live ambient aura** tinted to the dominant flow
-  (solar / grid / battery) and scaled to system activity
-- A charging-aware **battery state-of-charge ring** (both batteries)
-- Five colour themes via `glow_theme`
-
-Performance & accessibility: `glow_intensity: 1` renders a lighter "effects-lite"
-variant (no comet trails / pulse waves), and `prefers-reduced-motion` is
-respected (the moving extras are dropped and CSS animations are paused).
-
-**Preview it locally:** the [`demo/`](demo/) folder contains a standalone,
-glow-on-vs-off comparison across all themes — serve it with any static server
-(e.g. `npx http-server demo`) and open `index.html`.
+It honours `prefers-reduced-motion` (particles and spin pause).
 
 ## Installation & setup
 
@@ -161,8 +129,7 @@ every `sensor.*` value to your own entity IDs** (find them in
 
 ```yaml
 type: custom:solar-solution
-cardstyle: full # full | lite | compact
-glow: true # optional neon theme — set false for the classic look
+glow_theme: neon # neon | ice | fire | aurora | mono
 inverter:
   model: sunsynk # sunsynk | deye | solis | goodwe | lux | ...
 battery:
@@ -186,7 +153,7 @@ required attributes).
 ## Use with the SolarSynk add-on
 
 If you use the SolarSynk add-on to pull your inverter data into Home Assistant,
-a ready-to-use, pre-mapped card preset (with the glow theme enabled) lives in
+a ready-to-use, pre-mapped card preset lives in
 [`examples/solarsynk/`](examples/solarsynk/) — replace `YOURSERIAL` and paste it in.
 
 ## Troubleshooting
@@ -198,7 +165,7 @@ a ready-to-use, pre-mapped card preset (with the glow theme enabled) lives in
 | **"No solar attributes defined" / "include the solar mppts"** | Add a `solar:` section with `mppts: <1-6>`, or set `show_solar: false`. |
 | **"Please include the day_… attributes"** | You turned on a `show_daily*` option but didn't map its `day_*` entity. Map it or set the `show_daily*` option back to `false`. |
 | **Card loads but values are blank / "unavailable"** | Your `sensor.*` entity IDs are wrong. Check exact IDs in *Developer Tools → States*. |
-| **Glow theme looks flat** | It's opt-in: set `glow: true`. It shows best on dark themes. |
+| **HUD accent colour isn't what I want** | Set `glow_theme:` to `neon`, `ice`, `fire`, `aurora` or `mono`. |
 
 ## Companion cards
 

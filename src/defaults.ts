@@ -1,13 +1,10 @@
 import { InverterModel } from './types';
 
 export default {
-  cardstyle: 'lite',
-  wide: false,
+  cardstyle: 'futuristic',
+  wide: true,
   large_font: false,
-  glow: false,
-  glow_intensity: 2,
   glow_theme: 'neon',
-  soc_ring: true,
   show_solar: true,
   show_battery: true,
   show_grid: true,
