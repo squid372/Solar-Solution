@@ -43,6 +43,7 @@ export interface FuturisticModel {
   acTemp?: number;
   dcTemp?: number;
   frequency?: number;
+  acVoltage?: number;
 
   // Colours
   solarColour: string;
@@ -138,6 +139,7 @@ export function buildFuturisticModel(
     acTemp: maybe((data as any).stateRadiatorTemp),
     dcTemp: maybe((data as any).stateDCTransformerTemp),
     frequency: maybe((data as any).loadFrequency, 2),
+    acVoltage: maybe((data as any).inverterVoltage, 0),
 
     solarColour: (data as any).solarColour || '#ffb300',
     batteryColour: (data as any).batteryColour || '#ff5fa2',

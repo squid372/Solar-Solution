@@ -50,8 +50,12 @@ entities:
 
 What it shows:
 
-- A glowing **reactor-core inverter** with counter-rotating rings and a live
-  power readout at the centre.
+- A glowing **arc-reactor inverter** — a hex backplate, a rotating radar sweep,
+  a load gauge, counter-rotating segmented rings, seated bolts and a plasma core
+  with the live power readout at the centre.
+- Depth layers: a drifting **nebula**, a Tron-style **perspective grid floor**,
+  a **top status bar** (day/night, frequency, AC/DC temps, grid voltage, status)
+  and an edge vignette.
 - **Particle energy** streaming through each conduit — packet count and speed
   scale with power, and direction follows real charge/discharge & import/export.
 - A **day/night sky** with a twinkling starfield (driven by local time) and a

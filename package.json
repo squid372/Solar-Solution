@@ -1,6 +1,6 @@
 {
   "name": "solar-solution",
-  "version": "7.4.0",
+  "version": "7.4.1",
   "description": "Solar-Solution — a customizable, animated Home Assistant card with an optional neon glow theme for visualizing solar / battery / grid power flow.",
   "main": "solar-solution.js",
   "prettier": {
