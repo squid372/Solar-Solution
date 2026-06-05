@@ -163,6 +163,22 @@ export const futuristicCard = (m: FuturisticModel) => {
   const loadI = Math.min(1, m.loadW / 4000);
   const coreI = Math.min(1, m.inverterW / 6000);
 
+  // Inverter readout split into a big number + small unit for the core orb.
+  const invBig =
+    Math.abs(m.inverterW) >= 1000
+      ? (m.inverterW / 1000).toFixed(2)
+      : Math.round(m.inverterW).toString();
+  const invUnit = Math.abs(m.inverterW) >= 1000 ? 'kW' : 'W';
+  // Prepaid balance colour (green → amber → red as it runs low).
+  const ppColor =
+    m.prepaidKwh === undefined
+      ? '#46d97c'
+      : m.prepaidKwh <= 20
+        ? '#ff6b6b'
+        : m.prepaidKwh <= 50
+          ? '#ffc63a'
+          : '#46d97c';
+
   const net = m.netGridW;
   const heroSub =
     Math.abs(net) < 20
@@ -485,100 +501,83 @@ export const futuristicCard = (m: FuturisticModel) => {
           stroke-opacity: 0.22;
           stroke-width: 1.5;
         }
-        .fz-radar {
-          fill: url(#fz-radar);
-          transform-box: fill-box;
-          transform-origin: center;
-          animation: fz-spin 6s linear infinite;
-        }
         .fz-gauge-bg {
           fill: none;
-          stroke: #2a3f63;
-          stroke-width: 4;
+          stroke: #1c3450;
+          stroke-width: 5;
         }
         .fz-gauge {
           fill: none;
           stroke: var(--fz-a);
-          stroke-width: 4;
-          stroke-linecap: round;
-          filter: drop-shadow(0 0 5px var(--fz-a));
-          transition: stroke-dasharray 0.8s ease;
-        }
-        .fz-ring,
-        .fz-ring2,
-        .fz-ring3 {
-          fill: none;
-          stroke: var(--fz-soft);
-        }
-        .fz-ring {
-          stroke-width: 2;
-          stroke-opacity: 0.6;
-          stroke-dasharray: 18 12;
-        }
-        .fz-ring2 {
           stroke-width: 5;
-          stroke-opacity: 0.8;
-          stroke-dasharray: 22 11.33;
-        }
-        .fz-ring3 {
-          stroke-width: 1.2;
-          stroke-opacity: 0.45;
-          stroke-dasharray: 4 7;
+          stroke-linecap: round;
+          filter: drop-shadow(0 0 6px var(--fz-a));
+          transition: stroke-dasharray 0.8s ease;
         }
         .fz-rot {
           transform-box: fill-box;
           transform-origin: center;
-          animation: fz-spin 16s linear infinite;
-        }
-        .fz-rot.rev {
-          animation: fz-spin 11s linear infinite reverse;
-        }
-        .fz-rot.fast {
-          animation: fz-spin 7s linear infinite;
+          animation: fz-spin 26s linear infinite;
         }
         @keyframes fz-spin {
           to {
             transform: rotate(360deg);
           }
         }
-        .fz-bolt {
-          fill: var(--fz-soft);
-          filter: drop-shadow(0 0 3px var(--fz-a));
+        .fz-orb-aura {
+          fill: url(#fz-orbglow);
+          animation: fz-breathe 3.6s ease-in-out infinite;
         }
-        .fz-core-aura {
-          fill: url(#fz-core-grad);
-          opacity: 0.45;
-          filter: blur(6px);
-          animation: fz-breathe 3.4s ease-in-out infinite;
+        .fz-orb {
+          fill: url(#fz-orb);
+          filter: drop-shadow(0 0 18px var(--fz-a));
         }
-        .fz-core-body {
-          fill: url(#fz-core-grad);
-          filter: drop-shadow(0 0 12px var(--fz-a)) drop-shadow(0 0 28px var(--fz-a));
-        }
-        .fz-spokes {
-          stroke: #ffffff;
-          stroke-width: 1;
-          stroke-opacity: 0.4;
-          transform-box: fill-box;
-          transform-origin: center;
-          animation: fz-spin 5s linear infinite;
-        }
-        .fz-core-pulse {
+        .fz-orb-ring {
           fill: none;
           stroke: var(--fz-soft);
-          stroke-width: 2;
-          transform-box: fill-box;
-          transform-origin: center;
-          animation: fz-pulse 2.6s ease-out infinite;
+          stroke-width: 1.4;
+          stroke-opacity: 0.45;
+          stroke-dasharray: 2 10;
+        }
+        .fz-orb-spec {
+          fill: #ffffff;
+          opacity: 0.22;
+        }
+        .fz-orb-plate {
+          fill: #07111f;
+          fill-opacity: 0.6;
+        }
+        .fz-prepaid {
+          fill: rgba(4, 10, 20, 0.55);
+          stroke: var(--pp);
+          stroke-width: 1.5;
+          filter: drop-shadow(0 0 8px var(--pp));
+        }
+        .fz-prepaid-dot {
+          fill: var(--pp);
+          filter: drop-shadow(0 0 4px var(--pp));
+        }
+        .fz-prepaid-v {
+          fill: #fff;
+          font-size: 13px;
+          font-weight: 800;
+          text-anchor: middle;
+        }
+        .fz-prepaid-l {
+          fill: var(--pp);
+          font-size: 7px;
+          font-weight: 600;
+          letter-spacing: 1px;
+          text-anchor: middle;
         }
         .fz-core-val {
           fill: #fff;
-          font-size: 19px;
+          font-size: 30px;
           font-weight: 800;
         }
         .fz-core-unit {
-          fill: #bcd6ff;
-          font-size: 8px;
+          fill: #9fc6ff;
+          font-size: 9px;
           letter-spacing: 2px;
         }
         @keyframes fz-pulse {
@@ -757,11 +756,8 @@ export const futuristicCard = (m: FuturisticModel) => {
         }
         @media (prefers-reduced-motion: reduce) {
           .fz-star,
-          .fz-radar,
           .fz-rot,
-          .fz-spokes,
-          .fz-core-aura,
-          .fz-core-pulse,
+          .fz-orb-aura,
           .fz-rays,
           .fz-wave,
           .fz-bubble,
@@ -793,6 +789,15 @@ export const futuristicCard = (m: FuturisticModel) => {
               <stop offset="0" stop-color="#ffffff" />
               <stop offset="0.35" stop-color="${th.a}" />
               <stop offset="1" stop-color="${th.deep}" />
+            </radialGradient>
+            <radialGradient id="fz-orb" cx="0.4" cy="0.34" r="0.78">
+              <stop offset="0" stop-color="#ffffff" />
+              <stop offset="0.44" stop-color="${th.a}" />
+              <stop offset="1" stop-color="${th.deep}" />
+            </radialGradient>
+            <radialGradient id="fz-orbglow" cx="0.5" cy="0.5" r="0.5">
+              <stop offset="0" stop-color="${th.a}" stop-opacity="0.4" />
+              <stop offset="1" stop-color="${th.a}" stop-opacity="0" />
             </radialGradient>
             <radialGradient id="fz-sun-grad" cx="0.5" cy="0.5" r="0.5">
               <stop offset="0" stop-color="#fff7e0" />
@@ -883,29 +888,19 @@ export const futuristicCard = (m: FuturisticModel) => {
           ${conduit(2, `M${GRID.x - 18} ${GRID.y - 22} C ${GRID.x - 150} ${GRID.y - 60}, ${C.x + 150} ${C.y + 40}, ${C.x + 32} ${C.y + 16}`, m.gridColour, m.gridW, !m.gridImporting, reduced)}
           ${conduit(3, `M${C.x + 30} ${C.y - 18} C ${C.x + 150} ${C.y - 60}, ${HOME.x - 140} ${HOME.y + 70}, ${HOME.x - 26} ${HOME.y + 24}`, m.loadColour, m.loadW, false, reduced)}
 
-          <!-- ===== reactor core ===== -->
+          <!-- ===== reactor core (clean orb) ===== -->
           <g transform="translate(${C.x} ${C.y})">
-            <path class="fz-hex" d="${[0, 60, 120, 180, 240, 300]
-              .map((a, i) => {
-                const [x, y] = polar(0, 0, 92, a - 90);
-                return `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`;
-              })
-              .join(' ')} Z" />
-            <path class="fz-radar" d="M0 0 L82 -20 A84 84 0 0 1 82 20 Z" />
-            <circle class="fz-core-aura" r="80" />
-            <circle class="fz-gauge-bg" r="74" />
-            <circle class="fz-gauge" r="74" pathLength="100"
-              stroke-dasharray="${(loadI * 100).toFixed(1)} 100"
+            <circle class="fz-orb-aura" r="96" />
+            <circle class="fz-gauge-bg" r="80" />
+            <circle class="fz-gauge" r="80" pathLength="100"
+              stroke-dasharray="${(coreI * 100).toFixed(1)} 100"
               transform="rotate(-90)" />
-            <g class="fz-rot"><circle class="fz-ring" r="66" /></g>
-            <g class="fz-rot rev"><circle class="fz-ring2" r="56" pathLength="100" /></g>
-            <g class="fz-rot fast"><circle class="fz-ring3" r="46" /></g>
-            ${bolts}
-            <circle class="fz-core-body" r="36" />
-            <g class="fz-spokes">${spokes}</g>
-            <circle class="fz-core-pulse" r="36" />
-            <text class="fz-core-val" y="0">${fmtW(m.inverterW)}</text>
-            <text class="fz-core-unit" y="14">INVERTER</text>
+            <g class="fz-rot"><circle class="fz-orb-ring" r="68" /></g>
+            <circle class="fz-orb" r="60" />
+            <ellipse class="fz-orb-spec" cx="-18" cy="-22" rx="22" ry="13" />
+            <circle class="fz-orb-plate" r="46" />
+            <text class="fz-core-val" y="-2">${invBig}</text>
+            <text class="fz-core-unit" y="16">${invUnit} · INVERTER</text>
           </g>
 
           <!-- ===== sun / moon ===== -->
@@ -987,7 +982,16 @@ export const futuristicCard = (m: FuturisticModel) => {
               ? svg`<text class="fz-sub" x="${GRID.x}" y="${GRID.y + 84}"><tspan class="fz-st-${gridOn ? 'ok' : 'bad'}">●</tspan> ${gridOn ? 'ON-GRID' : 'OFF-GRID'}</text>`
               : nothing
           }
-          ${m.prepaidKwh !== undefined ? chip(GRID.x, GRID.y + 112, 'PREPAID', `${m.prepaidKwh.toFixed(1)} kWh`) : nothing}
+          ${
+            m.prepaidKwh !== undefined
+              ? svg`<g transform="translate(${GRID.x} ${GRID.y + 112})" style="--pp:${ppColor}">
+                  <rect x="-60" y="-16" width="120" height="32" rx="16" class="fz-prepaid" />
+                  <circle class="fz-prepaid-dot" cx="-44" cy="0" r="3.5" />
+                  <text class="fz-prepaid-v" x="2" y="-1">${m.prepaidKwh.toFixed(1)} kWh</text>
+                  <text class="fz-prepaid-l" x="2" y="10">PREPAID BALANCE</text>
+                </g>`
+              : nothing
+          }
 
           <!-- ===== home ===== -->
           <g transform="translate(${HOME.x} ${HOME.y})" style="color:${m.loadColour}">
