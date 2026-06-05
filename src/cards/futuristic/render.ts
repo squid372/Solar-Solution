@@ -76,6 +76,18 @@ const chip = (x: number, y: number, label: string, value: string) => svg`
     <text class="fz-chip-l" y="11">${label}</text>
   </g>`;
 
+// A frosted-glass module panel with a glowing node-coloured accent bar on top.
+const panel = (
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  accent: string,
+) => svg`
+  <rect class="fz-panel" x="${x}" y="${y}" width="${w}" height="${h}" rx="11" />
+  <rect x="${x + 14}" y="${y - 1}" width="${w - 28}" height="2.5" rx="1.25"
+    fill="${accent}" opacity="0.9" style="filter:drop-shadow(0 0 4px ${accent})" />`;
+
 const cloudPuff = (
   x: number,
   y: number,
@@ -744,6 +756,30 @@ export const futuristicCard = (m: FuturisticModel) => {
           stroke: rgba(140, 190, 255, 0.22);
           stroke-width: 1;
         }
+        .fz-panel {
+          fill: rgba(90, 140, 220, 0.06);
+          stroke: rgba(150, 190, 255, 0.16);
+          stroke-width: 1;
+        }
+        .fz-orb-pulse {
+          fill: none;
+          stroke: var(--fz-soft);
+          stroke-width: 2;
+          opacity: 0;
+          transform-box: fill-box;
+          transform-origin: center;
+          animation: fz-opulse 3s ease-out infinite;
+        }
+        @keyframes fz-opulse {
+          0% {
+            transform: scale(1);
+            opacity: 0.55;
+          }
+          100% {
+            transform: scale(1.5);
+            opacity: 0;
+          }
+        }
         .fz-chip-v {
           fill: #eaf2ff;
           font-size: 11px;
@@ -891,6 +927,7 @@ export const futuristicCard = (m: FuturisticModel) => {
           <!-- ===== reactor core (clean orb) ===== -->
           <g transform="translate(${C.x} ${C.y})">
             <circle class="fz-orb-aura" r="96" />
+            ${reduced ? nothing : svg`<circle class="fz-orb-pulse" r="60" />`}
             <circle class="fz-gauge-bg" r="80" />
             <circle class="fz-gauge" r="80" pathLength="100"
               stroke-dasharray="${(coreI * 100).toFixed(1)} 100"
@@ -920,6 +957,7 @@ export const futuristicCard = (m: FuturisticModel) => {
                   <circle class="fz-sun" r="${sunR}" />
                 </g>`
           }
+          ${panel(30, SUN.y + (night ? moonR : sunR) + 20, 184, 82, m.solarColour)}
           <text class="fz-label" x="${SUN.x}" y="${SUN.y + (night ? moonR : sunR) + 28}">SOLAR</text>
           <text class="fz-val" x="${SUN.x}" y="${SUN.y + (night ? moonR : sunR) + 44}">${fmtW(m.solarW)}</text>
           ${pvLine ? svg`<text class="fz-sub" x="${SUN.x}" y="${SUN.y + (night ? moonR : sunR) + 59}">${pvLine}</text>` : nothing}
@@ -955,6 +993,7 @@ export const futuristicCard = (m: FuturisticModel) => {
           <rect x="${batLeft}" y="${BAT.top}" width="${BAT.w}" height="${BAT.h}" rx="9" class="fz-cell-glow" />
           <rect x="${batLeft}" y="${BAT.top}" width="${BAT.w}" height="${BAT.h}" rx="9" class="fz-cell" />
           ${m.batteryValid ? svg`<text class="fz-soc" x="${BAT.cx}" y="${BAT.top + 56}">${soc.toFixed(0)}%</text>` : nothing}
+          ${panel(24, BAT.top + BAT.h + 8, 172, 82, liq)}
           <text class="fz-label" x="${BAT.cx}" y="${BAT.top + BAT.h + 18}">${batHeader}</text>
           <text class="fz-val" x="${BAT.cx}" y="${BAT.top + BAT.h + 34}">
             ${m.batteryCharging ? '▲ ' : m.batteryW > 15 ? '▼ ' : ''}${fmtW(m.batteryW)}
@@ -973,6 +1012,7 @@ export const futuristicCard = (m: FuturisticModel) => {
             <circle cx="22" cy="-24" r="2.4" class="fz-bolt" />
             ${!reduced ? svg`<path class="fz-spark" d="M-22 -24 q-6 8 0 16 q6 8 0 16" />` : nothing}
           </g>
+          ${panel(612, GRID.y + 44, 156, 54, m.gridColour)}
           <text class="fz-label" x="${GRID.x}" y="${GRID.y + 54}">GRID</text>
           <text class="fz-val" x="${GRID.x}" y="${GRID.y + 70}">
             ${m.gridW > 15 ? (m.gridImporting ? '↓ ' : '↑ ') : ''}${fmtW(m.gridW)}
@@ -1009,6 +1049,7 @@ export const futuristicCard = (m: FuturisticModel) => {
                   style="opacity:${(0.25 + loadI * 0.7).toFixed(2)}; filter: drop-shadow(0 0 ${(2 + loadI * 6).toFixed(1)}px #ffe9a8)" />`,
             )}
           </g>
+          ${panel(612, HOME.y + 44, 140, 42, m.loadColour)}
           <text class="fz-label" x="${HOME.x}" y="${HOME.y + 54}">HOME</text>
           <text class="fz-val" x="${HOME.x}" y="${HOME.y + 70}">${fmtW(m.loadW)}</text>
 
