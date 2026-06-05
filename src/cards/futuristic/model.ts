@@ -71,6 +71,18 @@ export interface FuturisticModel {
   isNight: boolean;
   weather: 'clear' | 'clouds' | 'rain' | 'snow' | 'fog' | 'storm';
   cloudiness: number; // 0 … 1
+
+  // Primary entity per node for tap → more-info.
+  ids: {
+    solar?: string;
+    battery?: string;
+    grid?: string;
+    home?: string;
+    inverter?: string;
+  };
+
+  // True once at least one core entity is mapped (otherwise show a setup hint).
+  configured: boolean;
 }
 
 // Normalise a HA weather condition string into our render buckets.
@@ -256,5 +268,22 @@ export function buildFuturisticModel(
     isNight,
     weather,
     cloudiness,
+
+    ids: {
+      solar:
+        (config.entities as any)?.day_pv_energy_108 ||
+        (config.entities as any)?.pv1_power_186,
+      battery: (config.entities as any)?.battery_soc_184,
+      grid: (config.entities as any)?.grid_power_169,
+      home: (config.entities as any)?.essential_power,
+      inverter: (config.entities as any)?.inverter_power_175,
+    },
+    configured: !!(
+      (config.entities as any)?.battery_soc_184 ||
+      (config.entities as any)?.pv1_power_186 ||
+      (config.entities as any)?.grid_power_169 ||
+      (config.entities as any)?.inverter_power_175 ||
+      (config.entities as any)?.essential_power
+    ),
   };
 }

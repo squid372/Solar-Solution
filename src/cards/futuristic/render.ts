@@ -88,6 +88,19 @@ const panel = (
   <rect x="${x + 14}" y="${y - 1}" width="${w - 28}" height="2.5" rx="1.25"
     fill="${accent}" opacity="0.9" style="filter:drop-shadow(0 0 4px ${accent})" />`;
 
+// Fire HA's more-info dialog for an entity when a node is tapped.
+const more = (entityId?: string) => (e: Event) => {
+  if (!entityId) return;
+  e.stopPropagation();
+  (e.currentTarget as Element).dispatchEvent(
+    new CustomEvent('hass-more-info', {
+      detail: { entityId },
+      bubbles: true,
+      composed: true,
+    }),
+  );
+};
+
 const cloudPuff = (
   x: number,
   y: number,
@@ -281,6 +294,47 @@ export const futuristicCard = (m: FuturisticModel) => {
     const [x, y] = polar(0, 0, 74, i * 60 - 90);
     return svg`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" class="fz-bolt" />`;
   });
+
+  if (!m.configured) {
+    return html`
+      <ha-card>
+        <div class="fz-setup">
+          <div class="fz-setup-badge">⚡</div>
+          <div class="fz-setup-title">SOLAR-SOLUTION</div>
+          <div class="fz-setup-sub">
+            Add your entities to begin — map at least one of battery&nbsp;SOC, PV
+            power, grid power or inverter power in the card editor.
+          </div>
+        </div>
+        <style>
+          .fz-setup {
+            background: #0a1020;
+            border-radius: var(--ha-card-border-radius, 12px);
+            padding: 36px 26px;
+            text-align: center;
+            color: #dce8ff;
+            font-family: ui-sans-serif, system-ui, sans-serif;
+          }
+          .fz-setup-badge {
+            font-size: 30px;
+          }
+          .fz-setup-title {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin: 6px 0;
+          }
+          .fz-setup-sub {
+            font-size: 13px;
+            color: #9fb6d8;
+            max-width: 320px;
+            margin: 0 auto;
+            line-height: 1.5;
+          }
+        </style>
+      </ha-card>
+    `;
+  }
 
   return html`
     <ha-card>
@@ -761,6 +815,22 @@ export const futuristicCard = (m: FuturisticModel) => {
           stroke: rgba(150, 190, 255, 0.16);
           stroke-width: 1;
         }
+        .fz-strip {
+          fill: rgba(110, 160, 240, 0.07);
+          stroke: rgba(150, 190, 255, 0.2);
+          stroke-width: 1;
+        }
+        .fz-strip-div {
+          stroke: rgba(150, 190, 255, 0.18);
+          stroke-width: 1;
+        }
+        .fz-hit {
+          fill: transparent;
+          cursor: pointer;
+        }
+        .fz-hit:hover {
+          fill: rgba(255, 255, 255, 0.035);
+        }
         .fz-orb-pulse {
           fill: none;
           stroke: var(--fz-soft);
@@ -1053,11 +1123,37 @@ export const futuristicCard = (m: FuturisticModel) => {
           <text class="fz-label" x="${HOME.x}" y="${HOME.y + 54}">HOME</text>
           <text class="fz-val" x="${HOME.x}" y="${HOME.y + 70}">${fmtW(m.loadW)}</text>
 
-          <!-- daily totals strip -->
-          ${m.dailySolar !== undefined ? chip(316, 452, 'SOLAR', `${m.dailySolar.toFixed(1)} kWh`) : nothing}
-          ${m.dailyLoad !== undefined ? chip(408, 452, 'LOAD', `${m.dailyLoad.toFixed(1)} kWh`) : nothing}
-          ${m.dailyImport !== undefined ? chip(500, 452, 'IMPORT', `${m.dailyImport.toFixed(1)} kWh`) : nothing}
-          ${m.dailyExport !== undefined ? chip(592, 452, 'EXPORT', `${m.dailyExport.toFixed(1)} kWh`) : nothing}
+          <!-- unified daily totals strip -->
+          ${(() => {
+            const items = [
+              ['SOLAR', m.dailySolar],
+              ['LOAD', m.dailyLoad],
+              ['IMPORT', m.dailyImport],
+              ['EXPORT', m.dailyExport],
+            ].filter((d) => d[1] !== undefined) as [string, number][];
+            if (!items.length) return nothing;
+            const seg = 84;
+            const w = items.length * seg;
+            const x0 = 400 - w / 2;
+            return svg`<g transform="translate(${x0} 452)">
+              <rect class="fz-strip" x="0" y="-16" width="${w}" height="32" rx="9" />
+              ${items.map(
+                ([label, val], i) => svg`
+                ${i > 0 ? svg`<line class="fz-strip-div" x1="${i * seg}" y1="-9" x2="${i * seg}" y2="9" />` : nothing}
+                <text class="fz-chip-v" x="${i * seg + seg / 2}" y="-2">${val.toFixed(1)}</text>
+                <text class="fz-chip-l" x="${i * seg + seg / 2}" y="10">${label} kWh</text>`,
+              )}
+            </g>`;
+          })()}
+
+          <!-- tap targets → more-info -->
+          <g class="fz-hits">
+            ${m.ids.solar ? svg`<rect class="fz-hit" x="20" y="78" width="206" height="186" @click=${more(m.ids.solar)} />` : nothing}
+            ${m.ids.battery ? svg`<rect class="fz-hit" x="18" y="300" width="186" height="216" @click=${more(m.ids.battery)} />` : nothing}
+            ${m.ids.grid ? svg`<rect class="fz-hit" x="600" y="320" width="194" height="168" @click=${more(m.ids.grid)} />` : nothing}
+            ${m.ids.home ? svg`<rect class="fz-hit" x="600" y="88" width="194" height="126" @click=${more(m.ids.home)} />` : nothing}
+            ${m.ids.inverter ? svg`<circle class="fz-hit" cx="${C.x}" cy="${C.y}" r="92" @click=${more(m.ids.inverter)} />` : nothing}
+          </g>
 
           <rect x="0" y="0" width="800" height="520" fill="url(#fz-scan)" pointer-events="none" />
           ${reduced ? nothing : svg`<rect class="fz-sweep" x="0" y="-60" width="800" height="60" fill="url(#fz-sweep)" pointer-events="none" />`}
