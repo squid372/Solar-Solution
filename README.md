@@ -1,28 +1,37 @@
 # Solar-Solution
 
-A **futuristic, animated Home Assistant dashboard card** that visualises your
-solar, battery, grid and load power flow as a living sci-fi energy HUD. It works
-with many inverter brands (Sunsynk, Deye, Solis, Lux, FoxESS, Goodwe, Huawei and
-more) as long as you have the required sensor data, and pairs out of the box with
-the [SolarSynk](examples/solarsynk/) add-on.
+A **futuristic, animated Home Assistant dashboard card** that renders your solar,
+battery, grid and load power flow as a living sci-fi energy HUD — a glowing
+reactor orb, energy streaming through glass conduits, a weather-aware day/night
+sky, and tap-to-drill-down on every node. It works with many inverter brands
+(Sunsynk, Deye, Solis, Lux, FoxESS, Goodwe, Huawei and more) and pairs out of the
+box with the [SolarSynk](examples/solarsynk/) add-on.
 
 [![Open your Home Assistant instance and open this repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=squid372&repository=Solar-Solution&category=plugin)
 
-![Solar-Solution futuristic power-flow card](docs/images/solar-solution-glow.svg)
+![Solar-Solution futuristic power-flow card](docs/images/solar-solution-hero.svg)
 
 ## Features
 
-- A **living energy HUD** — a glowing arc-reactor inverter, particle energy
-  flowing through each conduit, and a weather-aware day/night sky (the sun
-  becomes a moon at night, with clouds / rain / snow / fog).
-- **Themeable** via `glow_theme` (neon / ice / fire / aurora / mono), with a
+- **Living energy HUD** — a clean glowing **reactor orb** at the centre, with
+  energy particles streaming through each conduit (count + speed scale with
+  power; direction follows real charge/discharge & import/export).
+- **Glass node modules** — solar, battery, grid and home each sit in a frosted
+  panel with a glowing node-coloured accent bar and rich readouts.
+- **Weather-aware day/night sky** — the sun **becomes a moon at night**, a
+  starfield appears, and clouds / rain / snow / fog roll in to match your weather
+  (auto-detected from `sun.sun` + your `weather.*` entity).
+- **Tap anything** — tap a node to open its entity's more-info dialog.
+- **Live 24-hour trends** — a battery-SOC trace inside the cell and a load
+  sparkline under the home module, drawn from real HA history.
+- A **liquid battery cell** (green→amber→red by SOC) and a **prepaid-credit
+  badge** that colour-warns as it runs low.
+- **Themeable** via `glow_theme` (neon / ice / fire / aurora / mono) with a
   holographic scanline overlay.
-- A **liquid battery cell** (green→amber→red by SOC) and a **glowing home**
-  whose windows brighten with load.
-- Rich readouts: per-MPPT strings, solar-sell + lifetime PV, battery
-  voltage / current / temp / capacity / efficiency / SOH, grid signal, inverter
-  run status, daily totals and a self-powered hero headline.
-- Up to **6 MPPT** solar strings, dynamic colours and clickable entities.
+- Deep readouts: **up to 6 MPPT** strings, solar-sell + max-sell + lifetime PV,
+  battery V / A / temp / capacity / efficiency / SOH, grid signal, inverter run
+  status, AC/DC temps, frequency, grid voltage, daily totals and a self-powered
+  hero headline.
 - Bundled **companion cards** (battery, inverter, daily energy, self-sufficiency,
   solar-vs-grid) — see [below](#companion-cards).
 - Honours `prefers-reduced-motion`.
@@ -49,44 +58,27 @@ entities:
   inverter_power_175: sensor.inverter_power
 ```
 
-What it shows:
+Use the **visual editor** (the ✏️ on the card) for a clean six-section form —
+**Card · Inverter · Solar · Battery · Grid · Home** — covering the entities and
+options above, plus the optional sky and extra readouts:
 
-- A glowing **arc-reactor inverter** — a hex backplate, a rotating radar sweep,
-  a load gauge, counter-rotating segmented rings, seated bolts and a plasma core
-  with the live power readout at the centre.
-- Depth layers: a drifting **nebula**, a Tron-style **perspective grid floor**,
-  a **top status bar** (day/night, frequency, AC/DC temps, grid voltage, and a
-  colour-coded inverter **run status**) and an edge vignette.
-- Live **status readouts**: under the solar node, **per-MPPT** strings,
-  **solar-sell** state + max-sell power and **lifetime PV**; under the battery,
-  **voltage / current / temperature / capacity / efficiency / SOH** and the
-  battery **status message**; and an **ON-GRID / OFF-GRID** badge at the pylon.
-- **Particle energy** streaming through each conduit — packet count and speed
-  scale with power, and direction follows real charge/discharge & import/export.
-- A **weather-aware day/night sky**: the sun **becomes a moon at night**, a
-  twinkling starfield appears, and clouds / rain / snow / fog roll in to match
-  your weather. It auto-detects your `sun.sun` and first `weather.*` entity — or
-  point it at specific ones:
+```yaml
+sun_entity: sun.sun # real day/night & elevation (optional)
+weather_entity: weather.forecast_home # clouds/rain/snow/fog (optional)
+entities:
+  environment_temp: sensor.outside_temperature # ambient temp in the status bar
+  prepaid_units: input_number.prepaid_balance # prepaid credit badge (kWh)
+  # …plus per-MPPT power, battery voltage/current/SOH, solar-sell,
+  #    max-sell power, lifetime PV, grid signal, AC/DC temps, frequency, …
+```
 
-  ```yaml
-  cardstyle: futuristic
-  sun_entity: sun.sun # optional — real day/night & elevation
-  weather_entity: weather.forecast_home # optional — clouds/rain/snow/fog
-  ```
+> **Prepaid balance:** since prepaid credit is topped up manually, create a
+> **Number helper** (Settings → Devices & Services → Helpers → Number, unit
+> `kWh`) and map it to `prepaid_units`. The badge turns amber, then red, as it
+> runs low.
 
-- A corona **sun** that flares with production.
-- A **themeable HUD** — `glow_theme` (neon / ice / fire / aurora / mono) recolours
-  the whole reactor, rings, gauges, grid floor and brackets, with a holographic
-  **scanline** overlay and a slow scan sweep.
-- Optional **environment temperature** (in the status bar) and a **prepaid
-  credit** chip (kWh) at the grid — map `environment_temp` / `prepaid_units`.
-- The **liquid battery cell** (green→amber→red by SOC, charge bubbles).
-- A **glowing home** whose windows brighten with load, plus an energised grid
-  pylon.
-- A **hero headline** — e.g. `94% SELF-POWERED · +1.2 kW exporting` — and chips
-  for daily totals and inverter temps.
-
-It honours `prefers-reduced-motion` (particles and spin pause).
+Don't have solar or a battery? Add `show_solar: false` and/or `show_battery:
+false` to skip those sections. The card honours `prefers-reduced-motion`.
 
 ## Installation & setup
 
@@ -166,6 +158,8 @@ a ready-to-use, pre-mapped card preset lives in
 | **"Please include the day_… attributes"** | You turned on a `show_daily*` option but didn't map its `day_*` entity. Map it or set the `show_daily*` option back to `false`. |
 | **Card loads but values are blank / "unavailable"** | Your `sensor.*` entity IDs are wrong. Check exact IDs in *Developer Tools → States*. |
 | **HUD accent colour isn't what I want** | Set `glow_theme:` to `neon`, `ice`, `fire`, `aurora` or `mono`. |
+| **24-hour trends don't appear** | They load a few seconds after the card opens (one history query) and need `battery_soc_184` / `essential_power` mapped. They refresh every ~5 min. |
+| **Prepaid badge is missing** | Map `prepaid_units` to a Number helper (kWh). See [The card](#the-card). |
 
 ## Companion cards
 
