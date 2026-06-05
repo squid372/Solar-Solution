@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 230" width="800" height="230" font-family="ui-sans-serif, system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="tbg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0c1830"/><stop offset="1" stop-color="#060912"/>
+    </linearGradient>
+    <radialGradient id="orb-neon" cx="0.4" cy="0.34" r="0.78"><stop offset="0" stop-color="#fff"/><stop offset="0.44" stop-color="#7fd0ff"/><stop offset="1" stop-color="#13386b"/></radialGradient>
+    <radialGradient id="orb-ice" cx="0.4" cy="0.34" r="0.78"><stop offset="0" stop-color="#fff"/><stop offset="0.44" stop-color="#9fe8ff"/><stop offset="1" stop-color="#0d4a66"/></radialGradient>
+    <radialGradient id="orb-fire" cx="0.4" cy="0.34" r="0.78"><stop offset="0" stop-color="#fff"/><stop offset="0.44" stop-color="#ff9e5c"/><stop offset="1" stop-color="#5c2410"/></radialGradient>
+    <radialGradient id="orb-aurora" cx="0.4" cy="0.34" r="0.78"><stop offset="0" stop-color="#fff"/><stop offset="0.44" stop-color="#73f0b0"/><stop offset="1" stop-color="#0d5a3a"/></radialGradient>
+    <radialGradient id="g-neon" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#7fd0ff" stop-opacity="0.4"/><stop offset="1" stop-color="#7fd0ff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="g-ice" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#9fe8ff" stop-opacity="0.4"/><stop offset="1" stop-color="#9fe8ff" stop-opacity="0"/></radialGradient>
+    <radialGradient id="g-fire" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#ff9e5c" stop-opacity="0.4"/><stop offset="1" stop-color="#ff9e5c" stop-opacity="0"/></radialGradient>
+    <radialGradient id="g-aurora" cx="0.5" cy="0.5" r="0.5"><stop offset="0" stop-color="#73f0b0" stop-opacity="0.4"/><stop offset="1" stop-color="#73f0b0" stop-opacity="0"/></radialGradient>
+    <style>
+      text { text-anchor: middle; font-family: ui-sans-serif, system-ui, sans-serif; }
+      .pulse { fill: none; stroke-width: 2; transform-box: fill-box; transform-origin: center; opacity: 0;
+        animation: tpulse 3s ease-out infinite; }
+      @keyframes tpulse { 0% { transform: scale(1); opacity: 0.5; } 100% { transform: scale(1.5); opacity: 0; } }
+      .lab { fill: #cfe0ff; font-size: 13px; font-weight: 700; letter-spacing: 3px; }
+      .v { fill: #fff; font-size: 19px; font-weight: 800; }
+      .u { font-size: 8px; letter-spacing: 1px; }
+    </style>
+  </defs>
+  <rect width="800" height="230" fill="url(#tbg)"/>
+  <text x="400" y="28" fill="#9fb6d8" font-size="11" letter-spacing="3">glow_theme — RECOLOUR THE WHOLE HUD</text>
+
+  <!-- one orb per theme -->
+  <g transform="translate(100 110)">
+    <circle r="62" fill="url(#g-neon)"/>
+    <circle class="pulse" r="42" style="stroke:#cfeaff"/>
+    <circle r="54" fill="none" stroke="#16273f" stroke-width="4"/>
+    <circle r="54" fill="none" stroke="#7fd0ff" stroke-width="4" stroke-linecap="round" pathLength="100" stroke-dasharray="72 100" transform="rotate(-90)" style="filter:drop-shadow(0 0 5px #7fd0ff)"/>
+    <circle r="40" fill="url(#orb-neon)" style="filter:drop-shadow(0 0 12px #3aa0ff)"/>
+    <circle r="30" fill="#07111f" fill-opacity="0.6"/>
+    <text class="v" y="2">2.58</text><text class="u" y="14" fill="#9fc6ff">kW</text>
+  </g>
+  <text class="lab" x="100" y="206" style="fill:#7fd0ff">NEON</text>
+
+  <g transform="translate(300 110)">
+    <circle r="62" fill="url(#g-ice)"/>
+    <circle class="pulse" r="42" style="stroke:#e2f7ff"/>
+    <circle r="54" fill="none" stroke="#16273f" stroke-width="4"/>
+    <circle r="54" fill="none" stroke="#9fe8ff" stroke-width="4" stroke-linecap="round" pathLength="100" stroke-dasharray="72 100" transform="rotate(-90)" style="filter:drop-shadow(0 0 5px #9fe8ff)"/>
+    <circle r="40" fill="url(#orb-ice)" style="filter:drop-shadow(0 0 12px #5fd0ff)"/>
+    <circle r="30" fill="#07111f" fill-opacity="0.6"/>
+    <text class="v" y="2">2.58</text><text class="u" y="14" fill="#bfeeff">kW</text>
+  </g>
+  <text class="lab" x="300" y="206" style="fill:#9fe8ff">ICE</text>
+
+  <g transform="translate(500 110)">
+    <circle r="62" fill="url(#g-fire)"/>
+    <circle class="pulse" r="42" style="stroke:#ffd8b0"/>
+    <circle r="54" fill="none" stroke="#3a2010" stroke-width="4"/>
+    <circle r="54" fill="none" stroke="#ff9e5c" stroke-width="4" stroke-linecap="round" pathLength="100" stroke-dasharray="72 100" transform="rotate(-90)" style="filter:drop-shadow(0 0 5px #ff9e5c)"/>
+    <circle r="40" fill="url(#orb-fire)" style="filter:drop-shadow(0 0 12px #ff7a2a)"/>
+    <circle r="30" fill="#150a04" fill-opacity="0.6"/>
+    <text class="v" y="2">2.58</text><text class="u" y="14" fill="#ffd0a0">kW</text>
+  </g>
+  <text class="lab" x="500" y="206" style="fill:#ff9e5c">FIRE</text>
+
+  <g transform="translate(700 110)">
+    <circle r="62" fill="url(#g-aurora)"/>
+    <circle class="pulse" r="42" style="stroke:#c6ffe4"/>
+    <circle r="54" fill="none" stroke="#0d3325" stroke-width="4"/>
+    <circle r="54" fill="none" stroke="#73f0b0" stroke-width="4" stroke-linecap="round" pathLength="100" stroke-dasharray="72 100" transform="rotate(-90)" style="filter:drop-shadow(0 0 5px #73f0b0)"/>
+    <circle r="40" fill="url(#orb-aurora)" style="filter:drop-shadow(0 0 12px #3ad98a)"/>
+    <circle r="30" fill="#04140d" fill-opacity="0.6"/>
+    <text class="v" y="2">2.58</text><text class="u" y="14" fill="#bfffe0">kW</text>
+  </g>
+  <text class="lab" x="700" y="206" style="fill:#73f0b0">AURORA</text>
+</svg>

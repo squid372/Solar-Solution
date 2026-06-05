@@ -80,6 +80,16 @@ entities:
 Don't have solar or a battery? Add `show_solar: false` and/or `show_battery:
 false` to skip those sections. The card honours `prefers-reduced-motion`.
 
+**At night & in bad weather** the sun becomes a moon, stars come out, and the
+scene reflects your real flow (here: no solar, battery discharging, grid covering
+the shortfall):
+
+![Solar-Solution at night](docs/images/solar-solution-night.svg)
+
+**Five colour themes** — `glow_theme` recolours the entire HUD:
+
+![glow_theme colour themes — neon, ice, fire, aurora, mono](docs/images/solar-solution-themes.svg)
+
 ## Installation & setup
 
 Getting the card running is **three steps**: install the file, register it as a

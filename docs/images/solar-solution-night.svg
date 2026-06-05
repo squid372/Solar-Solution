@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="800" height="420" font-family="ui-sans-serif, system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="nbg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#070d1c"/>
+      <stop offset="1" stop-color="#04060d"/>
+    </linearGradient>
+    <radialGradient id="norb" cx="0.4" cy="0.34" r="0.78">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.44" stop-color="#7fd0ff"/>
+      <stop offset="1" stop-color="#13386b"/>
+    </radialGradient>
+    <radialGradient id="norbglow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#7fd0ff" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#7fd0ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="moon" cx="0.42" cy="0.4" r="0.62">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.6" stop-color="#dfe7fb"/>
+      <stop offset="1" stop-color="#aab8df"/>
+    </radialGradient>
+    <radialGradient id="nvign" cx="0.5" cy="0.5" r="0.7">
+      <stop offset="0.6" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.5"/>
+    </radialGradient>
+    <style>
+      text { text-anchor: middle; }
+      .flow { fill: none; stroke-width: 3; stroke-linecap: round; stroke-opacity: 0.35; }
+      .stream { fill: none; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 3 7; opacity: 0.85;
+        animation: nflow 0.9s linear infinite; }
+      @keyframes nflow { to { stroke-dashoffset: -10; } }
+      .npulse { fill: none; stroke: #cfeaff; stroke-width: 2; transform-box: fill-box; transform-origin: center;
+        opacity: 0; animation: npulse 3s ease-out infinite; }
+      @keyframes npulse { 0% { transform: scale(1); opacity: 0.5; } 100% { transform: scale(1.5); opacity: 0; } }
+      .star { fill: #cfe0ff; animation: tw 3s ease-in-out infinite; }
+      @keyframes tw { 0%,100% { opacity: 0.25; } 50% { opacity: 1; } }
+      .struct { fill: none; stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
+      .lbl { fill: #9fb6d8; font-size: 11px; letter-spacing: 1.5px; }
+      .val { fill: #fff; font-size: 15px; font-weight: 700; }
+    </style>
+  </defs>
+
+  <rect width="800" height="420" fill="url(#nbg)"/>
+  <!-- grid floor -->
+  <g stroke="#4aa8ff" stroke-opacity="0.1" stroke-width="1">
+    <line x1="40" y1="340" x2="-120" y2="420"/><line x1="180" y1="340" x2="120" y2="420"/>
+    <line x1="320" y1="340" x2="320" y2="420"/><line x1="460" y1="340" x2="520" y2="420"/>
+    <line x1="600" y1="340" x2="680" y2="420"/><line x1="760" y1="340" x2="920" y2="420"/>
+    <line x1="0" y1="370" x2="800" y2="370"/><line x1="0" y1="398" x2="800" y2="398"/>
+  </g>
+  <!-- stars -->
+  <g>
+    <circle class="star" cx="90" cy="70" r="1.1"/><circle class="star" cx="210" cy="48" r="0.8" style="animation-delay:.4s"/>
+    <circle class="star" cx="330" cy="80" r="1" style="animation-delay:1s"/><circle class="star" cx="470" cy="50" r="0.9" style="animation-delay:1.6s"/>
+    <circle class="star" cx="560" cy="92" r="1.2" style="animation-delay:.7s"/><circle class="star" cx="690" cy="60" r="0.9" style="animation-delay:2.1s"/>
+    <circle class="star" cx="740" cy="120" r="1" style="animation-delay:1.3s"/><circle class="star" cx="150" cy="160" r="0.8" style="animation-delay:.2s"/>
+    <circle class="star" cx="400" cy="120" r="0.7" style="animation-delay:1.9s"/><circle class="star" cx="620" cy="150" r="1" style="animation-delay:.9s"/>
+  </g>
+
+  <!-- headline -->
+  <text x="400" y="44" fill="#ffffff" font-size="30" font-weight="800">38% SELF-POWERED</text>
+  <text x="400" y="64" fill="#9fc6ff" font-size="12" font-weight="700" letter-spacing="2">900 W IMPORTING</text>
+
+  <!-- conduits (battery discharging → core, grid importing → core, core → home) -->
+  <path class="flow" style="stroke:#ffc63a" d="M150 300 C 240 296, 320 280, 362 262"/>
+  <path class="stream" style="stroke:#ffc63a" d="M150 300 C 240 296, 320 280, 362 262"/>
+  <path class="flow" style="stroke:#5490c2" d="M650 300 C 560 296, 480 280, 438 262"/>
+  <path class="stream" style="stroke:#5490c2" d="M650 300 C 560 296, 480 280, 438 262"/>
+  <path class="flow" style="stroke:#5fb6ad" d="M440 250 C 480 232, 560 200, 650 150"/>
+  <path class="stream" style="stroke:#5fb6ad" d="M440 250 C 480 232, 560 200, 650 150"/>
+
+  <!-- reactor orb -->
+  <g transform="translate(400 250)">
+    <circle r="92" fill="url(#norbglow)"/>
+    <circle class="npulse" r="58"/>
+    <circle r="78" fill="none" stroke="#1c3450" stroke-width="5"/>
+    <circle r="78" fill="none" stroke="#7fd0ff" stroke-width="5" stroke-linecap="round"
+      pathLength="100" stroke-dasharray="50 100" transform="rotate(-90)"
+      style="filter:drop-shadow(0 0 6px #7fd0ff)"/>
+    <circle r="58" fill="url(#norb)" style="filter:drop-shadow(0 0 16px #3aa0ff)"/>
+    <ellipse cx="-17" cy="-21" rx="20" ry="12" fill="#fff" opacity="0.22"/>
+    <circle r="44" fill="#07111f" fill-opacity="0.6"/>
+    <text y="-2" fill="#fff" font-size="28" font-weight="800">1.80</text>
+    <text y="16" fill="#9fc6ff" font-size="9" letter-spacing="2">kW · INVERTER</text>
+  </g>
+
+  <!-- moon -->
+  <g transform="translate(130 130)">
+    <circle r="32" fill="none" stroke="#b9ccff" stroke-opacity="0.3" stroke-width="6" style="filter:blur(3px)"/>
+    <circle r="24" fill="url(#moon)" style="filter:drop-shadow(0 0 10px #acc6ff)"/>
+    <circle cx="-7" cy="-6" r="4.5" fill="#b3c0e2" opacity="0.55"/>
+    <circle cx="6" cy="4" r="6" fill="#b3c0e2" opacity="0.55"/>
+    <circle cx="9" cy="-8" r="3" fill="#b3c0e2" opacity="0.5"/>
+  </g>
+  <text class="lbl" x="130" y="192">SOLAR</text>
+  <text class="val" x="130" y="208">0 W</text>
+
+  <!-- house with lit windows -->
+  <g transform="translate(670 130)">
+    <path class="struct" stroke="#5fb6ad" d="M-32 0 L0 -28 L32 0 M-26 -2 L-26 28 L26 28 L26 -2"/>
+    <rect x="-20" y="6" width="9" height="9" rx="1.5" fill="#ffe9a8" style="filter:drop-shadow(0 0 4px #ffe9a8)"/>
+    <rect x="11" y="6" width="9" height="9" rx="1.5" fill="#ffe9a8" style="filter:drop-shadow(0 0 4px #ffe9a8)"/>
+  </g>
+  <text class="lbl" x="670" y="190">HOME</text>
+  <text class="val" x="670" y="206">1.80 kW</text>
+
+  <!-- battery (discharging, amber) -->
+  <g transform="translate(120 300)">
+    <rect x="-6" y="-44" width="12" height="6" rx="2" fill="rgba(255,255,255,0.5)"/>
+    <rect x="-22" y="-38" width="44" height="78" rx="8" fill="rgba(255,255,255,0.04)"/>
+    <rect x="-22" y="2" width="44" height="38" rx="6" fill="#ffc63a" opacity="0.92"/>
+    <rect x="-22" y="-38" width="44" height="78" rx="8" fill="none" stroke="#ffc63a" stroke-width="2" opacity="0.6"/>
+    <rect x="-22" y="-38" width="44" height="78" rx="8" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+    <text x="0" y="6" fill="#fff" font-size="14" font-weight="800">64%</text>
+  </g>
+  <text class="lbl" x="120" y="362">BATTERY</text>
+  <text x="120" y="378" fill="#fff" font-size="12" font-weight="700">▼ 1.70 kW</text>
+
+  <!-- grid pylon -->
+  <g transform="translate(670 300)">
+    <path class="struct" stroke="#5490c2" d="M-14 32 L-5 -32 L5 -32 L14 32 M-10 16 L10 16 M-8 0 L8 0 M-12 16 L0 0 L12 16 M-20 -22 L20 -22"
+      style="filter:drop-shadow(0 0 5px #5490c2)"/>
+  </g>
+  <text class="lbl" x="670" y="356">GRID</text>
+  <text x="670" y="372" fill="#fff" font-size="13" font-weight="700">↓ 0.90 kW</text>
+
+  <rect width="800" height="420" fill="url(#nvign)"/>
+</svg>
