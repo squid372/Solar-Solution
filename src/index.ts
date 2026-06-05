@@ -73,6 +73,69 @@ export class SunsynkPowerFlowCard extends LitElement {
     this._hass = value;
     // Schedule a single update in the next animation frame to coalesce bursts
     this._scheduleUpdateFromHass(old);
+    // Refresh the 24h sparkline history at most every few minutes.
+    this._maybeFetchSpark();
+  }
+
+  // Last-24h sparkline series for the futuristic card (best-effort, optional).
+  private _spark: { soc?: number[]; load?: number[] } = {};
+  private _sparkTs = 0;
+  private _sparkBusy = false;
+
+  private _maybeFetchSpark(): void {
+    const now = Date.now();
+    if (this._sparkBusy || now - this._sparkTs < 5 * 60 * 1000) return;
+    const ents = this._config?.entities as unknown as
+      | Record<string, string>
+      | undefined;
+    const ids = [ents?.battery_soc_184, ents?.essential_power].filter(
+      Boolean,
+    ) as string[];
+    if (!ids.length || !this._hass) return;
+    this._sparkTs = now;
+    void this._fetchSpark(ids, ents as Record<string, string>);
+  }
+
+  private async _fetchSpark(
+    ids: string[],
+    ents: Record<string, string>,
+  ): Promise<void> {
+    this._sparkBusy = true;
+    try {
+      const end = new Date();
+      const start = new Date(end.getTime() - 24 * 3600 * 1000);
+      const res = (await (this._hass as unknown as Record<string, any>).callWS({
+        type: 'history/history_during_period',
+        start_time: start.toISOString(),
+        end_time: end.toISOString(),
+        entity_ids: ids,
+        minimal_response: true,
+        no_attributes: true,
+      })) as Record<string, Array<{ s?: string; state?: string }>>;
+      const series = (id?: string): number[] | undefined => {
+        const arr = id ? res?.[id] : undefined;
+        if (!Array.isArray(arr) || arr.length < 2) return undefined;
+        const nums = arr
+          .map((p) => parseFloat((p.s ?? p.state) as string))
+          .filter((n) => Number.isFinite(n));
+        if (nums.length < 2) return undefined;
+        const N = 32;
+        if (nums.length <= N) return nums;
+        const out: number[] = [];
+        for (let i = 0; i < N; i++)
+          out.push(nums[Math.floor((i * nums.length) / N)]);
+        return out;
+      };
+      this._spark = {
+        soc: series(ents?.battery_soc_184),
+        load: series(ents?.essential_power),
+      };
+      this.requestUpdate();
+    } catch {
+      // history unavailable — sparklines simply won't show
+    } finally {
+      this._sparkBusy = false;
+    }
   }
   @property() private _config!: sunsynkPowerFlowCardConfig;
   @query('#grid-flow') gridFlow?: SVGSVGElement;
@@ -2773,7 +2836,7 @@ export class SunsynkPowerFlowCard extends LitElement {
 
     // The futuristic HUD is the only card view.
     const template = futuristicCard(
-      buildFuturisticModel(config, data, this.hass),
+      buildFuturisticModel(config, data, this.hass, this._spark),
     );
     return cache(keyed('futuristic', template));
   }

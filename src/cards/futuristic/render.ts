@@ -88,6 +88,28 @@ const panel = (
   <rect x="${x + 14}" y="${y - 1}" width="${w - 28}" height="2.5" rx="1.25"
     fill="${accent}" opacity="0.9" style="filter:drop-shadow(0 0 4px ${accent})" />`;
 
+// A small sparkline polyline auto-scaled to its own min/max within a box.
+const sparkline = (
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  data: number[] | undefined,
+  colour: string,
+) => {
+  if (!data || data.length < 2) return nothing;
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const rng = max - min || 1;
+  const pts = data
+    .map(
+      (v, i) =>
+        `${(x + (i / (data.length - 1)) * w).toFixed(1)},${(y + h - ((v - min) / rng) * h).toFixed(1)}`,
+    )
+    .join(' ');
+  return svg`<polyline class="fz-spark" points="${pts}" style="color:${colour}" />`;
+};
+
 // Fire HA's more-info dialog for an entity when a node is tapped.
 const more = (entityId?: string) => (e: Event) => {
   if (!entityId) return;
@@ -831,6 +853,23 @@ export const futuristicCard = (m: FuturisticModel) => {
         .fz-hit:hover {
           fill: rgba(255, 255, 255, 0.035);
         }
+        .fz-spark {
+          fill: none;
+          stroke: currentColor;
+          stroke-width: 1.6;
+          stroke-linejoin: round;
+          stroke-linecap: round;
+          opacity: 0.85;
+          filter: drop-shadow(0 0 3px currentColor);
+        }
+        .fz-soctrace {
+          fill: none;
+          stroke: rgba(255, 255, 255, 0.6);
+          stroke-width: 1.4;
+          stroke-linejoin: round;
+          stroke-linecap: round;
+          filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5));
+        }
         .fz-orb-pulse {
           fill: none;
           stroke: var(--fz-soft);
@@ -1058,6 +1097,16 @@ export const futuristicCard = (m: FuturisticModel) => {
                   )}</g>`
                 : nothing
             }
+            ${
+              m.sparkSoc && m.sparkSoc.length > 1
+                ? svg`<polyline class="fz-soctrace" points="${m.sparkSoc
+                    .map(
+                      (v, i) =>
+                        `${(batLeft + (i / (m.sparkSoc!.length - 1)) * BAT.w).toFixed(1)},${(BAT.top + (1 - Math.max(0, Math.min(100, v)) / 100) * BAT.h).toFixed(1)}`,
+                    )
+                    .join(' ')}" />`
+                : nothing
+            }
           </g>
           <rect x="${BAT.cx - 6}" y="${BAT.top - 6}" width="12" height="7" rx="2" fill="rgba(255,255,255,0.5)" />
           <rect x="${batLeft}" y="${BAT.top}" width="${BAT.w}" height="${BAT.h}" rx="9" class="fz-cell-glow" />
@@ -1122,6 +1171,14 @@ export const futuristicCard = (m: FuturisticModel) => {
           ${panel(612, HOME.y + 44, 140, 42, m.loadColour)}
           <text class="fz-label" x="${HOME.x}" y="${HOME.y + 54}">HOME</text>
           <text class="fz-val" x="${HOME.x}" y="${HOME.y + 70}">${fmtW(m.loadW)}</text>
+          ${
+            m.sparkLoad && m.sparkLoad.length > 1
+              ? svg`<g>
+                  <text class="fz-sub" x="${HOME.x}" y="${HOME.y + 92}">LOAD · 24H</text>
+                  ${sparkline(HOME.x - 64, HOME.y + 96, 128, 22, m.sparkLoad, m.loadColour)}
+                </g>`
+              : nothing
+          }
 
           <!-- unified daily totals strip -->
           ${(() => {

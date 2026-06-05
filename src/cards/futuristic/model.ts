@@ -83,6 +83,10 @@ export interface FuturisticModel {
 
   // True once at least one core entity is mapped (otherwise show a setup hint).
   configured: boolean;
+
+  // Optional last-24h sparkline series (fetched by the host element).
+  sparkSoc?: number[];
+  sparkLoad?: number[];
 }
 
 // Normalise a HA weather condition string into our render buckets.
@@ -122,6 +126,7 @@ export function buildFuturisticModel(
   config: sunsynkPowerFlowCardConfig,
   data: DataDto,
   hass?: any,
+  spark?: { soc?: number[]; load?: number[] },
 ): FuturisticModel {
   const invertBat = config.battery?.invert_flow === true;
   const batteryPower = safeNum((data as any).batteryPowerTotal);
@@ -285,5 +290,8 @@ export function buildFuturisticModel(
       (config.entities as any)?.inverter_power_175 ||
       (config.entities as any)?.essential_power
     ),
+
+    sparkSoc: spark?.soc,
+    sparkLoad: spark?.load,
   };
 }
