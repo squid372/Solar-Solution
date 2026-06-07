@@ -1,0 +1,83 @@
+# ============================================================================
+#  Auto-decrementing prepaid balance for Solar-Solution
+#
+#  You ONLY ever touch one thing: "Prepaid top-up" — set it to your balance
+#  right after you buy credit (in kWh). Everything below is automatic:
+#    • an automation snapshots your grid-import meter at that moment, and
+#    • a template sensor counts the balance down as you import from the grid.
+#
+#  On the card, point the prepaid badge at the result:
+#      prepaid_units: sensor.prepaid_balance
+#  (the badge shows green, then amber under 50 kWh, then red under 20 kWh.)
+#
+#  ── Before you paste ───────────────────────────────────────────────────────
+#  • Replace YOURSERIAL with your inverter serial.
+#  • The import sensor MUST be your CUMULATIVE (lifetime, only-ever-increasing)
+#    grid-import energy in kWh — for SolarSynk that's `grid_etotal_from`.
+#    Do NOT use the daily one (`grid_etoday_from`); it resets at midnight.
+#  • If you already keep helpers/automations/templates in separate files
+#    (e.g. `template: !include ...`), merge these blocks into those instead of
+#    pasting all of it into configuration.yaml. Restart HA after adding.
+# ============================================================================
+
+# ---- Helpers (or create them in Settings → Devices & Services → Helpers) ----
+input_number:
+  prepaid_topup:
+    name: Prepaid top-up
+    icon: mdi:cash-plus
+    min: 0
+    max: 100000
+    step: 0.1
+    unit_of_measurement: kWh
+    mode: box
+  # Set automatically — you never edit this one.
+  prepaid_baseline:
+    name: Prepaid baseline (auto)
+    icon: mdi:counter
+    min: 0
+    max: 100000000
+    step: 0.001
+    unit_of_measurement: kWh
+    mode: box
+
+# ---- The balance the card displays: top-up minus what you've imported since --
+template:
+  - sensor:
+      - name: Prepaid balance
+        unique_id: solar_solution_prepaid_balance
+        unit_of_measurement: kWh
+        icon: mdi:lightning-bolt-outline
+        state: >
+          {% set topup = states('input_number.prepaid_topup') | float(0) %}
+          {% set base  = states('input_number.prepaid_baseline') | float(0) %}
+          {% set used  = states('sensor.solarsynkv3_YOURSERIAL_grid_etotal_from') | float(0) %}
+          {{ [topup - (used - base), 0] | max | round(1) }}
+
+# ---- When you change the top-up, snapshot the import meter as the baseline ----
+automation:
+  - alias: Prepaid – snapshot grid baseline on top-up
+    id: solar_solution_prepaid_baseline
+    mode: single
+    trigger:
+      - platform: state
+        entity_id: input_number.prepaid_topup
+    condition:
+      - condition: template
+        value_template: >
+          {{ trigger.to_state.state not in ['unknown', 'unavailable', 'none'] }}
+    action:
+      - service: input_number.set_value
+        target:
+          entity_id: input_number.prepaid_baseline
+        data:
+          value: >
+            {{ states('sensor.solarsynkv3_YOURSERIAL_grid_etotal_from') | float(0) }}
+
+# ============================================================================
+#  How to use day-to-day
+#  ──────────────────────
+#  Bought 150 kWh and the card showed 12 kWh left?  Set "Prepaid top-up" to 162
+#  (your new total). The automation snapshots the meter, and the badge starts
+#  counting down from 162 as you draw from the grid. That's it — never touch the
+#  baseline. Add the "Prepaid top-up" helper to any dashboard for one-tap edits.
+# ============================================================================

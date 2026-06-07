@@ -127,3 +127,17 @@ self-sufficiency.
 
 Recolour the whole futuristic HUD with `glow_theme:` — `neon`, `ice`, `fire`,
 `aurora` or `mono`.
+
+## Auto-decrementing prepaid balance
+
+Want the prepaid badge to **count down on its own** as you import from the grid,
+so you only ever enter what you bought? Paste [`prepaid.yaml`](prepaid.yaml) into
+your HA config (replace `YOURSERIAL`), restart, then point the card at it:
+
+```yaml
+prepaid_units: sensor.prepaid_balance
+```
+
+It adds a **Prepaid top-up** helper (the only thing you ever set), snapshots your
+cumulative grid-import meter when you top up, and shows `top-up − imported-since`
+as the live balance — green, then amber under 50 kWh, then red under 20 kWh.

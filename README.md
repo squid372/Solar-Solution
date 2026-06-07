@@ -72,10 +72,12 @@ entities:
   #    max-sell power, lifetime PV, grid signal, AC/DC temps, frequency, …
 ```
 
-> **Prepaid balance:** since prepaid credit is topped up manually, create a
-> **Number helper** (Settings → Devices & Services → Helpers → Number, unit
-> `kWh`) and map it to `prepaid_units`. The badge turns amber, then red, as it
-> runs low.
+> **Prepaid balance:** map `prepaid_units` to any kWh value — a real prepaid
+> sensor, or a manual **Number helper** (Settings → Devices & Services → Helpers
+> → Number, unit `kWh`). Want it to **count down automatically** as you import
+> from the grid, so you only ever enter what you bought? Use the ready-made
+> [auto-decrementing prepaid recipe](examples/solarsynk/prepaid.yaml). The badge
+> turns amber, then red, as it runs low.
 
 Don't have solar or a battery? Add `show_solar: false` and/or `show_battery:
 false` to skip those sections. The card honours `prefers-reduced-motion`.
